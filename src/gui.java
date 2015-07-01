@@ -13,11 +13,17 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.FileHandler;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class gui extends JFrame
 {
-	private Logger log = null;
+	private Logger log = Logger.getLogger("log");
+	private FileHandler f = null;
 	
 	private JPanel pnlMain = null;
 	private JPanel northPanel = null;
@@ -28,13 +34,16 @@ public class gui extends JFrame
 	
 	private boolean isStarted = true;   // if set to false, program should stop. checked by control object
 	private boolean bSmartLoot = true;
+	private boolean bDebugMode = false; //if set to true, program will save loot imgages, logs
 	
 	private JCheckBox chxSmartLoot = null;
+	private JCheckBox chxDebugMode = null;
 	
-	public gui(Logger l)
+	
+	
+	public gui() 
 	{
-		log = l;
-		
+							
 		pnlMain = new JPanel();
 		northPanel = new JPanel();   // save room for other things later on, functionalities.
 		btnStart = new JButton("Stop");		
@@ -42,6 +51,9 @@ public class gui extends JFrame
 		txtArea = new JTextArea();
 		chxSmartLoot =  new JCheckBox("Smart Loot");
 		chxSmartLoot.setSelected(true);
+		
+		chxDebugMode = new JCheckBox("Debug Mode");
+		chxDebugMode.setSelected(bDebugMode);
 		
 		//txtArea.setPreferredSize( new Dimension( 200, 300) );
 		scroller = new JScrollPane(txtArea);	
@@ -56,6 +68,7 @@ public class gui extends JFrame
 		
 		northPanel.setLayout(new FlowLayout());
 		northPanel.add(chxSmartLoot);
+		northPanel.add(chxDebugMode);
 		
 		
 		
@@ -106,13 +119,52 @@ public class gui extends JFrame
 			}
 			
 		});
+		
+		
+		chxDebugMode.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent actionEvent)
+			{
+				AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
+		        boolean selected = abstractButton.getModel().isSelected();
+		        bDebugMode = selected;
+		        
+		        if(bDebugMode && f==null) // if we already declare f from previous setUpLog then don't create again.
+		        {
+		        	try
+		        	{
+		        		setUpLog();
+		        	}
+		        	catch(Exception e)
+		        	{
+		        		
+		        	}
+		        }
+		        info("debug mode : " + selected);
+		       
+			}
+			
+		});
+				
+	}
+	
+	public void setUpLog() throws Exception
+	{
+    	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Date date = new Date();				    						
+    	f = new FileHandler(System.getProperty("user.dir")+"\\log\\output-"+dateFormat.format(date)+".log");
+		log.addHandler(f);
+		SimpleFormatter formatter = new SimpleFormatter();  
+	    f.setFormatter(formatter);  
 	}
 	/*
 	 * log the string, also display in text field
 	 */
 	public void info(String s)
 	{
-		log.info(s);
+		if(bDebugMode)
+		{
+			log.info(s);
+		}
 		txtArea.append(s+"\n");		
 		
 		JScrollBar vertical = scroller.getVerticalScrollBar();
@@ -127,6 +179,11 @@ public class gui extends JFrame
 	public boolean getSmartLoot()
 	{
 		return bSmartLoot;
+	}
+	
+	public boolean getDebugMode()
+	{
+		return bDebugMode;
 	}
 	
 }

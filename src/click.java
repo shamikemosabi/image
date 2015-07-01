@@ -52,10 +52,12 @@ public class click
 	boolean sendPicText= false;
 	boolean disconnected =false;
 	
+	/*
 	Logger log = Logger.getLogger("log");
 	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	Date date = new Date();
 	FileHandler f = new FileHandler(System.getProperty("user.dir")+"\\log\\output-"+dateFormat.format(date)+".log");
+	*/
 	
 	private gui guiFrame = null;
 	private control cont = null;
@@ -80,7 +82,7 @@ public class click
 		System.exit(0);
 		*/
 		RunEmailService();		
-		setUpLog();
+		//setUpLog();
 		setGUIandControl();
 			
 		
@@ -114,7 +116,7 @@ public class click
 		// if at work, we check read.txt value
 			try{
 				// change to case statement. 2=bot, 1=stay active dont bot, 0= stop bot.
-				int value = isServiceStarted2(config.readFile);
+				int value = isServiceStarted2(config.readFile);				
 				//while((config.work)?isServiceStarted("C:\\Documents and Settings\\dhwang\\My Documents\\read.txt"):true)	
 				switch(value)
 				{	
@@ -295,7 +297,7 @@ public class click
 	}
 	public void setGUIandControl()
 	{
-		guiFrame = new gui(log);
+		guiFrame = new gui();
 		cont = new control(guiFrame, bot);		
 	}
 	
@@ -523,13 +525,7 @@ public class click
 			
 		
 	}		
-	public void setUpLog()
-	{
-		log.addHandler(f);
-	//	log.setUseParentHandlers(false);
-		SimpleFormatter formatter = new SimpleFormatter();  
-	    f.setFormatter(formatter);  
-	}
+
 	
 	public void sendPictureText(String file) throws Exception
 	{
@@ -1104,7 +1100,11 @@ public class click
 		Integer comb = Integer.valueOf(gold) + Integer.valueOf(elixer);
 		
 		ret = comb > lootThreshold;
-       // saveLoot(gold, elixer, de, ret);
+		
+		if(guiFrame.getDebugMode())
+		{
+			saveLoot(gold, elixer, de, ret);
+		}
         
         guiFrame.info("COMBINED LOOT : "+String.valueOf(comb )+" "+ret);
         
