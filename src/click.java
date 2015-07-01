@@ -42,9 +42,6 @@ import setting.config;
 
 public class click
 {
-	
-
-	
 	boolean activateHero = false; //activate king
 	Robot bot = new Robot();
 	boolean serviceStopped = false;
@@ -52,12 +49,6 @@ public class click
 	boolean sendPicText= false;
 	boolean disconnected =false;
 	
-	/*
-	Logger log = Logger.getLogger("log");
-	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-	Date date = new Date();
-	FileHandler f = new FileHandler(System.getProperty("user.dir")+"\\log\\output-"+dateFormat.format(date)+".log");
-	*/
 	
 	private gui guiFrame = null;
 	private control cont = null;
@@ -82,33 +73,8 @@ public class click
 		System.exit(0);
 		*/
 		RunEmailService();		
-		//setUpLog();
 		setGUIandControl();
 			
-		
-		/*
-		s.start();
-		while(true)
-		{
-			if(!s.isStarted())
-			{
-				guiFrame.info("Starting Stop Watch");
-				s.start(); // start stop watch
-			}
-			
-			setLoot();
-			Thread.sleep(1000);
-			
-			if(s.isStarted())
-			{
-				guiFrame.info("STOPING Stop Watch");
-				guiFrame.info("A - Started?" + s.isStarted());
-				s.reset();
-				guiFrame.info("B - Started?" + s.isStarted());
-				//s.stop();
-			}
-		}
-		*/
 		
 		
 		while(true)
