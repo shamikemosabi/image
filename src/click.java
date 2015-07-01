@@ -65,7 +65,7 @@ public class click
 	StopWatch s = new StopWatch();
 	public click() throws Exception
 	{
-		//log.info("in MAIN? "+ inMain());	
+		//log.info("in MAIN? "+ inMain());
 		//System.exit(0);
 		
 	
@@ -1104,7 +1104,7 @@ public class click
 		Integer comb = Integer.valueOf(gold) + Integer.valueOf(elixer);
 		
 		ret = comb > lootThreshold;
-        saveLoot(gold, elixer, de, ret);
+       // saveLoot(gold, elixer, de, ret);
         
         guiFrame.info("COMBINED LOOT : "+String.valueOf(comb )+" "+ret);
         
