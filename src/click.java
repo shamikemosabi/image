@@ -58,23 +58,24 @@ public class click
 	StopWatch s = new StopWatch();
 	public click() throws Exception
 	{
-		//log.info("in MAIN? "+ inMain());
-		//System.exit(0);
-		
 	
-		//String s= "C:\\Dropbox\\Workspace\\image\\loot\\" ;
 		
-		/*
-		 
-		String s = "C:\\Users\\CGS\\bot\\image\\loot\\";
-		String n = "current.jpg";
-		saveLootParent(s,n);
-	
-		System.exit(0);
-		*/
 		RunEmailService();		
 		setGUIandControl();
-			
+		
+		/*
+		BufferedImage screencapture =cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+		String name = "current.jpg";
+		File outputFile = new File(name);
+        ImageIO.write(screencapture, "jpg", outputFile);	
+        
+        
+        System.out.println(inBattle(true));
+		System.exit(0);
+		
+		
+		saveLootParent("C:\\Users\\shami_000\\Documents\\GitHub\\image\\rule\\", "current.jpg");
+        */
 		
 		
 		while(true)

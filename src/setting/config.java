@@ -41,7 +41,8 @@ public class config
 			}
 			else if(name.equals("camp_full"))
 			{
-				s = new struct("camp_full",389,624, 186, 30, ruleFolder+"\\camp_full.jpg",pos);
+				//use barracks jpg different coordinate, match on All Camps Full!
+				s = new struct("camp_full",692,174, 122, 25, ruleFolder+"\\barracks.jpg",pos); 
 			}
 			else if(name.equals("camp"))
 			{
@@ -68,13 +69,13 @@ public class config
 				pos.add(new xy(505,297)); //click barracks
 				pos.add(new xy(859,712)); //click train
 				
-				// match on: Hint: Tap and hold down unit icon to train multiple troops.
-				s = new struct("barracks",	481, 632, 482, 33, ruleFolder+"\\barracks.jpg",pos);				
+				// match on: "Barracks" (level ...)
+				s = new struct("barracks",	573, 117, 144, 32, ruleFolder+"\\barracks.jpg",pos);				
 			}
 			else if(name.equals("battle")){
 				
 				pos.add(new xy(1316,612)); //click next
-				s = new struct("battle",35, 628, 115, 25, ruleFolder+"\\battle.jpg",pos);	
+				s = new struct("battle",31, 648, 121, 28, ruleFolder+"\\battle.jpg",pos);	//match on end battle
 			}
 			else if(name.equals("end")){
 				pos.add(new xy(718,686)); //click return home			
@@ -104,14 +105,14 @@ public class config
 			else if(name.equals("barbs"))
 			{
 				pos.add(new xy(450,400)); // position of barb in camp
-				pos.add(new xy(1159,430)); // next button
+				pos.add(new xy(1159,398)); // next button
 				pos.add(new xy(254,764)); // position in battle screen
 				s = new struct("barbs",221,698,55, 68, ruleFolder+"\\barbs.jpg",pos); 
 			}
 			else if(name.equals("archs"))
 			{
 				pos.add(new xy(590,408)); // position of archs in camp
-				pos.add(new xy(1159,430)); // next button
+				pos.add(new xy(1159,398)); // next button
 				pos.add(new xy(344,750)); // position in battle screen
 				s = new struct("archs",317,701, 54, 59, ruleFolder+"\\archs.jpg",pos); 
 			}

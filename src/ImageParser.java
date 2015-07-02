@@ -44,7 +44,7 @@ public class ImageParser
 	{
 		int x1 = 0;
 		int x2 = 0;
-		int y= 4;  //de = 5, g = 4
+		int y= 6;  // this value can change
 		String ret= "";
 		
 		boolean out=false;
