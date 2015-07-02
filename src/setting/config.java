@@ -1,16 +1,10 @@
 /**
  * @todo
- *  - figure out how many times i get d/c
- *  - if not d/c often, then change loot threshold value, the longer the nexting the lower the loot threshold for optimize loot
- *  
- * - GUI
  * 
+ * king
  * 
  * - Think about deploying king/queen/cc troops if I have them
  * - load config from file instead? perhaps XML?
-
- * - merge email projec with this project
- * - merge autohotkey project with this project
  */
 
 package setting;
@@ -141,13 +135,14 @@ public class config
 			}
 			else if(name.equals("queen"))
 			{
-				pos.add(new xy(408,706));
-				s = new struct("queen",403,698, 60, 59, ruleFolder+"\\queen.jpg",pos); 
+				//pos.add(new xy(408,706));
+				pos.add(new xy(431,746));
+				s = new struct("queen",400,726, 70, 43, ruleFolder+"\\queen.jpg",pos);  //new queen position
 			}
 			else  if(name.equals("status"))
 			{
-				pos.add(new xy(48,643));
-				pos.add(new xy(660,112));
+				pos.add(new xy(63,187));
+				pos.add(new xy(666,106));
 				s = new struct("status",0,0,0,0, ruleFolder+"\\status.jpg",pos);
 			}
 			

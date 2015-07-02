@@ -69,14 +69,13 @@ public class click
 		File outputFile = new File(name);
         ImageIO.write(screencapture, "jpg", outputFile);	
         
-        
-        System.out.println(inBattle(true));
+        System.out.println(compareImage("queen"));
+        deployHero("queen");
 		System.exit(0);
-		
-		
+				
 		saveLootParent("C:\\Users\\shami_000\\Documents\\GitHub\\image\\rule\\", "current.jpg");
         */
-		
+
 		
 		while(true)
 		{	
