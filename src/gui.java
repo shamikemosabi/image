@@ -18,6 +18,7 @@
 
 6th commit
 
+<<<<<<< HEAD
 7th commit
 
 
