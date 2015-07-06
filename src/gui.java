@@ -1,4 +1,11 @@
 
+/*
+ *1st commit 
+ * 
+ * 2nd commit
+ * 
+ */
+
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -41,17 +48,6 @@ public class gui extends JFrame
 	
 	private JCheckBox chxSmartLoot = null;
 	private JCheckBox chxDebugMode = null;
-	
-	/*
-	 * This is a change
-	 * 
-	 * new chagne blahblabhlbabjh
-<<<<<<< HEAD
-	 * 
-	 * second change
-=======
->>>>>>> branch 'master' of https://github.com/shamikemosabi/image
-	 */
 	
 	
 	public gui() 
