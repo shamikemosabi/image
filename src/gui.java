@@ -8,8 +8,11 @@
  * 3rd commit
  * 
  * 4th commit
+<<<<<<< HEAD
  * 
  * 5th commit
+=======
+>>>>>>> branch 'master' of https://github.com/shamikemosabi/image
  */
 
 import javax.swing.AbstractButton;
