@@ -1,3 +1,9 @@
+/*
+ * Comment
+ * 
+ * 
+ */
+
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -41,6 +47,9 @@ public class gui extends JFrame
 	private JCheckBox chxSmartLoot = null;
 	private JCheckBox chxDebugMode = null;
 	
+	/*
+	 * This is a change
+	 */
 	
 	
 	public gui() 
