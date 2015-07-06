@@ -1,8 +1,3 @@
-/*
- * Comment  
- * 
- * 
- */
 
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
