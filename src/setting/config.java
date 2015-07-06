@@ -1,8 +1,6 @@
 /**
  * @todo
  * 
- * king
- * 
  * - Think about deploying king/queen/cc troops if I have them
  * - load config from file instead? perhaps XML?
  */
@@ -111,9 +109,11 @@ public class config
 				s = new struct("archs",317,701, 54, 59, ruleFolder+"\\archs.jpg",pos); 
 			}
 			else if(name.equals("king"))
-			{
-				pos.add(new xy(408,706));
-				s = new struct("king",408,706, 60, 59, ruleFolder+"\\king.jpg",pos); 
+			{				
+				
+				pos.add(new xy(431,746));
+				s = new struct("king",400,726, 70, 43, ruleFolder+"\\king.jpg",pos);  //new queen position
+				
 			}
 			else if(name.equals("inactive"))
 			{
