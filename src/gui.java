@@ -1,8 +1,3 @@
-/*
- * Comment  
- * 
- * 
- */
 
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
@@ -49,6 +44,8 @@ public class gui extends JFrame
 	
 	/*
 	 * This is a change
+	 * 
+	 * new chagne blahblabhlbabjh
 	 */
 	
 	
