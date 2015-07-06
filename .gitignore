@@ -117,4 +117,5 @@ ehthumbs.db
 
 Thumbs.db
 
-/bin/
+/bin/*.class
+/.classpath
