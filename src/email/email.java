@@ -312,7 +312,7 @@ public String SaveScreenShot() throws Exception
  public void ClickRestart() throws Exception
  {
 	 Robot bot = new Robot();
-	 bot.mouseMove(335,183); //where clash icon is on bluestack
+	 bot.mouseMove(336,183); //where clash icon is on bluestack
 	 bot.mousePress(InputEvent.BUTTON1_MASK);			 
 	 bot.mouseRelease(InputEvent.BUTTON1_MASK);
  }
