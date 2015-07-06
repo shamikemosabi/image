@@ -11,6 +11,8 @@ import javax.swing.JTextField;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
@@ -66,7 +68,7 @@ public class gui extends JFrame
 		pnlMain.add(BorderLayout.CENTER, scroller);
 		
 		
-		northPanel.setLayout(new FlowLayout());
+		northPanel.setLayout(new GridLayout(2,1));
 		northPanel.add(chxSmartLoot);
 		northPanel.add(chxDebugMode);
 		
@@ -128,7 +130,7 @@ public class gui extends JFrame
 		        boolean selected = abstractButton.getModel().isSelected();
 		        bDebugMode = selected;
 		        
-		        if(bDebugMode && f==null) // if we already declare f from previous setUpLog then don't create again.
+		        if(bDebugMode && f==null) // if we already declare from previous setUpLog then don't create again.
 		        {
 		        	try
 		        	{
