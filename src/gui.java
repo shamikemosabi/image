@@ -46,8 +46,11 @@ public class gui extends JFrame
 	 * This is a change
 	 * 
 	 * new chagne blahblabhlbabjh
+<<<<<<< HEAD
 	 * 
 	 * second change
+=======
+>>>>>>> branch 'master' of https://github.com/shamikemosabi/image
 	 */
 	
 	
