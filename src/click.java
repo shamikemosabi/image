@@ -64,6 +64,9 @@ public class click
 		setGUIandControl();
 		
 		/*
+		 * 
+		 * HI
+		 * 
 		BufferedImage screencapture =cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
 		String name = "current.jpg";
 		File outputFile = new File(name);
