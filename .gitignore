@@ -120,3 +120,5 @@ Thumbs.db
 /bin/*.class
 /.classpath
 /bin/
+/bin/*
+*.jpg
