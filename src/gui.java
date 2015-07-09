@@ -1,34 +1,4 @@
 
-/*
- *1st commit 
- * 
- * 2nd commit
- * 
- * 
- * 3rd commit
- * 
- * 4th commit
-<<<<<<< HEAD
- * 
- * 5th commit
-=======
->>>>>>> branch 'master' of https://github.com/shamikemosabi/image
-
-
-
-6th commit
-
-<<<<<<< HEAD
-7th commit
-
-
-8th commit
-
-change
-
-change2
- */
-
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
