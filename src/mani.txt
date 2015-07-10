@@ -1,5 +1,12 @@
 Manifest-Version: 1.0
-Class-path: javax.mail.jar javaocr-plugins-distribution-1.0-bin/javaocr/javaocr-core-1.0.jar javaocr-plugins-distribution-1.0-bin/javaocr/javaocr-plugin-awt-1.0.jar javaocr-plugins-distribution-1.0-bin/javaocr/javaocr-plugin-cluster-1.0.jar javaocr-plugins-distribution-1.0-bin/javaocr/javaocr-plugin-fir-1.0.jar javaocr-plugins-distribution-1.0-bin/javaocr/javaocr-plugin-moment-1.0.jar javaocr-plugins-distribution-1.0-bin/javaocr/javaocr-plugin-morphology-1.0.jar commons-lang3-3.3.2.jar
+Class-path: javaocr-plugins-distribution-1.0-bin/javaocr/javaocr-core-1.0.jar    
+ javaocr-plugins-distribution-1.0-bin/javaocr/javaocr-plugin-awt-1.0.jar    
+ javaocr-plugins-distribution-1.0-bin/javaocr/javaocr-plugin-cluster-1.0.jar
+ javaocr-plugins-distribution-1.0-bin/javaocr/javaocr-plugin-fir-1.0.jar    
+ javaocr-plugins-distribution-1.0-bin/javaocr/javaocr-plugin-moment-1.0.jar 
+ javaocr-plugins-distribution-1.0-bin/javaocr/javaocr-plugin-morphology-1.0.jar   
+ javaocr-plugins-distribution-1.0-bin/commons-lang3-3.3.2.jar 
+ javaocr-plugins-distribution-1.0-bin/javax.mail.jar
 Main-Class: click
 Sealed: true
 
