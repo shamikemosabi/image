@@ -73,10 +73,13 @@ public class click
         deployHero("queen");
 		System.exit(0);
 				
+		System.out.println(gotRaided()+"GOT RAIDED");
+		System.exit(0);
+		
 		saveLootParent("C:\\Users\\shami_000\\Documents\\GitHub\\image\\rule\\", "current.jpg");
         */
 
-		
+
 		while(true)
 		{	
 		// if at work, we check read.txt value
