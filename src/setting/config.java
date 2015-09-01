@@ -6,7 +6,11 @@
  */
 
 package setting;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.*;
+
 public class config
 {
 	ArrayList<struct> data ;
@@ -16,7 +20,30 @@ public class config
 	String ruleFolder = System.getProperty("user.dir")+"\\"+ ((work)?"rule":"rule_home");	
 	
 	public final static String readFile =  System.getProperty("user.dir")+"\\read.txt";
+	public final static String configFile =  System.getProperty("user.dir")+"\\config.txt";
 	
+	
+	public config()
+	{
+		loadConfig();
+	}
+	
+	public void loadConfig()
+	{
+		try{
+			   File inputFile = new File(config.configFile);
+			   BufferedReader br = new BufferedReader(new FileReader(inputFile));
+			   String blah2 = br.readLine().trim();
+			   br.close();
+			
+			
+		}
+		catch(Exception e)
+		{
+			System.out.println("error loading config file");
+			e.printStackTrace();
+		}
+	}
 	
 	
 	public void setName(String name)

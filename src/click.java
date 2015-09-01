@@ -56,6 +56,8 @@ public class click
 	int lootThreshold = 150000;
 	
 	StopWatch s = new StopWatch();
+	
+	public config con = new config();
 	public click() throws Exception
 	{
 	
@@ -85,7 +87,7 @@ public class click
 		// if at work, we check read.txt value
 			try{
 				// change to case statement. 2=bot, 1=stay active dont bot, 0= stop bot.
-				int value = isServiceStarted2(config.readFile);				
+				int value = isServiceStarted2(con.readFile);				
 				//while((config.work)?isServiceStarted("C:\\Documents and Settings\\dhwang\\My Documents\\read.txt"):true)	
 				switch(value)
 				{	
@@ -204,7 +206,7 @@ public class click
 					try{
 						//only at work
 						//send text to me, if service has ebeen stopped:
-						if(config.work && serviceStopped && sendStopText)  //sendStopText only sends the first time service was stopped.
+						if(con.work && serviceStopped && sendStopText)  //sendStopText only sends the first time service was stopped.
 						{									// or else each loop it'll keep sending.
 															// might not need these variables anymore (now we change to switch), but lets jus leave it.
 							sendText();
@@ -275,8 +277,7 @@ public class click
 		if(sendPicText)
 		{
 			clickCamp(); // lets click camp first, get image of camp
-			guiFrame.info("Started picture sending");
-			config con = new config();
+			guiFrame.info("Started picture sending");			
 			con.setName("status");
 			
 			for(int i=0; i< con.getPos().size(); i++)
@@ -366,8 +367,7 @@ public class click
 	 */
 	
 	public void deployTroops2()throws Exception
-	{		
-		config con = new config();
+	{			
 		con.setName("attack");
 		
 		Random rand=  new Random(); 
@@ -429,10 +429,9 @@ public class click
 						for(int b=0 ; b<2; b++) // 2 for barbs and arch
 						{
 							
-							 // click barbs
-							 config c2 = new config();				 
-							 c2.setName((b==0)?"barbs":"archs");
-							 cont.mouseMove(c2.getPos().get(2).getX(),c2.getPos().get(2).getY()); //click barbs/archs , index 2 is position of arch/barb in battle screen
+							 // click barbs							 				
+							 con.setName((b==0)?"barbs":"archs");
+							 cont.mouseMove(con.getPos().get(2).getX(),con.getPos().get(2).getY()); //click barbs/archs , index 2 is position of arch/barb in battle screen
 							 cont.mousePress(InputEvent.BUTTON1_MASK);	
 							 cont.mouseRelease(InputEvent.BUTTON1_MASK);
 							 Thread.sleep(500);
@@ -447,7 +446,7 @@ public class click
 							cont.mouseMove(x1,y1);
 							
 							
-							for(int a= 0; a<  ((config.work)? ((b%2==0)?18:14): ((b%2==0)?28:22)) ; a++) //25:20 for home cause it lags.  
+							for(int a= 0; a<  ((con.work)? ((b%2==0)?18:14): ((b%2==0)?28:22)) ; a++) //25:20 for home cause it lags.  
 							{				
 								int local = rand.nextInt(30);
 								int local2 = rand.nextInt(10); // gives it a little realistic feel 
@@ -610,7 +609,6 @@ public class click
 		
 	public boolean isBaseInactive() throws Exception
 	{			
-		config con = new config();
 		con.setName("inactive");
 		
 		boolean ret =compareImage("inactive");
@@ -624,7 +622,6 @@ public class click
 		if(activateHero)
 		{
 			guiFrame.info("activating Hero");			
-			config con = new config();
 			con.setName("king");
 			
 			 cont.mouseMove(con.getPos().get(0).getX(), con.getPos().get(0).getY());
@@ -635,7 +632,6 @@ public class click
 	}
 	public void deployHero(String h) throws Exception
 	{		
-		config con = new config();
 		con.setName(h);
 		Random rand = new Random();
 		boolean ret  = compareImage(h);			
@@ -649,9 +645,8 @@ public class click
 			 cont.mouseRelease(InputEvent.BUTTON1_MASK);
 			 Thread.sleep(500);
 			 
-			 config c2 = new config();
-			 c2.setName("attack");
-			 cont.mouseMove(c2.getPos().get(i).getX(), c2.getPos().get(i).getY());
+			 con.setName("attack");
+			 cont.mouseMove(con.getPos().get(i).getX(), con.getPos().get(i).getY());
 			 cont.mousePress(InputEvent.BUTTON1_MASK);	
 			 cont.mouseRelease(InputEvent.BUTTON1_MASK);
 			 
@@ -664,7 +659,6 @@ public class click
 	
 	public void clickSafeSpot() throws Exception
 	{		
-		config con = new config();
 		con.setName("safe");
 		
 		for(int i=0; i< con.getPos().size(); i++)
@@ -679,7 +673,6 @@ public class click
 	
 	public boolean outOfArchs() throws Exception
 	{				
-		config con = new config();
 		con.setName("archs");
 		
 		boolean ret =compareImage("archs");
@@ -689,7 +682,6 @@ public class click
 	
 	public boolean outOfBarbs() throws Exception
 	{		
-		config con = new config();
 		con.setName("barbs");
 		
 		boolean ret =compareImage("barbs");
@@ -699,7 +691,6 @@ public class click
 	
 	public boolean gotRaided() throws Exception
 	{		
-		config con = new config();
 		con.setName("raided");
 		
 		boolean ret =compareImage("raided"); 		
@@ -708,7 +699,6 @@ public class click
 	}
 	public void returnHomeFromRaided() throws Exception
 	{				
-		config con = new config();
 		con.setName("raided");
 		
 		for(int i=0; i< con.getPos().size(); i++)
@@ -727,7 +717,6 @@ public class click
 	
 	public boolean endOfBattle() throws Exception
 	{		
-		config con = new config();
 		con.setName("end");
 		
 		boolean ret =compareImage("end"); 
@@ -737,7 +726,6 @@ public class click
 	}
 	public void returnHomeFromBattle() throws Exception
 	{		
-		config con = new config();
 		con.setName("end");
 		
 		for(int i=0; i< con.getPos().size(); i++)
@@ -923,7 +911,6 @@ public class click
 	
 	public void clickNext() throws Exception
 	{		
-		config con = new config();
 		con.setName("battle");
 		
 		for(int i=0; i< con.getPos().size(); i++)
@@ -1086,7 +1073,6 @@ public class click
 	public String getDarkElixerValue(Convert c, ImageScanner scan, String name) throws Exception
 	{			
 		String de= "0";
-		config con = new config();
 		con.setName("de");
 		
 		boolean ret = compareImage("de");
@@ -1181,18 +1167,16 @@ public class click
 	public boolean inBattle(boolean init) throws Exception
 	{		
 		guiFrame.info("Checking In battle");
-		config con = new config();
 		con.setName("battle");
 		if(!init)
 		{
-			Thread.sleep((config.work)?3000:8000); //wait 3 seconds for finding, longer for home....
+			Thread.sleep((con.work)?3000:8000); //wait 3 seconds for finding, longer for home....
 		}
 		guiFrame.info("AFter In battle");
 		return compareImage("battle"); 
 	}
 	public void clickFind() throws Exception
 	{		
-		config con = new config();
 		con.setName("find");
 		
 		for(int i=0; i< con.getPos().size(); i++)
@@ -1208,7 +1192,6 @@ public class click
 	public void trainBarbs() throws Exception
 	{
 		guiFrame.info("training barbs");		
-		config con = new config();
 		con.setName("barbs");
 				
 		cont.mouseMove(con.getPos().get(0).getX(), con.getPos().get(0).getY());
@@ -1227,7 +1210,6 @@ public class click
 	public void trainArchs() throws Exception
 	{
 		guiFrame.info("training archers");		
-		config con = new config();
 		con.setName("archs");
 				
 		cont.mouseMove(con.getPos().get(0).getX(), con.getPos().get(0).getY());
@@ -1244,7 +1226,6 @@ public class click
 	
 	public boolean clickBarracks() throws Exception
 	{		 		
-		 config con = new config();
 		 con.setName("barracks");
 		 
 		 for(int i=0; i< con.getPos().size(); i++)
@@ -1265,7 +1246,6 @@ public class click
 	 */
 	public boolean clickBarracksForCamp() throws Exception
 	{		 		
-		 config con = new config();
 		 con.setName("barracks");
 		 
 		 for(int i=0; i< con.getPos().size(); i++)
@@ -1281,7 +1261,6 @@ public class click
 	public void clickAttack() throws Exception
 	{		
 		guiFrame.info("click attack");		 
-		 config con = new config();
 		 con.setName("main");
 		 
 		 //click twice, once to get out of camp screen
@@ -1351,8 +1330,7 @@ public class click
 		String name = "current.jpg";
 		File outputFile = new File(name);
        ImageIO.write(screencapture, "jpg", outputFile);
-       
-       config con = new config();
+              
        con.setName(s);
        Convert c = new Convert();
        
@@ -1381,7 +1359,6 @@ public class click
 	    ImageIO.write(screencapture, "jpg", outputFile);
 	
        
-       config con = new config();
        con.setName(s);
        Convert c = new Convert();
        
@@ -1419,7 +1396,6 @@ public class click
 	public boolean clickCamp() throws Exception
 	{
 		guiFrame.info("click camp");		 	
-		 config con = new config();
 		 con.setName("camp");
 		 		 
 		 for(int i=0; i< con.getPos().size(); i++)
