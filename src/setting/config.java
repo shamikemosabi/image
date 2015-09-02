@@ -11,6 +11,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.*;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
+
+
 public class config
 {
 	ArrayList<struct> data ;
@@ -20,21 +28,56 @@ public class config
 	String ruleFolder = System.getProperty("user.dir")+"\\"+ ((work)?"rule":"rule_home");	
 	
 	public final static String readFile =  System.getProperty("user.dir")+"\\read.txt";
-	public final static String configFile =  System.getProperty("user.dir")+"\\config.txt";
+	public final static String configFile =  System.getProperty("user.dir")+"\\config.xml";
 	
+	private xy xyBarrack = null;
+	private xy xyCamp = null;
+	private String email="";
+	private String pw="";
+	public int deployArcher=0;
+	public int deployBarb=0;	
+	public String lootThreshold="";
 	
 	public config()
 	{
-		loadConfig();
+		
 	}
 	
-	public void loadConfig()
+	public config(String account)
+	{
+		loadConfig(account);
+				
+	}
+	
+	public void loadConfig(String account)
 	{
 		try{
-			   File inputFile = new File(config.configFile);
-			   BufferedReader br = new BufferedReader(new FileReader(inputFile));
-			   String blah2 = br.readLine().trim();
-			   br.close();
+			File fXmlFile = new File(this.configFile);
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(fXmlFile);
+			doc.getDocumentElement().normalize();
+			
+			NodeList nList = doc.getElementsByTagName("email");
+			
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+				
+				Node nNode = nList.item(temp);				
+				Element eElement = (Element) nNode;
+				email  = eElement.getAttribute("id");
+				
+				if(email.equals(account)) // if this is same account as what was input
+				{
+					xyBarrack = createXY(eElement.getElementsByTagName("barrack").item(0).getTextContent());
+					xyCamp = createXY(eElement.getElementsByTagName("camp").item(0).getTextContent());
+					pw = eElement.getElementsByTagName("password").item(0).getTextContent();
+					deployArcher = Integer.valueOf(eElement.getElementsByTagName("deployArcher").item(0).getTextContent());
+					deployBarb = Integer.valueOf(eElement.getElementsByTagName("deployBarb").item(0).getTextContent());
+					lootThreshold = eElement.getElementsByTagName("loot").item(0).getTextContent();
+				}
+
+
+			}
 			
 			
 		}
@@ -45,7 +88,13 @@ public class config
 		}
 	}
 	
-	
+	public xy createXY(String s)
+	{
+		int a = Integer.valueOf(s.substring(0, s.indexOf(",")));
+		int b = Integer.valueOf( s.substring(s.indexOf(",") + 1, s.length()));
+		xy temp = new xy(a,b);
+		return temp;
+	}
 	public void setName(String name)
 	{
 		
@@ -65,7 +114,8 @@ public class config
 			}
 			else if(name.equals("camp"))
 			{
-				pos.add(new xy(359,466)); //click camp
+				//pos.add(new xy(359,466)); //click camp				
+				pos.add(xyCamp);
 				pos.add(new xy(660, 739)); // click info
 				
 				/*
@@ -85,11 +135,12 @@ public class config
 			}
 			else if(name.equals("barracks"))
 			{
-				pos.add(new xy(505,297)); //click barracks
+				//pos.add(new xy(505,297)); //click barracks 
+				pos.add(xyBarrack); 
 				pos.add(new xy(859,712)); //click train
 				
-				// match on: "Barracks" (level ...)
-				s = new struct("barracks",	573, 117, 144, 32, ruleFolder+"\\barracks.jpg",pos);				
+				//match on Troop capacity after training:
+				s = new struct("barracks",	562, 298, 203, 21, ruleFolder+"\\barracks.jpg",pos);				
 			}
 			else if(name.equals("battle")){
 				
@@ -301,6 +352,27 @@ public class config
 		
 	}
 	
+	
+	public int getDeployArcher()
+	{
+		return deployArcher;
+	}
+	public int getDeployBarb()
+	{
+		return deployBarb;
+	}
+	public String getLootThreshold()
+	{
+		return lootThreshold;
+	}
+	public String getEmail()
+	{
+		return email;
+	}
+	public String getPW()
+	{
+		return pw;
+	}
 	public String getName()
 	{
 		return s.name;

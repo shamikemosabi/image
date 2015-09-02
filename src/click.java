@@ -50,6 +50,7 @@ public class click
 	boolean disconnected =false;
 	
 	
+	
 	private gui guiFrame = null;
 	private control cont = null;
 	
@@ -57,13 +58,12 @@ public class click
 	
 	StopWatch s = new StopWatch();
 	
-	public config con = new config();
+	public static config con = null;
 	public click() throws Exception
 	{
 	
-		
-		RunEmailService();		
 		setGUIandControl();
+//		RunEmailService();		
 		
 		/*
 		BufferedImage screencapture =cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
@@ -76,12 +76,13 @@ public class click
 		System.exit(0);
 				
 		System.out.println(gotRaided()+"GOT RAIDED");
+	
+				deployTroops2();
 		System.exit(0);
-		
 		saveLootParent("C:\\Users\\shami_000\\Documents\\GitHub\\image\\rule\\", "current.jpg");
         */
 
-
+		
 		while(true)
 		{	
 		// if at work, we check read.txt value
@@ -270,6 +271,7 @@ public class click
 	{
 		guiFrame = new gui();
 		cont = new control(guiFrame, bot);		
+		con = new config(guiFrame.account);
 	}
 	
 	public void sendPictureText() throws Exception
@@ -368,7 +370,7 @@ public class click
 	
 	public void deployTroops2()throws Exception
 	{			
-		con.setName("attack");
+		
 		
 		Random rand=  new Random(); 
 				
@@ -381,9 +383,12 @@ public class click
 			 Thread.sleep(100);
 		 }
 		
-		// x and y is the safe start. I KNOW for sure that it can deploy.
-		int x0 = con.getPos().get(0).getX(); 
-		int y0 =con.getPos().get(0).getY(); // keep track of y
+		 config conLocal  = new config();
+		 conLocal.setName("attack");
+		 // x and y is the safe start. I KNOW for sure that it can deploy.
+		int x0 = conLocal.getPos().get(0).getX(); 
+		int y0 =conLocal.getPos().get(0).getY(); // keep track of y
+			
 		
 		// x1,y1 - cooridnate of getPos(i)
 		int x1;
@@ -415,12 +420,12 @@ public class click
 				}
 				else
 				{
-					for(int temp = 0; temp< con.getPos().size(); temp++) // should loop each pos , should only be 4
+					for(int temp = 0; temp< conLocal.getPos().size(); temp++) // should loop each pos , should only be 4
 					{
-						x1 = con.getPos().get(temp).getX();  // current base point.
-						y1= con.getPos().get(temp).getY();  // don't want to mod x1/y1, because I use them to recalculate what to plot next
+						x1 = conLocal.getPos().get(temp).getX();  // current base point.
+						y1= conLocal.getPos().get(temp).getY();  // don't want to mod x1/y1, because I use them to recalculate what to plot next
 						
-						// x/y is  used to do the actual move, it gets changed every loop			
+						// x/y is  used to the actual move, it gets changed every loop			
 						x = x1;
 						y = y1;
 						
@@ -429,9 +434,10 @@ public class click
 						for(int b=0 ; b<2; b++) // 2 for barbs and arch
 						{
 							
+							config c2 = new config();
 							 // click barbs							 				
-							 con.setName((b==0)?"barbs":"archs");
-							 cont.mouseMove(con.getPos().get(2).getX(),con.getPos().get(2).getY()); //click barbs/archs , index 2 is position of arch/barb in battle screen
+							c2.setName((b==0)?"barbs":"archs");
+							 cont.mouseMove(c2.getPos().get(2).getX(),c2.getPos().get(2).getY()); //click barbs/archs , index 2 is position of arch/barb in battle screen
 							 cont.mousePress(InputEvent.BUTTON1_MASK);	
 							 cont.mouseRelease(InputEvent.BUTTON1_MASK);
 							 Thread.sleep(500);
@@ -446,7 +452,7 @@ public class click
 							cont.mouseMove(x1,y1);
 							
 							
-							for(int a= 0; a<  ((con.work)? ((b%2==0)?18:14): ((b%2==0)?28:22)) ; a++) //25:20 for home cause it lags.  
+							for(int a= 0; a<  ((con.work)? ((b%2==0)?con.getDeployBarb():con.getDeployArcher()): ((b%2==0)?28:22)) ; a++) //25:20 for home cause it lags.  
 							{				
 								int local = rand.nextInt(30);
 								int local2 = rand.nextInt(10); // gives it a little realistic feel 
@@ -471,7 +477,8 @@ public class click
 							}	
 							cont.mouseRelease(InputEvent.BUTTON1_MASK); // release mouse here
 							//switch between barbs/archs			
-						}				
+						}	
+						
 						
 						if(activateHero && temp==3) // first temp= 1 won't activate because activateHero will be false;
 						{
@@ -482,7 +489,7 @@ public class click
 							deployHero("king") ;
 							deployHero("queen") ;													
 						
-						}
+					}
 				}
 				guiFrame.info("break out value " + breakOut);
 				breakOut++;
@@ -499,8 +506,8 @@ public class click
 	{
 		guiFrame.info("Started sendPictureText");
 		 String host = "smtp.gmail.com";
-		    String from = "mturkbot@gmail.com";
-		    String pass = "mturkbotpassword";
+		    String from = con.getEmail(); 
+		    String pass = con.getPW();
 		    Properties props = System.getProperties();
 		    
 		  		    
@@ -536,7 +543,7 @@ public class click
 	        multipart.addBodyPart(attachPart);
 	        multipart.addBodyPart(attachPart2);
 	        
-		    message.setFrom(new InternetAddress("mturkbot@gmail.com"));
+		    message.setFrom(new InternetAddress(con.getEmail()));
 		    InternetAddress[] toAddress = new InternetAddress[to.length];
 		    for( int i=0; i < to.length; i++ ) { // changed from a while loop
 		        toAddress[i] = new InternetAddress(to[i]);
@@ -564,8 +571,8 @@ public class click
 	 {
 		 
 		 String host = "smtp.gmail.com";
-		    String from = "mturkbot@gmail.com";
-		    String pass = "mturkbotpassword";
+		    String from = con.getEmail();
+		    String pass = con.getPW();
 		    Properties props = System.getProperties();
 		  		    
 		    props.put("mail.smtp.starttls.enable", "true"); // added this line
@@ -580,9 +587,9 @@ public class click
 		    String[] to = {"6462841208@tmomail.net"}; // added this line
 		    
 		   
-		    Session session = Session.getDefaultInstance(props, new GMailAuthenticator(from, pass));		    
+		    Session session = Session.getDefaultInstance(props, new GMailAuthenticator(from, pass));
 		    MimeMessage message = new MimeMessage(session);
-		    message.setFrom(new InternetAddress("mturkbot@gmail.com"));
+		    message.setFrom(new InternetAddress(con.getEmail()));
 		    InternetAddress[] toAddress = new InternetAddress[to.length];
 		    for( int i=0; i < to.length; i++ ) { // changed from a while loop
 		        toAddress[i] = new InternetAddress(to[i]);
@@ -645,8 +652,9 @@ public class click
 			 cont.mouseRelease(InputEvent.BUTTON1_MASK);
 			 Thread.sleep(500);
 			 
-			 con.setName("attack");
-			 cont.mouseMove(con.getPos().get(i).getX(), con.getPos().get(i).getY());
+			 config c2 = new config();
+			 c2.setName("attack");
+			 cont.mouseMove(c2.getPos().get(i).getX(), c2.getPos().get(i).getY());
 			 cont.mousePress(InputEvent.BUTTON1_MASK);	
 			 cont.mouseRelease(InputEvent.BUTTON1_MASK);
 			 
@@ -834,8 +842,8 @@ public class click
 	{
 		guiFrame.info("Started delete status email");
 		 String host = "smtp.gmail.com";
-		    String from = "mturkbot@gmail.com";
-		    String pass = "mturkbotpassword";
+		    String from = con.getEmail();
+		    String pass = con.getPW();
 		    Properties props = System.getProperties();
 		   
 		  
@@ -928,6 +936,8 @@ public class click
 	 */
 	public boolean shouldIAttack() throws Exception
 	{		
+		
+		lootThreshold = Integer.valueOf(con.getLootThreshold());
 		//IF smart loot is on.
 		if(guiFrame.getSmartLoot())
 		{
@@ -1420,7 +1430,7 @@ public class click
 	
 	public void RunEmailService()
 	{
-		 email e = new email();
+		 email e = new email(con.getEmail(), con.getPW());
 		 Thread t = new Thread(e);
 		 t.start();
 	}

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<root>
+	<email id="docogo1@gmail.com">
+		<barrack>817,487</barrack>
+		<camp>826,588</camp>
+		<password>corpsucks11</password>
+		<deployArcher>10</deployArcher>
+		<deployBarb>13</deployBarb>
+		<loot>10000</loot>
+	</email>
+
+	<email id="docogo.two@gmail.com">
+		<barrack>817,487</barrack>
+		<camp>826,588</camp>
+		<password>corpsucks11</password>
+		<deployArcher>10</deployArcher>
+		<deployBarb>13</deployBarb>
+		<loot>10000</loot>
+	</email>
+</root>

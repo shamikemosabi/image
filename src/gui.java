@@ -2,6 +2,7 @@
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JScrollBar;
@@ -13,7 +14,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
@@ -41,6 +41,8 @@ public class gui extends JFrame
 	
 	private JCheckBox chxSmartLoot = null;
 	private JCheckBox chxDebugMode = null;
+	
+	public static String account = "";
 	
 	
 	public gui() 
@@ -84,6 +86,8 @@ public class gui extends JFrame
 		frame.pack();
 		frame.setVisible(true);
 		
+		
+		account = JOptionPane.showInputDialog("Account?"); 
 	}
 	
 	

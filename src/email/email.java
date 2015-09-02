@@ -36,10 +36,18 @@ import setting.config;
 
 
 public class email implements Runnable{
+	
+	private static String email ="";
+	private static String pw  = "";
+	public email(String e, String p)
+	{
+		email = e;
+		pw = p;
+	}
 
  public static void main(String[] args) {
 	 
-	 
+	/*
 	 
 	 email gmail = new email();
 	 
@@ -54,6 +62,7 @@ public class email implements Runnable{
 		    Thread.currentThread().interrupt();
 		}
 	}
+	*/
  }
  
  
@@ -79,8 +88,8 @@ public class email implements Runnable{
   
   Properties props = System.getProperties();
 	 String host = "smtp.gmail.com";
-	    String username = "mturkbot@gmail.com";
-	    String password = "mturkbotpassword";
+	    String username = email;
+	    String password = pw;
     
 
   
@@ -245,7 +254,8 @@ public class email implements Runnable{
    store.close();
 
   } catch (Exception e) {
-   //e.printStackTrace();
+   e.printStackTrace();
+	  
   }
  }
  /*
@@ -319,8 +329,8 @@ public String SaveScreenShot() throws Exception
  public static void sendText(Session ses, String s) throws Exception
  {
 	 String host = "smtp.gmail.com";
-	    String from = "mturkbot@gmail.com";
-	    String pass = "mturkbotpassword";
+	    String from = email;
+	    String pass = pw;
 	    Properties props = System.getProperties();
 	    
 	    /*
@@ -336,7 +346,7 @@ public String SaveScreenShot() throws Exception
 	    String[] to = {"6462841208@tmomail.net"}; // added this line
 	    
 	    MimeMessage message = new MimeMessage(ses);
-	    message.setFrom(new InternetAddress("mturkbot@gmail.com"));
+	    message.setFrom(new InternetAddress(email));
 	    InternetAddress[] toAddress = new InternetAddress[to.length];
 	    for( int i=0; i < to.length; i++ ) { // changed from a while loop
 	        toAddress[i] = new InternetAddress(to[i]);
@@ -371,8 +381,8 @@ public String SaveScreenShot() throws Exception
  public void sendPictureText(String file) throws Exception
 	{		
 		 String host = "smtp.gmail.com";
-		    String from = "mturkbot@gmail.com";
-		    String pass = "mturkbotpassword";
+		    String from = email;
+		    String pass = pw;
 		    Properties props = System.getProperties();
 
 		    //String[] to = {"shamikemosabi@gmail.com"}; // added this line
@@ -388,7 +398,7 @@ public String SaveScreenShot() throws Exception
 			    
 	        multipart.addBodyPart(attachPart);
 	     	        
-		    message.setFrom(new InternetAddress("mturkbot@gmail.com"));
+		    message.setFrom(new InternetAddress(email));
 		    InternetAddress[] toAddress = new InternetAddress[to.length];
 		    for( int i=0; i < to.length; i++ ) { // changed from a while loop
 		        toAddress[i] = new InternetAddress(to[i]);
