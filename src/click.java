@@ -63,7 +63,7 @@ public class click
 	{
 	
 		setGUIandControl();
-//		RunEmailService();		
+		RunEmailService();		
 		
 		/*
 		BufferedImage screencapture =cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));

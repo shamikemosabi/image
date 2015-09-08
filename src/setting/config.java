@@ -64,10 +64,11 @@ public class config
 				
 				Node nNode = nList.item(temp);				
 				Element eElement = (Element) nNode;
-				email  = eElement.getAttribute("id");
+				String e  = eElement.getAttribute("id");
 				
-				if(email.equals(account)) // if this is same account as what was input
+				if(e.equals(account)) // if this is same account as what was input
 				{
+					email = e;
 					xyBarrack = createXY(eElement.getElementsByTagName("barrack").item(0).getTextContent());
 					xyCamp = createXY(eElement.getElementsByTagName("camp").item(0).getTextContent());
 					pw = eElement.getElementsByTagName("password").item(0).getTextContent();
