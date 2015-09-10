@@ -48,6 +48,18 @@ public class control{
 		bot.mouseRelease(i);
 	}
 	
+	public void keyPress(int i)
+	{
+		checkPause();
+		 bot.keyPress(i);
+	}
+	
+	public void keyRelease(int i)
+	{
+		checkPause();
+		bot.keyRelease(i);
+	}
+	
 	public BufferedImage createScreenCapture(Rectangle rec)
 	{
 		checkPause();

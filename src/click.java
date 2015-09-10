@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,7 +22,6 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.Multipart;
 import javax.mail.Authenticator;
-
 import javax.mail.Part;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
@@ -59,11 +59,16 @@ public class click
 	StopWatch s = new StopWatch();
 	
 	public static config con = null;
+	
+	private String email;
+	private email e;
 	public click() throws Exception
 	{
 	
 		setGUIandControl();
-		RunEmailService();		
+		RunEmailService();	
+		
+		
 		
 		/*
 		BufferedImage screencapture =cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
@@ -80,8 +85,14 @@ public class click
 				deployTroops2();
 		System.exit(0);
 		saveLootParent("C:\\Users\\shami_000\\Documents\\GitHub\\image\\rule\\", "current.jpg");
+		
+			email = "docogo.two@gmail.com";
+		swap();
+		System.exit(0);
         */
+		
 
+	
 		
 		while(true)
 		{	
@@ -196,6 +207,13 @@ public class click
 				guiFrame.info("end loop");
 				break;
 				
+				case 5:
+					if(inMain())
+					{
+						swap();			
+					}
+					
+					break;
 				
 				case 1:
 					clickSafeSpot(); // click safe spot to be active	
@@ -255,6 +273,135 @@ public class click
 			}
 			*/
 		}
+	}
+	
+	public void swap() throws Exception
+	{
+		config newCon = new config(email); // new account's setting, most importantly I need the slot position
+		
+		newCon.setName("swap");
+		cont.mouseMove(newCon.getPos().get(0).getX(), newCon.getPos().get(0).getY()); // move to setting button.
+		cont.mousePress(InputEvent.BUTTON1_MASK);	
+		 Thread.sleep(1000);
+		 cont.mouseRelease(InputEvent.BUTTON1_MASK);	
+		 Thread.sleep(1000);
+		 
+		 int temp = 0;
+		 boolean ret  =false ;
+		 while(temp < 10)
+		 {
+			Thread.sleep(500);
+			cont.mouseMove(newCon.getPos().get(1).getX(), newCon.getPos().get(1).getY()); // move to disconnect
+			cont.mousePress(InputEvent.BUTTON1_MASK);	
+			 Thread.sleep(1000);
+			 cont.mouseRelease(InputEvent.BUTTON1_MASK);	
+			Thread.sleep(500);
+			cont.mousePress(InputEvent.BUTTON1_MASK);	
+			 Thread.sleep(1000);
+			 cont.mouseRelease(InputEvent.BUTTON1_MASK);
+			 
+			 Thread.sleep(7000);
+			 
+			 cont.mouseMove(newCon.getPos().get(2).getX(), newCon.getPos().get(2).getY()); // move to account
+			cont.mousePress(InputEvent.BUTTON1_MASK);	
+			Thread.sleep(1000);
+			 cont.mouseRelease(InputEvent.BUTTON1_MASK);
+			 
+			 // move to OK
+			 cont.mouseMove(newCon.getPos().get(3).getX(), newCon.getPos().get(3).getY()); 
+			cont.mousePress(InputEvent.BUTTON1_MASK);	
+			Thread.sleep(1000);
+			 cont.mouseRelease(InputEvent.BUTTON1_MASK);
+			 
+			 
+			 Thread.sleep(7000); //wait 7 seconds for load village to show up.
+			 
+			 ret = compareImage("swap"); //check if load village screen.
+			 if(ret)
+			 {
+				 break; // break out of while.
+			 }
+			 
+			 temp++; // I want something to break the while loop. Don't want infinite loops
+		 }
+		 
+		 if(ret)
+		 {
+			 // we are at load village screen.
+			 //click load
+			 cont.mouseMove(newCon.getPos().get(4).getX(), newCon.getPos().get(4).getY()); 
+			 cont.mousePress(InputEvent.BUTTON1_MASK);	
+			 Thread.sleep(1000);
+			 cont.mouseRelease(InputEvent.BUTTON1_MASK);	
+			 Thread.sleep(2000);
+			 
+			 //click textbox
+			 cont.mouseMove(newCon.getPos().get(5).getX(), newCon.getPos().get(5).getY()); 
+			 cont.mousePress(InputEvent.BUTTON1_MASK);	
+			 Thread.sleep(1000);
+			 cont.mouseRelease(InputEvent.BUTTON1_MASK);	
+			 Thread.sleep(1000);
+			 
+			 //Type the word CONFIRM
+			 cont.keyPress( KeyEvent.VK_SHIFT );
+			 cont.keyPress(KeyEvent.VK_C);
+			 cont.keyRelease(KeyEvent.VK_C);
+			 Thread.sleep(500);
+			 cont.keyPress(KeyEvent.VK_O);
+			 cont.keyRelease(KeyEvent.VK_O);
+			 Thread.sleep(500);
+			 cont.keyPress(KeyEvent.VK_N);
+			 cont.keyRelease(KeyEvent.VK_N);
+			 Thread.sleep(500);
+			 cont.keyPress(KeyEvent.VK_F);
+			 cont.keyRelease(KeyEvent.VK_F);
+			 Thread.sleep(500);
+			 cont.keyPress(KeyEvent.VK_I);
+			 cont.keyRelease(KeyEvent.VK_I);
+			 Thread.sleep(500);
+			 cont.keyPress(KeyEvent.VK_R);
+			 cont.keyRelease(KeyEvent.VK_R);
+			 Thread.sleep(500);
+			 cont.keyPress(KeyEvent.VK_M);
+			 cont.keyRelease(KeyEvent.VK_M);
+			 cont.keyRelease( KeyEvent.VK_SHIFT );
+			 
+			 Thread.sleep(1000);
+			 
+			 //click okay
+			 cont.mouseMove(newCon.getPos().get(6).getX(), newCon.getPos().get(6).getY()); 
+			 cont.mousePress(InputEvent.BUTTON1_MASK);	
+			 Thread.sleep(1000);
+			 cont.mouseRelease(InputEvent.BUTTON1_MASK);	
+			
+			 
+			 //delete swap email
+			 //this HAS to be the old con NOT THE NEW!! old account has the swap email.
+			 deleteEmail("swap");
+			 
+			 
+			 // We assume village will load successfully.
+			 //In this case we need to set the the new config
+			 con = newCon;
+			 
+			//set email service with new account and pw
+			 e.setEmail(con.getEmail());
+			 e.setPW(con.getPW());
+			 
+			//might have to update read.txt here.
+			// lets update to 1, which mean start (keep active), we'll let email service run the next time to update actual value.
+			updateReadFile("1");
+			
+			 Thread.sleep(5000); // wait 5 sec before taking screen shot, I want village to load up.
+			 
+			//take and send screenshot
+			BufferedImage screencapture = cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));			
+			String name = "currentstatus.jpg";
+			File outputFile = new File(name);
+	        ImageIO.write(screencapture, "jpg", outputFile);	
+	        sendPictureText(name);
+		 }
+		 
 	}
 	
 	public void GotDisconnected()
@@ -536,12 +683,13 @@ public class click
 	        
 	        MimeBodyPart attachPart = new MimeBodyPart();
 	        attachPart.attachFile(file);
-	        MimeBodyPart attachPart2 = new MimeBodyPart();
-	        attachPart2.attachFile("currentcamp.jpg");
+	        
+	        //MimeBodyPart attachPart2 = new MimeBodyPart();
+	        //attachPart2.attachFile("currentcamp.jpg");
 	        
 		    
 	        multipart.addBodyPart(attachPart);
-	        multipart.addBodyPart(attachPart2);
+	        //multipart.addBodyPart(attachPart2);
 	        
 		    message.setFrom(new InternetAddress(con.getEmail()));
 		    InternetAddress[] toAddress = new InternetAddress[to.length];
@@ -775,7 +923,7 @@ public class click
 			guiFrame.info("Read file value is " + ret);
 			if(ret == 4)
 			{
-				deleteStatusEmail();
+				deleteEmail("status");
 				sendPicText = true;
 				
 			}
@@ -789,6 +937,18 @@ public class click
 		}
 	}
 	
+	
+	public void updateReadFile(String s) throws Exception
+	{
+		
+		 File f = new File(config.readFile);
+		  PrintWriter fw = new PrintWriter(f);
+		  		  
+		  fw.print(s);
+		  fw.close();
+		
+	}
+	
 	/*
 	 * 
 	 * return int instead of boolean
@@ -799,7 +959,17 @@ public class click
 		//guiFrame.info("Checking service started or not");
 		File f = new File(s); //file to read
 		BufferedReader br = new BufferedReader(new FileReader(f));
-		int ret = Integer.valueOf(br.readLine());
+		int ret = 0;
+		String str = br.readLine();
+		try{
+			ret = Integer.valueOf(str);
+		}
+		catch(Exception e) // throw exception if code is 5, have email in string. valueOf will throw exception
+		{
+			email  = str.substring(1); // get rid of first char which is "5"
+			email  = email.trim(); 
+			ret = 5;
+		}
 		br.close();
 		
 		if(ret == 2 || ret == 4) 
@@ -816,11 +986,15 @@ public class click
 			guiFrame.info("Read file value is " + ret);
 			if(ret == 4)
 			{
-				deleteStatusEmail();
+				deleteEmail("status");
 				sendPicText = true;
 				
 			}
 			return 2; // return 2, 4 is just so we know we should take screen shot later, but still return 2 to bot
+		}
+		else if(ret==5)
+		{
+			return 5;
 		}
 		else if(ret==1)// 1 or 0 we stop service
 		{
@@ -838,9 +1012,9 @@ public class click
 		}
 	}
 	
-	public void deleteStatusEmail() throws Exception
+	public void deleteEmail(String str) throws Exception
 	{
-		guiFrame.info("Started delete status email");
+		guiFrame.info("Started delete " + str + "email");
 		 String host = "smtp.gmail.com";
 		    String from = con.getEmail();
 		    String pass = con.getPW();
@@ -868,12 +1042,12 @@ public class click
 		      String body="";
 		       
 		      body = getText((Part)messages[i]).toLowerCase(); //(String)messages[i].getContent();//;		    
-		      if(body.contains("status")) messages[i].setFlag(Flags.Flag.DELETED, true);
+		      if(body.contains(str)) messages[i].setFlag(Flags.Flag.DELETED, true);
 		   }
 		   
 		   inbox.close(true);
 		   
-		   guiFrame.info("Completed delete status email");
+		   guiFrame.info("Completed delete " + str +" email");
 	  
 		   
 	}
@@ -1430,7 +1604,7 @@ public class click
 	
 	public void RunEmailService()
 	{
-		 email e = new email(con.getEmail(), con.getPW());
+		 e = new email(con.getEmail(), con.getPW());
 		 Thread t = new Thread(e);
 		 t.start();
 	}

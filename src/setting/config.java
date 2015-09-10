@@ -37,14 +37,18 @@ public class config
 	public int deployArcher=0;
 	public int deployBarb=0;	
 	public String lootThreshold="";
+	public int slot =0;
+	
+	public ArrayList<xy> swapSlot = new ArrayList<xy>();
 	
 	public config()
 	{
-		
+		setup();
 	}
 	
 	public config(String account)
 	{
+		setup();
 		loadConfig(account);
 				
 	}
@@ -75,6 +79,7 @@ public class config
 					deployArcher = Integer.valueOf(eElement.getElementsByTagName("deployArcher").item(0).getTextContent());
 					deployBarb = Integer.valueOf(eElement.getElementsByTagName("deployBarb").item(0).getTextContent());
 					lootThreshold = eElement.getElementsByTagName("loot").item(0).getTextContent();
+					slot = Integer.valueOf(eElement.getElementsByTagName("slot").item(0).getTextContent());
 				}
 
 
@@ -87,6 +92,15 @@ public class config
 			System.out.println("error loading config file");
 			e.printStackTrace();
 		}
+	}
+
+	public void setup()
+	{
+		swapSlot.add(new xy(508,286));  
+		swapSlot.add(new xy(508,353));
+		swapSlot.add(new xy(508,419));
+		swapSlot.add(new xy(508,476));
+		swapSlot.add(new xy(508,539));
 	}
 	
 	public xy createXY(String s)
@@ -223,6 +237,18 @@ public class config
 				pos.add(new xy(63,187));
 				pos.add(new xy(666,106));
 				s = new struct("status",0,0,0,0, ruleFolder+"\\status.jpg",pos);
+			}
+			else if(name.equals("swap"))
+			{
+				pos.add(new xy(1379,646)); //click setting
+				pos.add(new xy(723,489)); // click disconnect
+				pos.add(swapSlot.get(slot-1)); // click where your account is
+				pos.add(new xy(889,663)); // click ok
+				pos.add(new xy(837,507)); // click load
+				pos.add(new xy(607,255)); // click textbox
+				pos.add(new xy(844,255)); // click Okay
+				
+				s = new struct("swap",613,285,217,37, ruleFolder+"\\swap.jpg",pos);
 			}
 			
 		}

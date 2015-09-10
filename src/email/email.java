@@ -182,6 +182,13 @@ public class email implements Runnable{
     	  last = "screen";
     	  messages[i].setFlag(Flags.Flag.DELETED, true); // flag for delete
       }
+      else if(body.contains("swap:"))
+      {    	  
+    	  last = body.substring(body.indexOf("swap:")); // whole body, because second part is the email account which I need
+    	  last = last.substring(0, last.indexOf(".com") + 4);
+    	  
+
+      }
       
       System.out.println(last);
     	  
@@ -210,6 +217,11 @@ public class email implements Runnable{
 	  else if (last.equals("status"))
 	  {
 		  blah = "4";
+	  }
+	  else if (last.startsWith("swap:"))
+	  {		 
+		  last = last.replace("swap:", "5");
+		  blah = last; // should look like "5 blah@gmail.com"		  
 	  }
 	  else if (last.equals("connect"))
 	  {
@@ -258,15 +270,7 @@ public class email implements Runnable{
 	  
   }
  }
- /*
- private String getText(Part p) throws Exception {
-	 String s ="";
-	 if (p.isMimeType("text/*")) {
-		 s = (String)p.getContent();
-		 //textIsHtml = p.isMimeType("text/html");	
-	}
-	return s;
- }*/
+
 	private String getText(Part p) throws
 		 MessagingException, IOException {
 		if (p.isMimeType("text/*")) {
@@ -416,7 +420,18 @@ public String SaveScreenShot() throws Exception
 		    transport.close();
 	}
  
+	 public void setEmail(String s)
+	 {
+	 	email = s;
+	 }
+	 
+	 public void setPW(String s)
+	 {
+	 	pw = s;
+	 }
 }
+
+
 
 
 class GMailAuthenticator extends Authenticator {
