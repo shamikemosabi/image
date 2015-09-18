@@ -189,6 +189,10 @@ public class email implements Runnable{
     	  
 
       }
+      else if(body.contains("config:"))
+      {
+    	  last = "config";
+      }
       
       System.out.println(last);
     	  
@@ -196,6 +200,13 @@ public class email implements Runnable{
    }
    
    
+   /*
+    *  1 - start
+    *  2 - bot
+    *  4 - status
+    *  5 - swap
+    *  6- config
+    */
    
    
    // let's check to see if we have a difference
@@ -236,6 +247,10 @@ public class email implements Runnable{
 		  String fileName = SaveScreenShot();
 		  sendPictureText(fileName);
 		  
+	  }
+	  else if(last.equals("config"))
+	  {
+		  blah = "6";
 	  }
 	  else
 	  {

@@ -6,13 +6,21 @@
  */
 
 package setting;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
@@ -41,6 +49,8 @@ public class config
 	
 	public ArrayList<xy> swapSlot = new ArrayList<xy>();
 	
+	private ArrayList<AutoUpgradeData> autoUpgradeList = new ArrayList<AutoUpgradeData>();
+	
 	public config()
 	{
 		setup();
@@ -62,8 +72,7 @@ public class config
 			Document doc = dBuilder.parse(fXmlFile);
 			doc.getDocumentElement().normalize();
 			
-			NodeList nList = doc.getElementsByTagName("email");
-			
+			NodeList nList = doc.getElementsByTagName("email");			
 			for (int temp = 0; temp < nList.getLength(); temp++) {
 				
 				Node nNode = nList.item(temp);				
@@ -81,11 +90,11 @@ public class config
 					lootThreshold = eElement.getElementsByTagName("loot").item(0).getTextContent();
 					slot = Integer.valueOf(eElement.getElementsByTagName("slot").item(0).getTextContent());
 				}
-
-
 			}
 			
-			
+	 
+			// create AutoUpgrade object
+			createAutoUpgrade(doc);			
 		}
 		catch(Exception e)
 		{
@@ -94,6 +103,44 @@ public class config
 		}
 	}
 
+	public void createAutoUpgrade(Document doc)
+	{	
+		autoUpgradeList.clear();
+		
+		NodeList nList = doc.getElementsByTagName("pos");
+		for (int temp = 0; temp < nList.getLength(); temp++) 
+		{
+			AutoUpgradeData aud = new AutoUpgradeData();
+			
+			Node nNode = nList.item(temp);				
+			Element eElement = (Element) nNode;
+			
+			String time = eElement.getAttribute("id");
+			String email = eElement.getElementsByTagName("upgradeEmail").item(0).getTextContent();
+			aud.setTime(time);
+			aud.setEmail(email);
+						
+			NodeList xyList = eElement.getElementsByTagName("xy");
+			
+			for (int i = 0; i < xyList.getLength(); i++) 
+			{
+				Node n = xyList.item(i);
+				Element xye = (Element) n;
+				
+				xy newXY = createXY(xye.getTextContent());
+				aud.getXYArrayList().add(newXY);
+						
+			}
+			
+			autoUpgradeList.add(aud);
+		}
+
+	}
+	
+	public ArrayList<AutoUpgradeData> getAutoUpgradeList()
+	{
+		return autoUpgradeList;
+	}
 	public void setup()
 	{
 		swapSlot.add(new xy(508,286));  
@@ -101,6 +148,8 @@ public class config
 		swapSlot.add(new xy(508,419));
 		swapSlot.add(new xy(508,476));
 		swapSlot.add(new xy(508,539));
+		
+		downloadFTP(config.configFile , "/config/config.xml");
 	}
 	
 	public xy createXY(String s)
@@ -110,6 +159,37 @@ public class config
 		xy temp = new xy(a,b);
 		return temp;
 	}
+	
+	public void downloadFTP(String localFile, String remoteFile)
+	{
+		
+        String server = "doms.freewha.com";
+        String user = "www.mturkpl.us";
+        String pass = "freewebsucks11";
+ 
+        FTPClient ftpClient = new FTPClient();
+        try {
+ 
+            ftpClient.connect(server);
+            ftpClient.login(user, pass);
+            ftpClient.enterLocalPassiveMode();
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+            File downloadFile1 = new File(localFile);
+            OutputStream outputStream1 = new BufferedOutputStream(new FileOutputStream(downloadFile1));
+            boolean success = ftpClient.retrieveFile(remoteFile, outputStream1);
+            outputStream1.close();
+            ftpClient.disconnect();
+        }
+        catch(Exception e)
+        {
+        	System.out.println("Error downloadFTP");
+        	e.printStackTrace();
+        }
+  
+         
+	}
+	
 	public void setName(String name)
 	{
 		

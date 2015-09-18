@@ -2,13 +2,19 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
@@ -32,10 +38,23 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.MessagingException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.time.StopWatch;
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import email.email;
+import setting.AutoUpgradeData;
 import setting.config;
 
 
@@ -64,7 +83,7 @@ public class click
 	private email e;
 	public click() throws Exception
 	{
-	
+		downloadFTP(config.configFile , "/config/config.xml");
 		setGUIandControl();
 		RunEmailService();	
 		
@@ -88,11 +107,16 @@ public class click
 		
 			email = "docogo.two@gmail.com";
 		swap();
-		System.exit(0);
-        */
 		
+      
+		upLoadFTP("config.xml","config");
+		downloadFTP("config.xml" , "/config/config.xml");
+		System.exit(0);
+		AutoUpgrade();
+		System.exit(0);
+	*/
 
-	
+
 		
 		while(true)
 		{	
@@ -107,8 +131,9 @@ public class click
 				case 2:
 				if(inMain())
 				{
-					if(disconnected) GotDisconnected();					
+					if(disconnected) GotDisconnected();	
 					
+					AutoUpgrade();
 					sendPictureText();
 					setUpScreen();				
 					//if(clickCamp())
@@ -210,13 +235,17 @@ public class click
 				case 5:
 					if(inMain())
 					{
-						swap();			
+						swap(email);			
 					}
 					
 					break;
 				
 				case 1:
-					clickSafeSpot(); // click safe spot to be active	
+					clickSafeSpot(); // click safe spot to be active
+					if(inMain())
+					{
+						AutoUpgrade();
+					}
 					Thread.sleep(30000);
 					guiFrame.info("STAY ACTIVE");
 					break;
@@ -275,9 +304,180 @@ public class click
 		}
 	}
 	
-	public void swap() throws Exception
+	
+	/**
+	 *  check auto upgrade list if there is anything to upgrade, if there is 
+	 *  we will swap to that account upgrade and swap back to originaly account and continue botting.
+	 */
+	public void AutoUpgrade() throws Exception
+	{	
+		if(!con.getAutoUpgradeList().isEmpty())
+		{			
+			guiFrame.info("have auto upgrade");
+			clickSafeSpot();
+			boolean exist  = false;
+			//current time
+			DateFormat dateFormat = new SimpleDateFormat("MM/dd h:mm a");
+			Calendar d = Calendar.getInstance();
+			Date currDate = d.getTime();
+			
+			// get the first one, assume to be sorted.
+			String t = con.getAutoUpgradeList().get(0).getTime();
+			DateFormat format = new SimpleDateFormat("MM/dd/yyyy h:mm a");
+			Date date = format.parse(t);
+	
+			//current time - 15 min
+			d.setTime(currDate);
+			d.add(Calendar.MINUTE, -15); // 15 mins
+			Date currDateSubtracted = d.getTime();
+			
+			String upgradeEmail = con.getAutoUpgradeList().get(0).getEmail().trim();
+			
+			AutoUpgradeData aud = con.getAutoUpgradeList().get(0);
+	
+			String oldEmail = con.getEmail();
+			// if date is before date, but also 15 mins prior to current time, then lets try to upgrade
+			// I don't want to keep upgrading old config file.
+			
+			if(date.before(currDate) && date.after(currDateSubtracted) )
+			{
+				
+				//first thing i have to do is download config file. Just to make sure I have the most updated file
+				downloadFTP(config.configFile , "/config/config.xml");
+				// second thing I want to do is to see if it still exist in config file. if it does I want to get rid of it
+				// and go ahead and swap - > upgrade.
+				// if it doesn't exist then don't do anything because it's been removed!, OR most likely been done by another bot
+				// It's important to note this is running concurrently on multiple machines, So I'm hoping the download of config file
+				// modifiying config and upload config back to FTP is quick.
+				exist = workOnConfigFile(t);
+				
+				if(exist)
+				{	
+					guiFrame.info("found in XML file");
+					if(oldEmail.equals(upgradeEmail)) // same account dont need to swap
+					{
+						guiFrame.info("same account don't need to swap");
+						con = new config(oldEmail); //just to re download config, get new autoUpgrade
+						if(inMain()) // make sure in main.
+						{
+							setUpScreen();
+							clickAutoUpgrade(aud);
+							takeCurrentScreenshot();
+							clickSafeSpot();
+						}
+					}
+					else
+					{
+						guiFrame.info("Need to swap");
+						swap(upgradeEmail); //swap to upgrade email
+						
+						//we should be in the new account now.
+						if(inMain()) // make sure in main.
+						{
+							setUpScreen();
+							clickAutoUpgrade(aud);
+							takeCurrentScreenshot();
+							clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.
+							swap(oldEmail); // swap back
+							
+						}
+						//if not in main something happened with swap
+						// upgrade failed, doing nothing should be okay.
+					}
+				}
+			
+			}
+		}
+	}
+	public void clickAutoUpgrade(AutoUpgradeData aud) throws Exception
 	{
-		config newCon = new config(email); // new account's setting, most importantly I need the slot position
+		for(int i=0 ; i < aud.getXYArrayList().size(); i++)
+		{			
+			Thread.sleep(2000);
+			cont.mouseMove(aud.getXYArrayList().get(i).getX(), aud.getXYArrayList().get(i).getY()); 
+			cont.mousePress(InputEvent.BUTTON1_MASK);	
+			Thread.sleep(500);
+			cont.mouseRelease(InputEvent.BUTTON1_MASK);				
+		}
+	}
+	/*
+	 * String t - is my time , which is the ID attribute for pos tag
+	 */
+	public boolean workOnConfigFile(String t)
+	{
+		boolean exist = false;
+		try{
+			File fXmlFile = new File(con.configFile);
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(fXmlFile);
+			doc.getDocumentElement().normalize();			
+			
+			// returns true if deleted, false if can't find
+			 exist  = deleteFromXML(doc, t);
+			 
+			 
+			 if(exist)
+			 {
+				 upLoadFTP(con.configFile,"config");
+			 }
+		
+		}
+		catch(Exception e)
+		{
+			System.out.println("error in method workOnConfigFile");
+			e.printStackTrace();
+		}
+		
+		return exist;
+	}
+	
+	public boolean deleteFromXML(Document d , String t)
+	{
+		
+		Node upgrade = d.getElementsByTagName("upgrade").item(0);
+		NodeList list = upgrade.getChildNodes();
+		Node node = list.item(1); // should be first pos
+		
+		System.out.println(node.getNodeName());
+		Element eElement = (Element) node;
+		String time = eElement.getAttribute("id");
+		
+		if ("pos".equals(node.getNodeName()) && time.equals(t))  // make sure first child is pos, and attribute id is same as time
+		{
+			upgrade.removeChild(node);
+			
+			try{
+				// write the content into xml file
+				TransformerFactory transformerFactory = TransformerFactory.newInstance();
+				Transformer transformer = transformerFactory.newTransformer();
+				DOMSource source = new DOMSource(d);
+				StreamResult result = new StreamResult(new File(con.configFile));
+				transformer.transform(source, result);
+			}
+			catch(Exception e)
+			{
+				System.out.println("error in deleteFromXML");
+				e.printStackTrace();
+			}
+			
+		 }
+		else
+		{
+			return false;
+		}
+		
+		return true;
+		
+		
+	}
+	
+	
+	public void swap(String em) throws Exception
+	{
+		downloadFTP(config.configFile , "/config/config.xml");
+		
+		config newCon = new config(em); // new account's setting, most importantly I need the slot position
 		
 		newCon.setName("swap");
 		cont.mouseMove(newCon.getPos().get(0).getX(), newCon.getPos().get(0).getY()); // move to setting button.
@@ -395,13 +595,18 @@ public class click
 			 Thread.sleep(5000); // wait 5 sec before taking screen shot, I want village to load up.
 			 
 			//take and send screenshot
-			BufferedImage screencapture = cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));			
-			String name = "currentstatus.jpg";
-			File outputFile = new File(name);
-	        ImageIO.write(screencapture, "jpg", outputFile);	
-	        sendPictureText(name);
+			 takeCurrentScreenshot();
 		 }
 		 
+	}
+	
+	public void takeCurrentScreenshot() throws Exception
+	{
+		BufferedImage screencapture = cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));			
+		String name = "currentstatus.jpg";
+		File outputFile = new File(name);
+        ImageIO.write(screencapture, "jpg", outputFile);	
+        sendPictureText(name);
 	}
 	
 	public void GotDisconnected()
@@ -952,7 +1157,16 @@ public class click
 	/*
 	 * 
 	 * return int instead of boolean
+	 * 
 	 */
+	
+	   /*
+	    *  1 - start
+	    *  2 - bot
+	    *  4 - status
+	    *  5 - swap
+	    *  6 - config
+	    */
 	
 	public int isServiceStarted2(String s) throws Exception
 	{
@@ -1006,11 +1220,79 @@ public class click
 			//guiFrame.info("stopping service");
 			return 0;
 		}
+		else if(ret==6) // download new config.xml file and load new config object
+		{
+			downloadAndLoadConfig();
+			deleteEmail("config");
+			updateReadFile("1");
+			return 1; // let the next email service update actual read value
+		}
 		else // in case for some reason, value read is not any of the numbers, lets just default to bot.
 		{
 			return 2;
 		}
 	}
+	
+	public void downloadAndLoadConfig()
+	{
+		downloadFTP(config.configFile , "/config/config.xml");
+		con = new config(con.getEmail());   // new config object with same account as before, just NEW config.xml
+	}
+	
+	/*
+	 * uploads FileName to FTP dir
+	 */
+	public void upLoadFTP(String FileName, String dir) throws IOException
+	{
+		File f = new File(FileName);
+
+		FTPClient ftp = new FTPClient();
+
+		ftp.connect("doms.freewha.com");
+		System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
+		System.out.println(ftp.getReplyString());
+		ftp.enterLocalPassiveMode();
+		ftp.changeWorkingDirectory(dir);				
+		
+		final InputStream is = new FileInputStream(f.getPath());
+		boolean  blah = ftp.storeFile(f.getName(), is);
+		System.out.println(blah);
+	
+		is.close();
+		
+		ftp.disconnect();		
+	}
+	
+	public void downloadFTP(String localFile, String remoteFile)
+	{
+		
+        String server = "doms.freewha.com";
+        String user = "www.mturkpl.us";
+        String pass = "freewebsucks11";
+ 
+        FTPClient ftpClient = new FTPClient();
+        try {
+ 
+            ftpClient.connect(server);
+            ftpClient.login(user, pass);
+            ftpClient.enterLocalPassiveMode();
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+            File downloadFile1 = new File(localFile);
+            OutputStream outputStream1 = new BufferedOutputStream(new FileOutputStream(downloadFile1));
+            boolean success = ftpClient.retrieveFile(remoteFile, outputStream1);
+            outputStream1.close();
+            ftpClient.disconnect();
+        }
+        catch(Exception e)
+        {
+        	System.out.println("Error downloadFTP");
+        	e.printStackTrace();
+        }
+  
+         
+	}
+	
 	
 	public void deleteEmail(String str) throws Exception
 	{
@@ -1460,7 +1742,7 @@ public class click
 		int breakout = 0; 
 		while(!isScreenSetup())
 		{
-			if(breakout > 5) break;	// make sure we break out eventually, don't want any infinite loops 	
+			if(breakout > 10) break;	// make sure we break out eventually, don't want any infinite loops 	
 			 guiFrame.info("Setting up screen");			 
 			 
 			 //lets click to get focus
