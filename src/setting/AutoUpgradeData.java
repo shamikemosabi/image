@@ -9,6 +9,7 @@ public class AutoUpgradeData
 	private String email ="";
 	private String time = "";
 	private ArrayList<xy> xyArrayList = new ArrayList<xy>();
+	private boolean swapBack = false;
 	public AutoUpgradeData()
 	{
 		
@@ -33,6 +34,14 @@ public class AutoUpgradeData
 	public ArrayList<xy> getXYArrayList()
 	{
 		return xyArrayList;
+	}
+
+	public boolean isSwapBack() {
+		return swapBack;
+	}
+
+	public void setSwapBack(boolean swapBack) {
+		this.swapBack = swapBack;
 	}
 	
 }

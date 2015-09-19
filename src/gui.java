@@ -42,6 +42,9 @@ public class gui extends JFrame
 	private JCheckBox chxSmartLoot = null;
 	private JCheckBox chxDebugMode = null;
 	
+	private JCheckBox chxAutoUpgrade = null;	
+	private boolean bAutoUpgrade = true;
+	
 	public static String account = "";
 	
 	
@@ -59,6 +62,10 @@ public class gui extends JFrame
 		chxDebugMode = new JCheckBox("Debug Mode");
 		chxDebugMode.setSelected(bDebugMode);
 		
+		chxAutoUpgrade = new JCheckBox("Auto Upgrade");
+		chxAutoUpgrade.setSelected(bAutoUpgrade);
+		
+		
 		//txtArea.setPreferredSize( new Dimension( 200, 300) );
 		scroller = new JScrollPane(txtArea);	
 		scroller.setPreferredSize(new Dimension(200,150));
@@ -70,9 +77,10 @@ public class gui extends JFrame
 		pnlMain.add(BorderLayout.CENTER, scroller);
 		
 		
-		northPanel.setLayout(new GridLayout(2,1));
+		northPanel.setLayout(new GridLayout(3,1));
 		northPanel.add(chxSmartLoot);
 		northPanel.add(chxDebugMode);
+		northPanel.add(chxAutoUpgrade);
 		
 		
 		
@@ -150,6 +158,21 @@ public class gui extends JFrame
 			}
 			
 		});
+		
+		
+		chxAutoUpgrade.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent actionEvent)
+			{
+				AbstractButton abstractButton = (AbstractButton) actionEvent.getSource();
+		        boolean selected = abstractButton.getModel().isSelected();
+		        bAutoUpgrade = selected;
+		        
+		        info("Auto Upgrade set to " + selected);
+		       
+			}
+			
+		});
+		
 				
 	}
 	
@@ -190,6 +213,10 @@ public class gui extends JFrame
 	public boolean getDebugMode()
 	{
 		return bDebugMode;
+	}
+	public boolean getAutoUpgrade()
+	{
+		return bAutoUpgrade;
 	}
 	
 }

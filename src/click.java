@@ -87,8 +87,7 @@ public class click
 		setGUIandControl();
 		RunEmailService();	
 		
-		
-		
+		AutoUpgrade();
 		/*
 		BufferedImage screencapture =cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
 		String name = "current.jpg";
@@ -235,7 +234,8 @@ public class click
 				case 5:
 					if(inMain())
 					{
-						swap(email);			
+						//email is from read file
+						swap(email, con.getEmail());			
 					}
 					
 					break;
@@ -311,9 +311,8 @@ public class click
 	 */
 	public void AutoUpgrade() throws Exception
 	{	
-		if(!con.getAutoUpgradeList().isEmpty())
-		{			
-			guiFrame.info("have auto upgrade");
+		if(guiFrame.getAutoUpgrade() && (!con.getAutoUpgradeList().isEmpty()))
+		{		
 			clickSafeSpot();
 			boolean exist  = false;
 			//current time
@@ -334,6 +333,7 @@ public class click
 			String upgradeEmail = con.getAutoUpgradeList().get(0).getEmail().trim();
 			
 			AutoUpgradeData aud = con.getAutoUpgradeList().get(0);
+			boolean swapBack = con.getAutoUpgradeList().get(0).isSwapBack();
 	
 			String oldEmail = con.getEmail();
 			// if date is before date, but also 15 mins prior to current time, then lets try to upgrade
@@ -341,6 +341,7 @@ public class click
 			
 			if(date.before(currDate) && date.after(currDateSubtracted) )
 			{
+				guiFrame.info("have auto upgrade");
 				
 				//first thing i have to do is download config file. Just to make sure I have the most updated file
 				downloadFTP(config.configFile , "/config/config.xml");
@@ -349,7 +350,7 @@ public class click
 				// if it doesn't exist then don't do anything because it's been removed!, OR most likely been done by another bot
 				// It's important to note this is running concurrently on multiple machines, So I'm hoping the download of config file
 				// modifiying config and upload config back to FTP is quick.
-				exist = workOnConfigFile(t);
+				exist = workOnConfigFile(t , upgradeEmail);
 				
 				if(exist)
 				{	
@@ -369,7 +370,9 @@ public class click
 					else
 					{
 						guiFrame.info("Need to swap");
-						swap(upgradeEmail); //swap to upgrade email
+						swap(upgradeEmail,oldEmail); //swap to upgrade email
+						clickSafeSpot(); // click safe spot to get rid of raided screen
+						Thread.sleep(3000);
 						
 						//we should be in the new account now.
 						if(inMain()) // make sure in main.
@@ -378,15 +381,22 @@ public class click
 							clickAutoUpgrade(aud);
 							takeCurrentScreenshot();
 							clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.
-							swap(oldEmail); // swap back
+							if(swapBack)
+							{
+								swap(oldEmail,upgradeEmail); // swap back
+							}
 							
 						}
 						//if not in main something happened with swap
 						// upgrade failed, doing nothing should be okay.
 					}
 				}
+				else
+				{
+					con = new config(oldEmail); //get new autoUpgrade
+				}
 			
-			}
+			} // coming out of this IF I need to get new autoupgrade
 		}
 	}
 	public void clickAutoUpgrade(AutoUpgradeData aud) throws Exception
@@ -403,7 +413,7 @@ public class click
 	/*
 	 * String t - is my time , which is the ID attribute for pos tag
 	 */
-	public boolean workOnConfigFile(String t)
+	public boolean workOnConfigFile(String t, String upgradeEmail)
 	{
 		boolean exist = false;
 		try{
@@ -412,9 +422,12 @@ public class click
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(fXmlFile);
 			doc.getDocumentElement().normalize();			
+
+			boolean active  = isEmailActive(doc, upgradeEmail);
 			
 			// returns true if deleted, false if can't find
-			 exist  = deleteFromXML(doc, t);
+			// upgrade email has to be not active, if it's active it means another machine is running it. don't want to interrput it.
+			 exist  = (!active) && deleteFromXML(doc, t);
 			 
 			 
 			 if(exist)
@@ -427,6 +440,27 @@ public class click
 		{
 			System.out.println("error in method workOnConfigFile");
 			e.printStackTrace();
+		}
+		
+		return exist;
+	}
+	
+	public boolean isEmailActive(Document d, String upgradeEmail)
+	{
+		
+		boolean exist = false;
+
+		NodeList nList = d.getElementsByTagName("activeEmail");
+		for (int temp = 0; temp < nList.getLength(); temp++) 
+		{
+			Node nNode = nList.item(temp);				
+			Element eElement = (Element) nNode;
+			String email  = eElement.getTextContent();
+			if(email.equals(upgradeEmail))
+			{
+				exist = true;		
+			}
+			
 		}
 		
 		return exist;
@@ -473,11 +507,11 @@ public class click
 	}
 	
 	
-	public void swap(String em) throws Exception
+	public void swap(String em, String oldEmail) throws Exception
 	{
 		downloadFTP(config.configFile , "/config/config.xml");
 		
-		config newCon = new config(em); // new account's setting, most importantly I need the slot position
+		config newCon = new config(em, oldEmail); // new account's setting, most importantly I need the slot position
 		
 		newCon.setName("swap");
 		cont.mouseMove(newCon.getPos().get(0).getX(), newCon.getPos().get(0).getY()); // move to setting button.

@@ -1,12 +1,29 @@
-<?xml version="1.0"?>
-<root>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><root>
+	<upgrade>
+				
+		<pos id="09/19/2015 9:35 PM">
+			<upgradeEmail> docogo1@gmail.com </upgradeEmail>
+			<swapBack>false</swapBack>
+			<xy>843,559</xy>
+			<xy>767,730</xy>
+			<xy>732,610</xy>
+		</pos>	
+		
+
+	</upgrade>
+	
+	
+	<active>
+	
+<activeEmail>docogo1@gmail.com</activeEmail><activeEmail>docogo12@gmail.com</activeEmail></active>
+	
 	<email id="docogo1@gmail.com">
 		<barrack>817,487</barrack>
 		<camp>826,588</camp>
 		<password>corpsucks11</password>
 		<deployArcher>10</deployArcher>
-		<deployBarb>13</deployBarb>
-		<loot>10000</loot>
+		<deployBarb>15</deployBarb>
+		<loot>50000</loot>
 		<slot>2</slot>
 	</email>
 
@@ -15,8 +32,8 @@
 		<camp>826,588</camp>
 		<password>corpsucks11</password>
 		<deployArcher>10</deployArcher>
-		<deployBarb>13</deployBarb>
-		<loot>10000</loot>
+		<deployBarb>15</deployBarb>
+		<loot>50000</loot>
 		<slot>3</slot>
 	</email>
 	
@@ -25,8 +42,8 @@
 		<camp>826,588</camp>
 		<password>corpsucks11</password>
 		<deployArcher>10</deployArcher>
-		<deployBarb>13</deployBarb>
-		<loot>10000</loot>
+		<deployBarb>16</deployBarb>
+		<loot>50000</loot>
 		<slot>4</slot>
 	</email>
 	
@@ -36,8 +53,8 @@
 		<password>corpsucks11</password>
 		<deployArcher>10</deployArcher>
 		<deployBarb>13</deployBarb>
-		<loot>10000</loot>
+		<loot>50000</loot>
 		<slot>5</slot>
 	</email>
-	
+
 </root>

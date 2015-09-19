@@ -9,8 +9,11 @@ package setting;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -18,6 +21,10 @@ import java.util.*;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -51,19 +58,28 @@ public class config
 	
 	private ArrayList<AutoUpgradeData> autoUpgradeList = new ArrayList<AutoUpgradeData>();
 	
+	//used only in some local method. just to do some comparison
 	public config()
 	{
 		setup();
 	}
 	
+	//only specify new account, just add account
 	public config(String account)
 	{
 		setup();
-		loadConfig(account);
+		loadConfig(account,"");
 				
 	}
 	
-	public void loadConfig(String account)
+	// specify new and old account , called from swap. we need to add account and delete oldAccount from active
+	public config(String account, String oldAccount)
+	{
+		setup();
+		loadConfig(account, oldAccount);			
+	}
+	
+	public void loadConfig(String account, String oldAccount)
 	{
 		try{
 			File fXmlFile = new File(this.configFile);
@@ -94,12 +110,120 @@ public class config
 			
 	 
 			// create AutoUpgrade object
-			createAutoUpgrade(doc);			
+			createAutoUpgrade(doc);	
+			
+			
+			addActiveEmail(doc , account);
+			if(!oldAccount.isEmpty())
+			{
+				deleteActiveEmail(doc, oldAccount);
+			}
+			
 		}
 		catch(Exception e)
 		{
 			System.out.println("error loading config file");
 			e.printStackTrace();
+		}
+	}
+	
+	public void deleteActiveEmail(Document doc, String oldAccount)
+	{
+		boolean exist = false;
+		Node active = doc.getElementsByTagName("active").item(0); //should only be  1 active
+		NodeList nList = doc.getElementsByTagName("activeEmail");
+		for (int temp = 0; temp < nList.getLength(); temp++) 
+		{
+			Node nNode = nList.item(temp);				
+			Element eElement = (Element) nNode;
+			String email  = eElement.getTextContent();
+			//String email = eElement.getAttribute("id");
+			if(email.equals(oldAccount))
+			{
+				exist = true;		
+				active.removeChild(nNode);			
+			}
+			
+		}
+		
+		// if exist then it means we deleted node, need to FTP 
+		if(exist)
+		{
+			try{
+				// write the content into xml file
+				TransformerFactory transformerFactory = TransformerFactory.newInstance();
+				Transformer transformer = transformerFactory.newTransformer();
+				DOMSource source = new DOMSource(doc);
+				StreamResult result = new StreamResult(new File(this.configFile));
+				transformer.transform(source, result);
+				
+				 upLoadFTP(this.configFile,"config");
+			}
+			catch(IOException ioe)
+			{
+				System.out.println("error uploading to FTP, method addActiveEmail");
+				ioe.printStackTrace();
+			}
+			catch(Exception e)
+			{
+				System.out.println("error in writing into XML file, method addActiveEmail");
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
+	// if email does not already exist then add it.
+	public void addActiveEmail(Document doc, String account)
+	{
+		boolean exist = false;
+		NodeList nList = doc.getElementsByTagName("activeEmail");
+		for (int temp = 0; temp < nList.getLength(); temp++) 
+		{
+			Node nNode = nList.item(temp);				
+			Element eElement = (Element) nNode;
+			String email  = eElement.getTextContent();
+			//String email = eElement.getAttribute("id");
+			if(email.equals(account))
+			{
+				exist = true;
+				break;
+			}
+			
+		}
+		
+		//could not find email, we have to add it.
+		if(!exist)
+		{
+			
+			Node active = doc.getElementsByTagName("active").item(0); //should only be  1 active
+			// append a new node
+			Element age = doc.createElement("activeEmail");
+			age.appendChild(doc.createTextNode(account));
+			active.appendChild(age);
+			
+			try{
+				// write the content into xml file
+				TransformerFactory transformerFactory = TransformerFactory.newInstance();
+				Transformer transformer = transformerFactory.newTransformer();
+				DOMSource source = new DOMSource(doc);
+				StreamResult result = new StreamResult(new File(this.configFile));
+				transformer.transform(source, result);
+				
+				 upLoadFTP(this.configFile,"config");
+			}
+			catch(IOException ioe)
+			{
+				System.out.println("error uploading to FTP, method addActiveEmail");
+				ioe.printStackTrace();
+			}
+			catch(Exception e)
+			{
+				System.out.println("error in writing into XML file, method addActiveEmail");
+				e.printStackTrace();
+			}
+				
+				
 		}
 	}
 
@@ -117,8 +241,10 @@ public class config
 			
 			String time = eElement.getAttribute("id");
 			String email = eElement.getElementsByTagName("upgradeEmail").item(0).getTextContent();
+			boolean swapBack= Boolean.valueOf(eElement.getElementsByTagName("swapBack").item(0).getTextContent());
 			aud.setTime(time);
 			aud.setEmail(email);
+			aud.setSwapBack(swapBack);
 						
 			NodeList xyList = eElement.getElementsByTagName("xy");
 			
@@ -158,6 +284,27 @@ public class config
 		int b = Integer.valueOf( s.substring(s.indexOf(",") + 1, s.length()));
 		xy temp = new xy(a,b);
 		return temp;
+	}
+	
+	public void upLoadFTP(String FileName, String dir) throws IOException
+	{
+		File f = new File(FileName);
+
+		FTPClient ftp = new FTPClient();
+
+		ftp.connect("doms.freewha.com");
+		System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
+		System.out.println(ftp.getReplyString());
+		ftp.enterLocalPassiveMode();
+		ftp.changeWorkingDirectory(dir);				
+		
+		final InputStream is = new FileInputStream(f.getPath());
+		boolean  blah = ftp.storeFile(f.getName(), is);
+		System.out.println(blah);
+	
+		is.close();
+		
+		ftp.disconnect();		
 	}
 	
 	public void downloadFTP(String localFile, String remoteFile)
