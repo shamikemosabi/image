@@ -350,7 +350,7 @@ public class click
 				// if it doesn't exist then don't do anything because it's been removed!, OR most likely been done by another bot
 				// It's important to note this is running concurrently on multiple machines, So I'm hoping the download of config file
 				// modifiying config and upload config back to FTP is quick.
-				exist = workOnConfigFile(t , upgradeEmail);
+				exist = workOnConfigFile(t , upgradeEmail, oldEmail);
 				
 				if(exist)
 				{	
@@ -413,7 +413,7 @@ public class click
 	/*
 	 * String t - is my time , which is the ID attribute for pos tag
 	 */
-	public boolean workOnConfigFile(String t, String upgradeEmail)
+	public boolean workOnConfigFile(String t, String upgradeEmail, String oldEmail)
 	{
 		boolean exist = false;
 		try{
@@ -423,7 +423,7 @@ public class click
 			Document doc = dBuilder.parse(fXmlFile);
 			doc.getDocumentElement().normalize();			
 
-			boolean active  = isEmailActive(doc, upgradeEmail);
+			boolean active  = isEmailActive(doc, upgradeEmail, oldEmail);
 			
 			// returns true if deleted, false if can't find
 			// upgrade email has to be not active, if it's active it means another machine is running it. don't want to interrput it.
@@ -445,7 +445,7 @@ public class click
 		return exist;
 	}
 	
-	public boolean isEmailActive(Document d, String upgradeEmail)
+	public boolean isEmailActive(Document d, String upgradeEmail, String oldEmail)
 	{
 		
 		boolean exist = false;
@@ -461,6 +461,12 @@ public class click
 				exist = true;		
 			}
 			
+		}
+		
+		// if old email is same as upgradeEmail, that means we are going to upgrade on same account
+		// which means it's going to be active but I'm on same account so I can upgrade so set to false
+		if(upgradeEmail.equals(oldEmail)){
+			exist = false;
 		}
 		
 		return exist;
