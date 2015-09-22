@@ -87,7 +87,7 @@ public class click
 		setGUIandControl();
 		RunEmailService();	
 		
-		AutoUpgrade();
+	//	AutoUpgrade();
 		/*
 		BufferedImage screencapture =cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
 		String name = "current.jpg";

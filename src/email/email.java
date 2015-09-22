@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Properties;
 
-
 import javax.imageio.ImageIO;
 import javax.mail.Flags;
 import javax.mail.Folder;
@@ -27,12 +26,11 @@ import javax.mail.Store;
 import javax.mail.Transport;
 import javax.mail.internet.*;
 import javax.activation.*;
-
-
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 
 import setting.config;
+import setting.config.xy;
 
 
 public class email implements Runnable{
@@ -172,9 +170,13 @@ public class email implements Runnable{
       {
     	  last="status";
       }
-      else if(body.contains("connect"))
+      else if(body.contains("connect:"))
       {
     	  last = "connect";
+    	  
+    	  last = body.substring(body.indexOf("connect:")); 
+    	  last = last.substring(0, last.lastIndexOf(":") + 1);
+    	  
     	  messages[i].setFlag(Flags.Flag.DELETED, true); // flag for delete
       }
       else if(body.contains("screen"))
@@ -234,10 +236,12 @@ public class email implements Runnable{
 		  last = last.replace("swap:", "5");
 		  blah = last; // should look like "5 blah@gmail.com"		  
 	  }
-	  else if (last.equals("connect"))
+	  else if (last.startsWith("connect:"))
 	  {
-		  blah = blah2; //set it to whatever it was before. Won't trigger overwrite of file so won't send text.		  
-		  ClickRestart();
+		  blah = blah2; //set it to whatever it was before. Won't trigger overwrite of file so won't send text.
+		  
+		  String temp = last.substring(last.indexOf(":") + 1 , last.lastIndexOf(":"));
+		  ClickRestart(temp);
 		  //specify my own send text
 		  sendText(session,"Clash of Clans restarting...");
 	  }
@@ -338,12 +342,17 @@ public String SaveScreenShot() throws Exception
         return name;
         	       	       
 	}
- public void ClickRestart() throws Exception
+
+//s should look like 199,234
+ public void ClickRestart(String s) throws Exception
  {
-	 Robot bot = new Robot();
-	 bot.mouseMove(336,183); //where clash icon is on bluestack
-	 bot.mousePress(InputEvent.BUTTON1_MASK);			 
-	 bot.mouseRelease(InputEvent.BUTTON1_MASK);
+		int a = Integer.valueOf(s.substring(0, s.indexOf(",")));
+		int b = Integer.valueOf( s.substring(s.indexOf(",") + 1, s.length()));
+		
+		 Robot bot = new Robot();
+		 bot.mouseMove(a,b); 
+		 bot.mousePress(InputEvent.BUTTON1_MASK);			 
+		 bot.mouseRelease(InputEvent.BUTTON1_MASK);
  }
  public static void sendText(Session ses, String s) throws Exception
  {
