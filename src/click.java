@@ -1284,25 +1284,38 @@ public class click
 	/*
 	 * uploads FileName to FTP dir
 	 */
-	public void upLoadFTP(String FileName, String dir) throws IOException
+	public void upLoadFTP(String FileName, String dir)
 	{
 		File f = new File(FileName);
 
 		FTPClient ftp = new FTPClient();
 
-		ftp.connect("doms.freewha.com");
-		System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
-		System.out.println(ftp.getReplyString());
-		ftp.enterLocalPassiveMode();
-		ftp.changeWorkingDirectory(dir);				
-		
-		final InputStream is = new FileInputStream(f.getPath());
-		boolean  blah = ftp.storeFile(f.getName(), is);
-		System.out.println(blah);
-	
-		is.close();
-		
-		ftp.disconnect();		
+		 boolean success = false;
+	     int count = 0;
+	     do 
+	        {   
+				try{		
+					ftp.connect("doms.freewha.com");
+					System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
+					System.out.println(ftp.getReplyString());
+					ftp.enterLocalPassiveMode();
+					ftp.changeWorkingDirectory(dir);				
+					
+					final InputStream is = new FileInputStream(f.getPath());
+					success = ftp.storeFile(f.getName(), is);
+				
+					is.close();
+					
+					ftp.disconnect();			
+				}
+				catch(Exception e)
+				{
+					System.out.println("Error UploadFTP CLICK method");
+		        	System.out.println(e.getMessage());
+		        	e.printStackTrace();
+		        	success = false;					
+				}
+	        }while(!success && count < 10);
 	}
 	
 	public void downloadFTP(String localFile, String remoteFile)
@@ -1313,24 +1326,35 @@ public class click
         String pass = "freewebsucks11";
  
         FTPClient ftpClient = new FTPClient();
-        try {
- 
-            ftpClient.connect(server);
-            ftpClient.login(user, pass);
-            ftpClient.enterLocalPassiveMode();
-            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-            File downloadFile1 = new File(localFile);
-            OutputStream outputStream1 = new BufferedOutputStream(new FileOutputStream(downloadFile1));
-            boolean success = ftpClient.retrieveFile(remoteFile, outputStream1);
-            outputStream1.close();
-            ftpClient.disconnect();
-        }
-        catch(Exception e)
-        {
-        	System.out.println("Error downloadFTP");
-        	e.printStackTrace();
-        }
+        
+        // if retrieveFile fails, it will retry again.
+        boolean success = false;
+        int count = 0;
+        do 
+        {        
+	        try {
+	 
+	            ftpClient.connect(server);
+	            ftpClient.login(user, pass);
+	            ftpClient.enterLocalPassiveMode();
+	            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+	
+	            File downloadFile1 = new File(localFile);
+	            OutputStream outputStream1 = new BufferedOutputStream(new FileOutputStream(downloadFile1));
+	             success = ftpClient.retrieveFile(remoteFile, outputStream1);
+	            outputStream1.close();
+	            ftpClient.disconnect();	  
+	            
+	            count++;
+	        }
+	        catch(Exception e)
+	        {
+	        	System.out.println("Error downloadFTP");
+	        	System.out.println(e.getMessage());
+	        	e.printStackTrace();
+	        	success = false;
+	        }
+        }while(!success && count < 10);
   
          
 	}
