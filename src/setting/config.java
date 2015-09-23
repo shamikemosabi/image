@@ -161,12 +161,14 @@ public class config
 			}
 			catch(IOException ioe)
 			{
-				System.out.println("error uploading to FTP, method addActiveEmail");
+				System.out.println("error uploading to FTP, method deleteActiveEmail");				
+				System.out.println(ioe.getMessage());				
 				ioe.printStackTrace();
 			}
 			catch(Exception e)
 			{
-				System.out.println("error in writing into XML file, method addActiveEmail");
+				System.out.println("error in writing into XML file, method deleteActiveEmail");			
+				System.out.println(e.getMessage());				
 				e.printStackTrace();
 			}
 		}
@@ -214,12 +216,14 @@ public class config
 			}
 			catch(IOException ioe)
 			{
-				System.out.println("error uploading to FTP, method addActiveEmail");
+				System.out.println("error uploading to FTP, method addActiveEmail");				
+				System.out.println(ioe.getMessage());				
 				ioe.printStackTrace();
 			}
 			catch(Exception e)
 			{
-				System.out.println("error in writing into XML file, method addActiveEmail");
+				System.out.println("error in writing into XML file, method addActiveEmail");				
+				System.out.println(e.getMessage());				
 				e.printStackTrace();
 			}
 				

@@ -439,6 +439,8 @@ public class click
 		catch(Exception e)
 		{
 			System.out.println("error in method workOnConfigFile");
+			guiFrame.info(e.getMessage());
+			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
 		
