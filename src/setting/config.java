@@ -54,6 +54,8 @@ public class config
 	public String lootThreshold="";
 	public int slot =0;
 	
+	private xy xyBarrackTrain = null;
+	
 	public ArrayList<xy> swapSlot = new ArrayList<xy>();
 	
 	private ArrayList<AutoUpgradeData> autoUpgradeList = new ArrayList<AutoUpgradeData>();
@@ -105,6 +107,7 @@ public class config
 					deployBarb = Integer.valueOf(eElement.getElementsByTagName("deployBarb").item(0).getTextContent());
 					lootThreshold = eElement.getElementsByTagName("loot").item(0).getTextContent();
 					slot = Integer.valueOf(eElement.getElementsByTagName("slot").item(0).getTextContent());
+					xyBarrackTrain =  createXY(eElement.getElementsByTagName("barrackTrain").item(0).getTextContent());
 				}
 			}
 			
@@ -300,12 +303,14 @@ public class config
 				
 					is.close();
 					
-					ftp.disconnect();			
+					ftp.disconnect();	
+					count++;
 				}
 				catch(Exception e)
 				{
 					System.out.println("Error UploadFTP CONFIG method");
 		        	System.out.println(e.getMessage());
+							        	
 		        	e.printStackTrace();
 		        	success = false;					
 				}
@@ -395,7 +400,7 @@ public class config
 			{
 				//pos.add(new xy(505,297)); //click barracks 
 				pos.add(xyBarrack); 
-				pos.add(new xy(859,712)); //click train
+				pos.add(xyBarrackTrain); //click train
 				
 				//match on Troop capacity after training:
 				s = new struct("barracks",	562, 298, 203, 21, ruleFolder+"\\barracks.jpg",pos);				

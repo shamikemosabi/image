@@ -500,6 +500,8 @@ public class click
 			catch(Exception e)
 			{
 				System.out.println("error in deleteFromXML");
+				guiFrame.info("error in deleteFromXML");
+				guiFrame.info(e.getMessage());
 				e.printStackTrace();
 			}
 			
@@ -1306,12 +1308,17 @@ public class click
 				
 					is.close();
 					
-					ftp.disconnect();			
+					ftp.disconnect();	
+					
+					count++;
 				}
 				catch(Exception e)
 				{
 					System.out.println("Error UploadFTP CLICK method");
 		        	System.out.println(e.getMessage());
+		        	
+					guiFrame.info("Error UploadFTP CLICK method");
+					guiFrame.info(e.getMessage());
 		        	e.printStackTrace();
 		        	success = false;					
 				}
@@ -1351,6 +1358,10 @@ public class click
 	        {
 	        	System.out.println("Error downloadFTP");
 	        	System.out.println(e.getMessage());
+	        	
+				guiFrame.info("Error downloadFTP");
+				guiFrame.info(e.getMessage());	   
+				
 	        	e.printStackTrace();
 	        	success = false;
 	        }
