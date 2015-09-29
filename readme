@@ -1,3 +1,7 @@
 @todo
 
-- move swapslots into config file
+
+
+@bug
+
+- config.xml sometimes gets cut off. Not sure if it's FTP problem, or writing from docuemnt to config file problem. 

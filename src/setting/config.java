@@ -112,6 +112,7 @@ public class config
 			}
 			
 	 
+			setUpSwapSlots(doc);
 			// create AutoUpgrade object
 			createAutoUpgrade(doc);	
 			
@@ -129,6 +130,21 @@ public class config
 			e.printStackTrace();
 		}
 	}
+	
+	public void setUpSwapSlots(Document doc)
+	{	
+		NodeList nList = doc.getElementsByTagName("swapSlots");
+		for (int temp = 0; temp < nList.getLength(); temp++) 
+		{
+
+			Node nNode = nList.item(temp);				
+			Element eElement = (Element) nNode;
+			
+			swapSlot.add(createXY(eElement.getTextContent().trim()));										
+		}
+					
+	}
+	
 	
 	public void deleteActiveEmail(Document doc, String oldAccount)
 	{
@@ -264,13 +280,16 @@ public class config
 	}
 	public void setup()
 	{
+		downloadFTP(config.configFile , "/config/config.xml"); 
+		
+		/*
 		swapSlot.add(new xy(508,286));  
 		swapSlot.add(new xy(508,353));
 		swapSlot.add(new xy(508,419));
 		swapSlot.add(new xy(508,476));
-		swapSlot.add(new xy(508,539));
+		swapSlot.add(new xy(508,539));	
+		*/	
 		
-		downloadFTP(config.configFile , "/config/config.xml");
 	}
 	
 	public xy createXY(String s)

@@ -83,7 +83,7 @@ public class click
 	private email e;
 	public click() throws Exception
 	{
-		downloadFTP(config.configFile , "/config/config.xml");
+		downloadFTP(config.configFile , "/config/config.xml"); 
 		setGUIandControl();
 		RunEmailService();	
 		
