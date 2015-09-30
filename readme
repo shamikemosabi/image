@@ -1,5 +1,7 @@
 @todo
-
+- currently, command config:, swap: only works IF screen is currently in Village.
+  If I call this command and it's mid battle, it will get stuck at return to home screen from battle.
+  (because method is call from within read=2)
 
 
 @bug
