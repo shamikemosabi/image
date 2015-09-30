@@ -696,7 +696,7 @@ public class click
 	        ImageIO.write(screencapture, "jpg", outputFile);	
 	        guiFrame.info("Finished saving to file");
 	        	       	       
-	        sendPictureText(name);
+	        sendPictureTextStatus(name);
 	        
 	        sendPicText = false;
 	        
@@ -933,12 +933,80 @@ public class click
 	        MimeBodyPart attachPart = new MimeBodyPart();
 	        attachPart.attachFile(file);
 	        
-	        //MimeBodyPart attachPart2 = new MimeBodyPart();
-	        //attachPart2.attachFile("currentcamp.jpg");
+	       // MimeBodyPart attachPart2 = new MimeBodyPart();
+	       // attachPart2.attachFile("currentcamp.jpg");
 	        
 		    
 	        multipart.addBodyPart(attachPart);
-	        //multipart.addBodyPart(attachPart2);
+	       // multipart.addBodyPart(attachPart2);
+	        
+		    message.setFrom(new InternetAddress(con.getEmail()));
+		    InternetAddress[] toAddress = new InternetAddress[to.length];
+		    for( int i=0; i < to.length; i++ ) { // changed from a while loop
+		        toAddress[i] = new InternetAddress(to[i]);
+		    }
+		    
+		    for( int i=0; i < toAddress.length; i++) { // changed from a while loop
+		        message.addRecipient(Message.RecipientType.TO, toAddress[i]);
+		    }
+		    
+		   // String temp = "Screen shot";
+
+		  //  message.setSubject(temp);
+		 //   String body=temp;
+		   //message.setContent(body, "text/html");
+		    message.setContent(multipart);
+		    Transport transport = session.getTransport("smtp");
+		    guiFrame.info("Connect");
+		    transport.connect(host, from, pass);
+		    guiFrame.info("Send message");
+		    transport.sendMessage(message, message.getAllRecipients());
+		    transport.close();
+		    guiFrame.info("Message Sent");
+	}
+	
+	
+	public void sendPictureTextStatus(String file) throws Exception
+	{
+		guiFrame.info("Started sendPictureText");
+		 String host = "smtp.gmail.com";
+		    String from = con.getEmail(); 
+		    String pass = con.getPW();
+		    Properties props = System.getProperties();
+		    
+		  		    
+		    props.put("mail.smtp.starttls.enable", "true"); // added this line
+		    props.put("mail.smtp.host", host);
+		    props.put("mail.smtp.user", from);
+		    props.put("mail.smtp.password", pass);
+		    props.put("mail.smtp.port", "587");
+		    props.put("mail.smtp.auth", "true");	
+		    
+		    
+		    //String[] to = {"shamikemosabi@gmail.com"}; // added this line
+		    String[] to = {"6462841208@tmomail.net"}; // added this line
+		    
+ 		    //Session session = Session.getDefaultInstance(props);
+			   Session session = Session.getDefaultInstance(props, new GMailAuthenticator(from, pass));
+		    MimeMessage message = new MimeMessage(session);
+		    
+		    // creates message part
+	      //  MimeBodyPart messageBodyPart = new MimeBodyPart();
+	     //   messageBodyPart.setContent("hi", "text/html");
+	 
+	        // creates multi-part
+	        Multipart multipart = new MimeMultipart();
+	      //  multipart.addBodyPart(messageBodyPart);
+	        
+	        MimeBodyPart attachPart = new MimeBodyPart();
+	        attachPart.attachFile(file);
+	        
+	        MimeBodyPart attachPart2 = new MimeBodyPart();
+	        attachPart2.attachFile("currentcamp.jpg");
+	        
+		    
+	        multipart.addBodyPart(attachPart);
+	        multipart.addBodyPart(attachPart2);
 	        
 		    message.setFrom(new InternetAddress(con.getEmail()));
 		    InternetAddress[] toAddress = new InternetAddress[to.length];
