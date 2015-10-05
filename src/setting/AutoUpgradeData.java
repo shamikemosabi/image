@@ -10,6 +10,9 @@ public class AutoUpgradeData
 	private String time = "";
 	private ArrayList<xy> xyArrayList = new ArrayList<xy>();
 	private boolean swapBack = false;
+	
+	private String name ="";	
+	
 	public AutoUpgradeData()
 	{
 		
@@ -42,6 +45,14 @@ public class AutoUpgradeData
 
 	public void setSwapBack(boolean swapBack) {
 		this.swapBack = swapBack;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 }

@@ -44,6 +44,7 @@ public class config
 	
 	public final static String readFile =  System.getProperty("user.dir")+"\\read.txt";
 	public final static String configFile =  System.getProperty("user.dir")+"\\config.xml";
+	public final static String upgradeFile =  System.getProperty("user.dir")+"\\upgrade.xml";
 	
 	private xy xyBarrack = null;
 	private xy xyCamp = null;
@@ -517,6 +518,11 @@ public class config
 				
 				s = new struct("swap",613,285,217,37, ruleFolder+"\\swap.jpg",pos);
 			}
+			if(name.equals("zeroBuilder"))
+			{						
+				//change match pic, to 0 builders
+				s = new struct("zeroBuilder",581,29, 22, 23, ruleFolder+"\\init.jpg",pos);
+			}			
 			
 		}
 		else

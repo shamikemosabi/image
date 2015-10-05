@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
@@ -56,6 +57,7 @@ import org.w3c.dom.NodeList;
 import email.email;
 import setting.AutoUpgradeData;
 import setting.config;
+import setting.config.xy;
 
 
 
@@ -113,6 +115,8 @@ public class click
 		System.exit(0);
 		AutoUpgrade();
 		System.exit(0);
+				AutoUpgradeBuilder();
+		System.exit(0);
 	*/
 
 
@@ -132,6 +136,7 @@ public class click
 				{
 					if(disconnected) GotDisconnected();	
 					
+					AutoUpgradeBuilder();
 					AutoUpgrade();
 					sendPictureText();
 					setUpScreen();				
@@ -244,6 +249,7 @@ public class click
 					clickSafeSpot(); // click safe spot to be active
 					if(inMain())
 					{
+						AutoUpgradeBuilder();
 						AutoUpgrade();
 					}
 					Thread.sleep(30000);
@@ -302,6 +308,136 @@ public class click
 			}
 			*/
 		}
+	}
+	
+	public boolean zeroBuilder() throws Exception
+	{
+
+		return compareImage("zeroBuilder");
+	}
+	
+	/* 
+	 * Auto upgrade when builder is available.
+	 * Current session will check for free builder.
+	 * 
+	 * Other session will have to swap first then will check for free builder
+	 */
+	public void AutoUpgradeBuilder() throws Exception
+	{
+		ArrayList<AutoUpgradeData>  al;
+		
+		//if screen is setup, and have builder
+		if(isScreenSetup() && (!zeroBuilder()) )
+		{
+			guiFrame.info("Builder free and screen setup");
+			al = loadUpgradeBuilder(con.getEmail());
+			
+			for(int i =0; (i < al.size() && !zeroBuilder()); i++)			
+			{	
+				clickAutoUpgrade(al.get(i));
+				takeCurrentScreenshot(false);
+				clickSafeSpot();
+				//compare previous cropCurrent image (cropped zero builder of last time) with current zerobuilder
+				// The idea is After clickAutoUpgrade(), and my image is still the same it means nothing happened, so there was no 
+				// successful upgrade. If it was different THEN I should send text to show upgrade.
+				
+				//make sure call from zerobuilder() and here does not have any compare image, or else my cropCurrent would be overwritten
+				boolean send = !SameBuilderImage();				
+								
+				 if(send)
+		        {
+		        	sendPictureText("currentstatus.jpg");
+		        }
+	
+			}
+		}
+		
+	}
+	
+	public boolean SameBuilderImage() throws Exception
+	{
+		boolean ret = false;
+		File f = new File("cropBuilderPrev.jpg");
+		f.delete();
+		
+		File f2 = new File("cropcurrent.jpg");
+		
+		f2.renameTo(f);
+		
+		zeroBuilder();
+		
+	    ImageCompare ic = new ImageCompare("cropBuilderPrev.jpg", "cropcurrent.jpg");
+	    ret =  ic.setupAndCompare(ic);
+	    
+	    return ret;
+	}
+	
+	
+	public ArrayList<AutoUpgradeData> loadUpgradeBuilder(String account)
+	{
+		ArrayList<AutoUpgradeData> alAutoUpgradeBuilder = new ArrayList<AutoUpgradeData> ();
+		try{					
+			downloadFTP(config.upgradeFile , "/config/upgrade.xml");
+			
+			File fXmlFile = new File(config.upgradeFile);
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(fXmlFile);
+			doc.getDocumentElement().normalize();
+			
+			NodeList nList = doc.getElementsByTagName("email");			
+			for (int temp = 0; temp < nList.getLength(); temp++) 
+			{
+				
+				Node nNode = nList.item(temp);				
+				Element eElement = (Element) nNode;
+				String e  = eElement.getAttribute("id");
+				
+				if(e.equals(account)) // if this is same account as what was input
+				{
+					NodeList itemList = eElement.getElementsByTagName("item");
+					
+					
+					//loop thru all item that match our account
+					for(int i = 0 ; i < itemList.getLength(); i ++)
+					{						
+						Node itemNode = itemList.item(i);				
+						Element itemEle = (Element) itemNode;
+						
+						AutoUpgradeData aud = new AutoUpgradeData();
+						
+						aud.setName(itemEle.getElementsByTagName("name").item(0).getTextContent());
+						aud.getXYArrayList().add(createXY(itemEle.getElementsByTagName("pos").item(0).getTextContent()));
+						aud.getXYArrayList().add(createXY(itemEle.getElementsByTagName("upgrade").item(0).getTextContent()));
+						aud.getXYArrayList().add(createXY(itemEle.getElementsByTagName("click").item(0).getTextContent()));
+						
+						alAutoUpgradeBuilder.add(aud);
+					}
+					
+					
+				}
+			}
+			
+						
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			guiFrame.info("Error in loadUpgradeBuilder");
+		}
+		
+		return alAutoUpgradeBuilder;
+	}
+	
+	public xy createXY(String s)
+	{
+		int a = Integer.valueOf(s.substring(0, s.indexOf(",")));
+		int b = Integer.valueOf( s.substring(s.indexOf(",") + 1, s.length()));
+		
+		xy temp = con.new xy(a,b);		
+		
+		return temp;
+		
 	}
 	
 	
@@ -363,7 +499,7 @@ public class click
 						{
 							setUpScreen();
 							clickAutoUpgrade(aud);
-							takeCurrentScreenshot();
+							takeCurrentScreenshot(true);
 							clickSafeSpot();
 						}
 					}
@@ -378,8 +514,9 @@ public class click
 						if(inMain()) // make sure in main.
 						{
 							setUpScreen();
+							AutoUpgradeBuilder();
 							clickAutoUpgrade(aud);
-							takeCurrentScreenshot();
+							takeCurrentScreenshot(true);
 							clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.
 							if(swapBack)
 							{
@@ -639,18 +776,21 @@ public class click
 			 Thread.sleep(5000); // wait 5 sec before taking screen shot, I want village to load up.
 			 
 			//take and send screenshot
-			 takeCurrentScreenshot();
+			 takeCurrentScreenshot(true);
 		 }
 		 
 	}
 	
-	public void takeCurrentScreenshot() throws Exception
+	public void takeCurrentScreenshot(boolean send) throws Exception
 	{
 		BufferedImage screencapture = cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));			
 		String name = "currentstatus.jpg";
 		File outputFile = new File(name);
         ImageIO.write(screencapture, "jpg", outputFile);	
-        sendPictureText(name);
+        if(send)
+        {
+        	sendPictureText(name);
+        }
 	}
 	
 	public void GotDisconnected()
