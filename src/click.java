@@ -83,6 +83,10 @@ public class click
 	
 	private String email;
 	private email e;
+	
+	ArrayList<AutoUpgradeData> alAutoUpgradeBuilderNOW = new ArrayList<AutoUpgradeData> ();
+	ArrayList<AutoUpgradeData> alAutoUpgradeBuilderSTATIC = new ArrayList<AutoUpgradeData> ();
+	
 	public click() throws Exception
 	{
 		downloadFTP(config.configFile , "/config/config.xml"); 
@@ -439,7 +443,81 @@ public class click
 		return temp;
 		
 	}
+	 
 	
+	public void AutoUpgrade2() throws Exception
+	{
+		
+		try{
+			alAutoUpgradeBuilderNOW.clear();
+			alAutoUpgradeBuilderSTATIC.clear();
+			downloadFTP(config.configFile , "/config/config.xml");
+			
+			File fXmlFile = new File(config.configFile);
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(fXmlFile);
+			doc.getDocumentElement().normalize();		
+			
+			NodeList nList = doc.getElementsByTagName("pos");
+			for (int temp = 0; temp < nList.getLength(); temp++) 
+			{
+				Node nNode = nList.item(temp);				
+				Element eElement = (Element) nNode;				
+				String id = eElement.getAttribute("id");
+				
+				AutoUpgradeData aud = new AutoUpgradeData();
+								
+				String email = eElement.getElementsByTagName("upgradeEmail").item(0).getTextContent();
+				boolean swapBack= Boolean.valueOf(eElement.getElementsByTagName("swapBack").item(0).getTextContent());
+				
+				aud.setEmail(email);
+				aud.setSwapBack(swapBack);
+				
+				NodeList xyList = eElement.getElementsByTagName("xy");
+				
+				for (int i = 0; i < xyList.getLength(); i++) 
+				{
+					Node n = xyList.item(i);
+					Element xye = (Element) n;
+					
+					xy newXY = createXY(xye.getTextContent());
+					aud.getXYArrayList().add(newXY);
+							
+				}
+								
+				if(id.equals("now"))
+				{
+					alAutoUpgradeBuilderNOW.add(aud);
+				}
+				else if(id.equals("static"))
+				{
+					alAutoUpgradeBuilderSTATIC.add(aud);
+				}
+				
+			}
+			
+			
+			for(int i=0; i< alAutoUpgradeBuilderNOW.size(); i++)
+			{
+				// if either auto upgrade is checked, or the id is same as current ID. 
+				if(guiFrame.getAutoUpgrade() || con.getEmail().equals(alAutoUpgradeBuilderNOW.get(i).getEmail()))
+				{
+				
+					
+					
+				}							
+			}
+			
+			
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+		}
+		
+	}
 	
 	/**
 	 *  check auto upgrade list if there is anything to upgrade, if there is 
