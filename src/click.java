@@ -443,79 +443,207 @@ public class click
 		return temp;
 		
 	}
-	 
+	
+	/*
+	 * New auto upgrade method,
+	 * - the idea is to call this everytime which will FTP everytime. might be a lot of FTP but I'm doing this now because there will now be no more
+	 *   concurrent machine running auto upgrade. Also with this new way, I don't have to call config: to load config file, I can just FTP new config file
+	 *   no more loading manually.
+	 *   
+	 * - This will work by reading ALL pos in upgrade. The sorting order now does not matter, because I will now loop thru all of them and if the time is
+	 * 	  less then current time, then I will do it. So if I just want to do a quick pos click, I can just add a pos with old date and it will work.
+	 * - if I want to do a future pos click ( maybe to remove gem, or to overwrite a build order from upgrade.xml) I can set the date and it will do it when
+	 *   it gets to it
+	 * 
+	 * - and lastly there will now be a "static" id pos, which is pos that I don't want to delete. These are basically used so I can swap to them 
+	 *   scheduled maybe every 2 - 3 hrs. This way I don't have to constantly upgrade config.xml to see when a builder is free. 
+	 *   every 2-3 hrs it will swap to another account, if it sees a free builder it will build. if it doesn't it just doesn't do anything and swaps to the 
+	 *   next account
+	 * - not sure how I want to do this yet, Maybe something outside of this that keeps track of timing, and when it hits every 2- 3 hrs it will set TRUE
+	 *   and it will try to STATIC swap.     
+	 *     
+	 */
 	
 	public void AutoUpgrade2() throws Exception
 	{
-		
-		try{
-			alAutoUpgradeBuilderNOW.clear();
-			alAutoUpgradeBuilderSTATIC.clear();
-			downloadFTP(config.configFile , "/config/config.xml");
-			
-			File fXmlFile = new File(config.configFile);
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(fXmlFile);
-			doc.getDocumentElement().normalize();		
-			
-			NodeList nList = doc.getElementsByTagName("pos");
-			for (int temp = 0; temp < nList.getLength(); temp++) 
-			{
-				Node nNode = nList.item(temp);				
-				Element eElement = (Element) nNode;				
-				String id = eElement.getAttribute("id");
-				
-				AutoUpgradeData aud = new AutoUpgradeData();
-								
-				String email = eElement.getElementsByTagName("upgradeEmail").item(0).getTextContent();
-				boolean swapBack= Boolean.valueOf(eElement.getElementsByTagName("swapBack").item(0).getTextContent());
-				
-				aud.setEmail(email);
-				aud.setSwapBack(swapBack);
-				
-				NodeList xyList = eElement.getElementsByTagName("xy");
-				
-				for (int i = 0; i < xyList.getLength(); i++) 
-				{
-					Node n = xyList.item(i);
-					Element xye = (Element) n;
-					
-					xy newXY = createXY(xye.getTextContent());
-					aud.getXYArrayList().add(newXY);
-							
-				}
-								
-				if(id.equals("now"))
-				{
-					alAutoUpgradeBuilderNOW.add(aud);
-				}
-				else if(id.equals("static"))
-				{
-					alAutoUpgradeBuilderSTATIC.add(aud);
-				}
-				
-			}
-			
-			
-			for(int i=0; i< alAutoUpgradeBuilderNOW.size(); i++)
-			{
-				// if either auto upgrade is checked, or the id is same as current ID. 
-				if(guiFrame.getAutoUpgrade() || con.getEmail().equals(alAutoUpgradeBuilderNOW.get(i).getEmail()))
-				{
-				
-					
-					
-				}							
-			}
-			
-			
-		}
-		catch(Exception e)
+		if(guiFrame.getAutoUpgrade())
 		{
-			e.printStackTrace();
-			System.out.println(e.getMessage());
+			try{
+				alAutoUpgradeBuilderNOW.clear();
+				alAutoUpgradeBuilderSTATIC.clear();
+				downloadFTP(config.configFile , "/config/config.xml");
+				
+				File fXmlFile = new File(config.configFile);
+				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+				Document doc = dBuilder.parse(fXmlFile);
+				doc.getDocumentElement().normalize();		
+				
+				NodeList nList = doc.getElementsByTagName("pos");
+				for (int temp = 0; temp < nList.getLength(); temp++) // each POS
+				{
+					Node nNode = nList.item(temp);				
+					Element eElement = (Element) nNode;				
+					String id = eElement.getAttribute("id");
+					
+					AutoUpgradeData aud = new AutoUpgradeData();
+									
+					String email = eElement.getElementsByTagName("upgradeEmail").item(0).getTextContent();
+					boolean swapBack= Boolean.valueOf(eElement.getElementsByTagName("swapBack").item(0).getTextContent());
+					
+					aud.setEmail(email);
+					aud.setSwapBack(swapBack);
+					aud.setTime(id);
+					
+					NodeList xyList = eElement.getElementsByTagName("xy");
+					
+					for (int i = 0; i < xyList.getLength(); i++) 
+					{
+						Node n = xyList.item(i);
+						Element xye = (Element) n;
+						
+						xy newXY = createXY(xye.getTextContent());
+						aud.getXYArrayList().add(newXY);
+								
+					}
+											
+					if(id.equals("static")) 
+					{
+						alAutoUpgradeBuilderSTATIC.add(aud);
+						
+					}
+					else  // if not static assume id is time
+					{
+						alAutoUpgradeBuilderNOW.add(aud);
+					}
+					
+				}
+				// I have loaded everything
+				
+				//current time
+				DateFormat dateFormat = new SimpleDateFormat("MM/dd h:mm a");
+				Calendar d = Calendar.getInstance();
+				Date currDate = d.getTime();
+				
+				
+				
+				if(alAutoUpgradeBuilderNOW.size() > 0)
+				{
+					String originalEmail = con.getEmail();
+					String lastEmail ="";
+					boolean deleted =  false;
+					
+					for(int i=0; i< alAutoUpgradeBuilderNOW.size(); i++)
+					{					
+						String t = alAutoUpgradeBuilderNOW.get(i).getTime();
+						String e = alAutoUpgradeBuilderNOW.get(i).getEmail();
+						AutoUpgradeData aud = alAutoUpgradeBuilderNOW.get(i);
+						
+						boolean active = false;
+						
+						DateFormat format = new SimpleDateFormat("MM/dd/yyyy h:mm a");
+						Date date = format.parse(t);					
+						
+						//if my date is before current date, then do it!
+						if(date.before(currDate))
+						{
+							deleted = true;
+							deleteFromXMLSpecific(doc, t);							
+							active = isEmailActive(doc, e, ""); //empty string last param, because I don't care if same account or not							
+						}
+						
+						// The email is currently not active so we can swap
+						if(!active)
+						{
+							lastEmail = e; //need to know what was the last email, so I can swap back when for loop is done.
+							
+							guiFrame.info("Auto upgrade swap");
+							swap(e,con.getEmail());
+							clickSafeSpot(); // click safe spot to get rid of raided screen
+							Thread.sleep(3000);
+							
+							//we should be in the new account now.
+							if(inMain()) // make sure in main.
+							{
+								setUpScreen();
+								clickAutoUpgrade(aud);
+								AutoUpgradeBuilder();
+								takeCurrentScreenshot(true);
+								clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.								
+							}
+							else
+							{
+								guiFrame.info("Swap failed, not in main");
+							}
+							
+						}													
+					}
+					
+					//swap back to original
+					if(!active)
+					{
+						swap(oldEmail,upgradeEmail); // swap back
+					}
+					
+					if(deleted) // if we deleted from above then write back and FTP. 
+					{
+						//After looping all, lets take whatever is left of doc and write it to config and FTP it back
+						try{
+							// write the content into xml file
+							TransformerFactory transformerFactory = TransformerFactory.newInstance();
+							Transformer transformer = transformerFactory.newTransformer();
+							DOMSource source = new DOMSource(doc);
+							StreamResult result = new StreamResult(new File(con.configFile));
+							transformer.transform(source, result);
+							
+							upLoadFTP(con.configFile,"config");	
+						}
+						catch(Exception e)
+						{
+							System.out.println("error in deleteFromXMLSpecific");
+							guiFrame.info("error in deleteFromXMLSpecific");
+							guiFrame.info(e.getMessage());
+							e.printStackTrace();
+						}
+					}
+					
+
+					
+				}
+				
+			}
+		
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				System.out.println(e.getMessage());
+			}
 		}
+		
+	}
+	
+	public void deleteFromXMLSpecific(Document d, String id)
+	{
+		Node upgrade = d.getElementsByTagName("upgrade").item(0);
+		NodeList list = upgrade.getChildNodes();
+		
+		// loop thru all pos, and fine matching id.
+		for (int temp = 0; temp < list.getLength(); temp++)
+		{
+			Node nNode = list.item(temp);	
+						
+			Element eElement = (Element) nNode;
+			String idFromXML = eElement.getAttribute("id");
+			
+			// found my matching id, remove it
+			if(idFromXML.equals(id))
+			{
+				upgrade.removeChild(nNode);				
+				
+				break;
+				
+			}
+		}		
 		
 	}
 	
