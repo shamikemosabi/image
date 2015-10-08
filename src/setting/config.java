@@ -124,6 +124,7 @@ public class config
 				deleteActiveEmail(doc, oldAccount);
 			}
 			
+			
 		}
 		catch(Exception e)
 		{
@@ -281,7 +282,7 @@ public class config
 	}
 	public void setup()
 	{
-		downloadFTP(config.configFile , "/config/config.xml"); 
+		downloadFTP(config.configFile , "/config/config.xml");  
 		
 		/*
 		swapSlot.add(new xy(508,286));  

@@ -45,6 +45,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.*;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.net.ftp.FTP;
@@ -58,6 +59,7 @@ import email.email;
 import setting.AutoUpgradeData;
 import setting.config;
 import setting.config.xy;
+
 
 
 
@@ -89,9 +91,10 @@ public class click
 	
 	public click() throws Exception
 	{
-		downloadFTP(config.configFile , "/config/config.xml"); 
+		downloadFTP(config.configFile , "/config/config.xml");  
 		setGUIandControl();
 		RunEmailService();	
+		
 		
 	//	AutoUpgrade();
 		/*
@@ -140,8 +143,9 @@ public class click
 				{
 					if(disconnected) GotDisconnected();	
 					
+					AutoUpgrade2();
 					AutoUpgradeBuilder();
-					AutoUpgrade();
+					
 					sendPictureText();
 					setUpScreen();				
 					//if(clickCamp())
@@ -253,8 +257,9 @@ public class click
 					clickSafeSpot(); // click safe spot to be active
 					if(inMain())
 					{
+						AutoUpgrade2();
 						AutoUpgradeBuilder();
-						AutoUpgrade();
+						
 					}
 					Thread.sleep(30000);
 					guiFrame.info("STAY ACTIVE");
@@ -471,7 +476,7 @@ public class click
 			try{
 				alAutoUpgradeBuilderNOW.clear();
 				alAutoUpgradeBuilderSTATIC.clear();
-				downloadFTP(config.configFile , "/config/config.xml");
+				downloadFTP(config.configFile , "/config/config.xml"); 
 				
 				File fXmlFile = new File(config.configFile);
 				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -532,11 +537,13 @@ public class click
 					String originalEmail = con.getEmail();
 					String lastEmail ="";
 					boolean deleted =  false;
+					boolean swapBack = false;
 					
 					for(int i=0; i< alAutoUpgradeBuilderNOW.size(); i++)
 					{					
 						String t = alAutoUpgradeBuilderNOW.get(i).getTime();
 						String e = alAutoUpgradeBuilderNOW.get(i).getEmail();
+						swapBack = alAutoUpgradeBuilderNOW.get(i).isSwapBack();
 						AutoUpgradeData aud = alAutoUpgradeBuilderNOW.get(i);
 						
 						boolean active = false;
@@ -547,42 +554,47 @@ public class click
 						//if my date is before current date, then do it!
 						if(date.before(currDate))
 						{
+							guiFrame.info("There is upgrade to do");
 							deleted = true;
 							deleteFromXMLSpecific(doc, t);							
 							active = isEmailActive(doc, e, ""); //empty string last param, because I don't care if same account or not							
-						}
 						
-						// The email is currently not active so we can swap
-						if(!active)
-						{
-							lastEmail = e; //need to know what was the last email, so I can swap back when for loop is done.
-							
-							guiFrame.info("Auto upgrade swap");
-							swap(e,con.getEmail());
-							clickSafeSpot(); // click safe spot to get rid of raided screen
-							Thread.sleep(3000);
-							
-							//we should be in the new account now.
-							if(inMain()) // make sure in main.
+						
+							// The email is currently not active so we can swap
+							if(!active)
 							{
-								setUpScreen();
-								clickAutoUpgrade(aud);
-								AutoUpgradeBuilder();
-								takeCurrentScreenshot(true);
-								clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.								
-							}
-							else
-							{
-								guiFrame.info("Swap failed, not in main");
-							}
-							
-						}													
+								swapBack = !active && swapBack ; // also need to consider swapback value
+								lastEmail = e; //need to know what was the last email, so I can swap back when for loop is done.
+								
+								guiFrame.info("Email is not active so Swwapping");
+								swap(e,con.getEmail());
+								clickSafeSpot(); // click safe spot to get rid of raided screen
+								Thread.sleep(3000);
+								
+								//we should be in the new account now.
+								if(inMain()) // make sure in main.
+								{
+									guiFrame.info("In main from after swap");
+									setUpScreen();
+									clickAutoUpgrade(aud);
+									AutoUpgradeBuilder();
+									takeCurrentScreenshot(true);
+									clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.								
+								}
+								else
+								{
+									guiFrame.info("Swap failed, not in main");
+								}
+								
+							}		
+						}
 					}
 					
 					//swap back to original
-					if(!active)
+					if(swapBack)
 					{
-						swap(oldEmail,upgradeEmail); // swap back
+						guiFrame.info("Swapping back to original email");
+						swap(originalEmail,con.getEmail()); // swap back
 					}
 					
 					if(deleted) // if we deleted from above then write back and FTP. 
@@ -590,13 +602,14 @@ public class click
 						//After looping all, lets take whatever is left of doc and write it to config and FTP it back
 						try{
 							// write the content into xml file
+							guiFrame.info("Writing document to config.xml");
 							TransformerFactory transformerFactory = TransformerFactory.newInstance();
 							Transformer transformer = transformerFactory.newTransformer();
 							DOMSource source = new DOMSource(doc);
 							StreamResult result = new StreamResult(new File(con.configFile));
 							transformer.transform(source, result);
 							
-							upLoadFTP(con.configFile,"config");	
+							upLoadFTP(con.configFile,"config"); 	
 						}
 						catch(Exception e)
 						{
@@ -624,26 +637,22 @@ public class click
 	
 	public void deleteFromXMLSpecific(Document d, String id)
 	{
-		Node upgrade = d.getElementsByTagName("upgrade").item(0);
-		NodeList list = upgrade.getChildNodes();
-		
-		// loop thru all pos, and fine matching id.
-		for (int temp = 0; temp < list.getLength(); temp++)
+		try{		
+        XPathFactory xpf = XPathFactory.newInstance();
+        XPath xpath = xpf.newXPath();
+        String expression = "//upgrade/pos[@id='"+ id + "']";
+        
+		Node node = (Node) xpath.compile(expression).evaluate(d, XPathConstants.NODE);
+		node.getParentNode().removeChild(node);
+		guiFrame.info("removed node");
+		}
+		catch(Exception e)
 		{
-			Node nNode = list.item(temp);	
-						
-			Element eElement = (Element) nNode;
-			String idFromXML = eElement.getAttribute("id");
-			
-			// found my matching id, remove it
-			if(idFromXML.equals(id))
-			{
-				upgrade.removeChild(nNode);				
-				
-				break;
-				
-			}
-		}		
+			guiFrame.info("error in deleteFromXMLSpecific");
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+		}
+		
 		
 	}
 	
@@ -862,7 +871,7 @@ public class click
 	
 	public void swap(String em, String oldEmail) throws Exception
 	{
-		downloadFTP(config.configFile , "/config/config.xml");
+		downloadFTP(config.configFile , "/config/config.xml"); 
 		
 		config newCon = new config(em, oldEmail); // new account's setting, most importantly I need the slot position
 		
@@ -904,6 +913,7 @@ public class click
 			 Thread.sleep(7000); //wait 7 seconds for load village to show up.
 			 
 			 ret = compareImage("swap"); //check if load village screen.
+			
 			 if(ret)
 			 {
 				 break; // break out of while.
@@ -929,7 +939,7 @@ public class click
 			 cont.mouseRelease(InputEvent.BUTTON1_MASK);	
 			 Thread.sleep(1000);
 			 
-			 //Type the word CONFIRM
+			//Type the word CONFIRM
 			 cont.keyPress( KeyEvent.VK_SHIFT );
 			 cont.keyPress(KeyEvent.VK_C);
 			 cont.keyRelease(KeyEvent.VK_C);
@@ -977,12 +987,12 @@ public class click
 			 
 			//might have to update read.txt here.
 			// lets update to 1, which mean start (keep active), we'll let email service run the next time to update actual value.
-			updateReadFile("1");
+			//updateReadFile("1");
 			
 			 Thread.sleep(5000); // wait 5 sec before taking screen shot, I want village to load up.
 			 
 			//take and send screenshot
-			 takeCurrentScreenshot(true);
+			 //takeCurrentScreenshot(true);
 		 }
 		 
 	}
