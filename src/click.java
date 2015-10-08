@@ -547,6 +547,7 @@ public class click
 						AutoUpgradeData aud = alAutoUpgradeBuilderNOW.get(i);
 						
 						boolean active = false;
+						boolean exist = true;
 						
 						DateFormat format = new SimpleDateFormat("MM/dd/yyyy h:mm a");
 						Date date = format.parse(t);					
@@ -557,41 +558,55 @@ public class click
 							guiFrame.info("There is upgrade to do");
 							deleted = true;
 							deleteFromXMLSpecific(doc, t);							
-							active = isEmailActive(doc, e, ""); //empty string last param, because I don't care if same account or not							
-						
-						
-							// The email is currently not active so we can swap
-							if(!active)
+							exist = isEmailActive(doc, e, con.getEmail()); // exist is false if does not exist in xml, or swapping email and current email is the same 							
+													
+							// The email is not active or email swapping to is the same as old email
+							if(!exist)
 							{
-								swapBack = !active && swapBack ; // also need to consider swapback value
-								lastEmail = e; //need to know what was the last email, so I can swap back when for loop is done.
-								
-								guiFrame.info("Email is not active so Swwapping");
-								swap(e,con.getEmail());
-								clickSafeSpot(); // click safe spot to get rid of raided screen
-								Thread.sleep(3000);
-								
-								//we should be in the new account now.
-								if(inMain()) // make sure in main.
+								if(con.getEmail().equals(e)) // if same account then dont need to swap
 								{
-									guiFrame.info("In main from after swap");
-									setUpScreen();
-									clickAutoUpgrade(aud);
-									AutoUpgradeBuilder();
-									takeCurrentScreenshot(true);
-									clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.								
+									swapBack = false; //dont have to swapback original account
+									guiFrame.info("same account don't need to swap");
+									
+									if(inMain()) // make sure in main.
+									{
+										setUpScreen();
+										clickAutoUpgrade(aud);
+										takeCurrentScreenshot(true);
+										clickSafeSpot();
+									}
 								}
 								else
-								{
-									guiFrame.info("Swap failed, not in main");
-								}
+								{									
+									
+									guiFrame.info("Email is not active so Swapping");
+									swap(e,con.getEmail());
+									clickSafeSpot(); // click safe spot to get rid of raided screen
+									Thread.sleep(3000);
+									
+									//we should be in the new account now.
+									if(inMain()) // make sure in main.
+									{
+										guiFrame.info("In main from after swap");
+										setUpScreen();
+										clickAutoUpgrade(aud);
+										AutoUpgradeBuilder();
+										takeCurrentScreenshot(true);
+										clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.								
+									}
+									else
+									{
+										guiFrame.info("Swap failed, not in main");
+									}
+									
+								}				
 								
 							}		
 						}
 					}
 					
-					//swap back to original
-					if(swapBack)
+					//swap back to original, IF current email is not original email AND swapBack from xml is true
+					if(swapBack && (!con.getEmail().equals(originalEmail)))
 					{
 						guiFrame.info("Swapping back to original email");
 						swap(originalEmail,con.getEmail()); // swap back
@@ -619,8 +634,6 @@ public class click
 							e.printStackTrace();
 						}
 					}
-					
-
 					
 				}
 				
