@@ -248,7 +248,7 @@ public class click
 					if(inMain())
 					{
 						//email is from read file
-						swap(email, con.getEmail());			
+						swap(email, con.getEmail(), true);				
 					}
 					
 					break;
@@ -415,11 +415,23 @@ public class click
 						
 						AutoUpgradeData aud = new AutoUpgradeData();
 						
+						/*
 						aud.setName(itemEle.getElementsByTagName("name").item(0).getTextContent());
 						aud.getXYArrayList().add(createXY(itemEle.getElementsByTagName("pos").item(0).getTextContent()));
 						aud.getXYArrayList().add(createXY(itemEle.getElementsByTagName("upgrade").item(0).getTextContent()));
 						aud.getXYArrayList().add(createXY(itemEle.getElementsByTagName("click").item(0).getTextContent()));
+						*/
+						NodeList xyList = itemEle.getElementsByTagName("xy");		
 						
+						for (int j = 0; j < xyList.getLength(); j++) 		
+						{		
+							Node n = xyList.item(j);		
+							Element xye = (Element) n;		
+									
+							xy newXY = createXY(xye.getTextContent());		
+							aud.getXYArrayList().add(newXY);		
+											
+						}							
 						alAutoUpgradeBuilder.add(aud);
 					}
 					
@@ -471,8 +483,7 @@ public class click
 	
 	public void AutoUpgrade2() throws Exception
 	{
-		if(guiFrame.getAutoUpgrade())
-		{
+
 			try{
 				alAutoUpgradeBuilderNOW.clear();
 				alAutoUpgradeBuilderSTATIC.clear();
@@ -534,13 +545,15 @@ public class click
 				
 				if(alAutoUpgradeBuilderNOW.size() > 0)
 				{
-					String originalEmail = con.getEmail();
-					String lastEmail ="";
+					String originalEmail = con.getEmail();					
 					boolean deleted =  false;
 					boolean swapBack = false;
+					boolean defSwapBack  =false; // this is to know if we actually swapped or not, scenario where if swapBack is true (from config)
+												// the account exist is active, we need to know if it actually swapped and not soley rely on swaBack.
 					
 					for(int i=0; i< alAutoUpgradeBuilderNOW.size(); i++)
 					{					
+						defSwapBack = false; //default to false so it's for current for loop record
 						String t = alAutoUpgradeBuilderNOW.get(i).getTime();
 						String e = alAutoUpgradeBuilderNOW.get(i).getEmail();
 						swapBack = alAutoUpgradeBuilderNOW.get(i).isSwapBack();
@@ -556,8 +569,13 @@ public class click
 						if(date.before(currDate))
 						{
 							guiFrame.info("There is upgrade to do");
-							deleted = true;
-							deleteFromXMLSpecific(doc, t);							
+						
+							// only delete of autoupgrade, if it's not autoupgrade it'll still try to swap
+							if(guiFrame.getAutoUpgrade())
+							{
+								deleted = true;
+								deleteFromXMLSpecific(doc, t);
+							}
 							exist = isEmailActive(doc, e, con.getEmail()); // exist is false if does not exist in xml, or swapping email and current email is the same 							
 													
 							// The email is not active or email swapping to is the same as old email
@@ -565,7 +583,7 @@ public class click
 							{
 								if(con.getEmail().equals(e)) // if same account then dont need to swap
 								{
-									swapBack = false; //dont have to swapback original account
+									defSwapBack = false; //dont have to swapback original account
 									guiFrame.info("same account don't need to swap");
 									
 									if(inMain()) // make sure in main.
@@ -576,11 +594,11 @@ public class click
 										clickSafeSpot();
 									}
 								}
-								else
+								else if(guiFrame.getAutoUpgrade())
 								{									
-									
+									defSwapBack = true;
 									guiFrame.info("Email is not active so Swapping");
-									swap(e,con.getEmail());
+									swap(e,con.getEmail(),false);
 									clickSafeSpot(); // click safe spot to get rid of raided screen
 									Thread.sleep(3000);
 									
@@ -606,10 +624,10 @@ public class click
 					}
 					
 					//swap back to original, IF current email is not original email AND swapBack from xml is true
-					if(swapBack && (!con.getEmail().equals(originalEmail)))
+					if(guiFrame.getAutoUpgrade() && defSwapBack && swapBack && (!con.getEmail().equals(originalEmail)))
 					{
 						guiFrame.info("Swapping back to original email");
-						swap(originalEmail,con.getEmail()); // swap back
+						swap(originalEmail,con.getEmail(),false); // swap back
 					}
 					
 					if(deleted) // if we deleted from above then write back and FTP. 
@@ -644,7 +662,7 @@ public class click
 				e.printStackTrace();
 				System.out.println(e.getMessage());
 			}
-		}
+		
 		
 	}
 	
@@ -734,7 +752,7 @@ public class click
 					else
 					{
 						guiFrame.info("Need to swap");
-						swap(upgradeEmail,oldEmail); //swap to upgrade email
+						swap(upgradeEmail,oldEmail,false); //swap to upgrade email
 						clickSafeSpot(); // click safe spot to get rid of raided screen
 						Thread.sleep(3000);
 						
@@ -748,7 +766,7 @@ public class click
 							clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.
 							if(swapBack)
 							{
-								swap(oldEmail,upgradeEmail); // swap back
+								swap(oldEmail,upgradeEmail,false); // swap back
 							}
 							
 						}
@@ -882,7 +900,7 @@ public class click
 	}
 	
 	
-	public void swap(String em, String oldEmail) throws Exception
+	public void swap(String em, String oldEmail, boolean send) throws Exception
 	{
 		downloadFTP(config.configFile , "/config/config.xml"); 
 		
@@ -1005,7 +1023,10 @@ public class click
 			 Thread.sleep(5000); // wait 5 sec before taking screen shot, I want village to load up.
 			 
 			//take and send screenshot
-			 //takeCurrentScreenshot(true);
+			 if(send)					
+			 {		
+				 takeCurrentScreenshot(true);		
+			 }
 		 }
 		 
 	}
