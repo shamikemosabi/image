@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Properties;
 import java.util.Random;
 import java.util.logging.FileHandler;
@@ -89,15 +90,37 @@ public class click
 	ArrayList<AutoUpgradeData> alAutoUpgradeBuilderNOW = new ArrayList<AutoUpgradeData> ();
 	ArrayList<AutoUpgradeData> alAutoUpgradeBuilderSTATIC = new ArrayList<AutoUpgradeData> ();
 	
+	//every time I swap to the new account, the new account will get swapDate updated with current date.
+	static Hashtable<String, AutoUpgradeData> hashAutoUpgradeSWAP = new Hashtable <String, AutoUpgradeData> ();
+	
 	public click() throws Exception
 	{
 		downloadFTP(config.configFile , "/config/config.xml");  
 		setGUIandControl();
 		RunEmailService();	
+
 		
 		
 	//	AutoUpgrade();
 		/*
+		 * 
+		 * 		
+		AutoUpgradeData aud = new AutoUpgradeData();
+
+		Calendar d = Calendar.getInstance();
+		Date currDate = d.getTime();
+		
+		String t = "10/12/2015 9:22 PM";
+		aud.setEmail("docogo1@gmail.com");
+		
+		DateFormat format = new SimpleDateFormat("MM/dd/yyyy h:mm a");
+		Date date = format.parse(t);	
+		
+		aud.setSwapDate(date);
+		aud.setTime("static2");
+		isSwapStatic(aud, currDate);
+		
+		
 		BufferedImage screencapture =cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
 		String name = "current.jpg";
 		File outputFile = new File(name);
@@ -523,7 +546,7 @@ public class click
 								
 					}
 											
-					if(id.equals("static")) 
+					if(id.startsWith("static")) 
 					{
 						alAutoUpgradeBuilderSTATIC.add(aud);
 						
@@ -655,6 +678,54 @@ public class click
 					
 				}
 				
+				//static, only for auto upgrade option
+				if(guiFrame.getAutoUpgrade() && alAutoUpgradeBuilderSTATIC.size() > 0)
+				{	
+					String orignalEmail = con.getEmail();
+					for(int i= 0 ;  i< alAutoUpgradeBuilderSTATIC.size(); i++)
+					{
+						AutoUpgradeData  aud = alAutoUpgradeBuilderSTATIC.get(i);
+						String email = aud.getEmail(); //email to swap to
+						boolean swap = isSwapStatic(aud, currDate);
+						boolean exist = false;
+						if(swap)
+						{
+							guiFrame.info("Static exceeded will try to swap");
+							exist = isEmailActive(doc, email, ""); // don't compare with current email, simply see if upgrade to email exist
+							
+							if(!exist) //if doesn't exist
+							{								
+								guiFrame.info("Static email is not active swapping...");
+								swap(email,con.getEmail(),false);
+								clickSafeSpot(); // click safe spot to get rid of raided screen
+								Thread.sleep(3000);
+								
+								//we should be in the new account now.
+								if(inMain()) // make sure in main.
+								{
+									guiFrame.info("Static In main from after swap");
+									setUpScreen();
+									clickAutoUpgrade(aud);
+									AutoUpgradeBuilder();									
+									clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.								
+								}
+								else
+								{
+									guiFrame.info("Swap failed, not in main");
+								}
+							}
+
+						}
+
+					} //for
+					
+					if(orignalEmail.equals(con.getEmail())) //check to se if current email matches orginal, if not then swap back to original
+					{
+						guiFrame.info("Swapping back to original email");
+						swap(orignalEmail,con.getEmail(),false); // swap back
+					}
+				}
+				
 			}
 		
 			catch(Exception e)
@@ -664,6 +735,45 @@ public class click
 			}
 		
 		
+	}
+	
+	
+	/*
+	 * take aud.getTime, find the number after "static" 
+	 * that is the number of hours we will swapped next.
+	 * 
+	 * So for this current email, get last swap date, if difference of last swap date and curren date
+	 * is greater then number after static then we swap
+	 */
+	public boolean isSwapStatic(AutoUpgradeData aud, Date d)
+	{
+		boolean ret = false;
+		
+		String email = aud.getEmail();
+		
+		String s = aud.getTime();
+		String temp = s.substring(6);//remove the word static
+		long longStatic = Long.valueOf(temp); // this is the value that it has to exceed to swap
+		
+		
+		// get when this email was last swapped
+		AutoUpgradeData swapAUD = hashAutoUpgradeSWAP.get(email);
+		Date swapDate = swapAUD.getSwapDate();
+	//	Date swapDate = aud.getSwapDate();
+		
+		// get differecne between curr date and swap date
+		long diff = d.getTime() - swapDate.getTime();		
+		long diffHours = diff / (60 * 60 * 1000);
+
+		//the difference has to equal or exceed static number
+		if(diffHours >= longStatic)
+		{
+			ret = true;
+			
+			guiFrame.info("difference exceeds, swapping static");
+		}			
+						
+		return ret;
 	}
 	
 	public void deleteFromXMLSpecific(Document d, String id)
@@ -895,14 +1005,30 @@ public class click
 		}
 		
 		return true;
-		
-		
+				
 	}
 	
-	
+	/*
+	 * takes e and see if exist in AutoUpgradeSwap
+	 * it should exist, and we update swapDate with current date.
+	 * it will keep track of when the last time an email swapped was.
+	 */
+	public void updateSwapDate(String e)
+	{
+		Calendar d = Calendar.getInstance();
+		Date currDate = d.getTime();
+		
+		AutoUpgradeData aud = hashAutoUpgradeSWAP.get(e);
+		aud.setSwapDate(currDate);
+		
+		hashAutoUpgradeSWAP.put(e, aud);
+		
+	}
 	public void swap(String em, String oldEmail, boolean send) throws Exception
 	{
 		downloadFTP(config.configFile , "/config/config.xml"); 
+		
+		updateSwapDate(em);
 		
 		config newCon = new config(em, oldEmail); // new account's setting, most importantly I need the slot position
 		
@@ -1017,8 +1143,7 @@ public class click
 			 e.setPW(con.getPW());
 			 
 			//might have to update read.txt here.
-			// lets update to 1, which mean start (keep active), we'll let email service run the next time to update actual value.
-			//updateReadFile("1");
+			updateReadFile("2");
 			
 			 Thread.sleep(5000); // wait 5 sec before taking screen shot, I want village to load up.
 			 
@@ -1058,6 +1183,7 @@ public class click
 		guiFrame = new gui();
 		cont = new control(guiFrame, bot);		
 		con = new config(guiFrame.account);
+		hashAutoUpgradeSWAP = con.loadAutoUpgradeSWAP();
 	}
 	
 	public void sendPictureText() throws Exception
@@ -1746,86 +1872,91 @@ public class click
 	 */
 	public void upLoadFTP(String FileName, String dir)
 	{
-		File f = new File(FileName);
-
-		FTPClient ftp = new FTPClient();
-
-		 boolean success = false;
-	     int count = 0;
-	     do 
-	        {   
-				try{		
-					ftp.connect("doms.freewha.com");
-					System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
-					System.out.println(ftp.getReplyString());
-					ftp.enterLocalPassiveMode();
-					ftp.changeWorkingDirectory(dir);				
+		
+		if(!config.test) {
+			File f = new File(FileName);
+	
+			FTPClient ftp = new FTPClient();
+	
+			 boolean success = false;
+		     int count = 0;
+		     do 
+		        {   
+					try{		
+						ftp.connect("doms.freewha.com");
+						System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
+						System.out.println(ftp.getReplyString());
+						ftp.enterLocalPassiveMode();
+						ftp.changeWorkingDirectory(dir);				
+						
+						final InputStream is = new FileInputStream(f.getPath());
+						success = ftp.storeFile(f.getName(), is);
 					
-					final InputStream is = new FileInputStream(f.getPath());
-					success = ftp.storeFile(f.getName(), is);
-				
-					is.close();
-					
-					ftp.disconnect();	
-					
-					count++;
-				}
-				catch(Exception e)
-				{
-					System.out.println("Error UploadFTP CLICK method");
-		        	System.out.println(e.getMessage());
-		        	
-					guiFrame.info("Error UploadFTP CLICK method");
-					guiFrame.info(e.getMessage());
-		        	e.printStackTrace();
-		        	success = false;					
-				}
-	        }while(!success && count < 10);
+						is.close();
+						
+						ftp.disconnect();	
+						
+						count++;
+					}
+					catch(Exception e)
+					{
+						System.out.println("Error UploadFTP CLICK method");
+			        	System.out.println(e.getMessage());
+			        	
+						guiFrame.info("Error UploadFTP CLICK method");
+						guiFrame.info(e.getMessage());
+			        	e.printStackTrace();
+			        	success = false;					
+					}
+		        }while(!success && count < 10);
+	     
+		}
 	}
 	
 	public void downloadFTP(String localFile, String remoteFile)
 	{
-		
-        String server = "doms.freewha.com";
-        String user = "www.mturkpl.us";
-        String pass = "freewebsucks11";
- 
-        FTPClient ftpClient = new FTPClient();
-        
-        // if retrieveFile fails, it will retry again.
-        boolean success = false;
-        int count = 0;
-        do 
-        {        
-	        try {
+		if(!config.test){
+	        String server = "doms.freewha.com";
+	        String user = "www.mturkpl.us";
+	        String pass = "freewebsucks11";
 	 
-	            ftpClient.connect(server);
-	            ftpClient.login(user, pass);
-	            ftpClient.enterLocalPassiveMode();
-	            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-	
-	            File downloadFile1 = new File(localFile);
-	            OutputStream outputStream1 = new BufferedOutputStream(new FileOutputStream(downloadFile1));
-	             success = ftpClient.retrieveFile(remoteFile, outputStream1);
-	            outputStream1.close();
-	            ftpClient.disconnect();	  
-	            
-	            count++;
-	        }
-	        catch(Exception e)
-	        {
-	        	System.out.println("Error downloadFTP");
-	        	System.out.println(e.getMessage());
-	        	
-				guiFrame.info("Error downloadFTP");
-				guiFrame.info(e.getMessage());	   
-				
-	        	e.printStackTrace();
-	        	success = false;
-	        }
-        }while(!success && count < 10);
+	        FTPClient ftpClient = new FTPClient();
+	        
+	        // if retrieveFile fails, it will retry again.
+	        boolean success = false;
+	        int count = 0;
+	        do 
+	        {        
+		        try {
+		 
+		            ftpClient.connect(server);
+		            ftpClient.login(user, pass);
+		            ftpClient.enterLocalPassiveMode();
+		            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+		
+		            File downloadFile1 = new File(localFile);
+		            OutputStream outputStream1 = new BufferedOutputStream(new FileOutputStream(downloadFile1));
+		             success = ftpClient.retrieveFile(remoteFile, outputStream1);
+		            outputStream1.close();
+		            ftpClient.disconnect();	  
+		            
+		            count++;
+		        }
+		        catch(Exception e)
+		        {
+		        	System.out.println("Error downloadFTP");
+		        	System.out.println(e.getMessage());
+		        	
+					guiFrame.info("Error downloadFTP");
+					guiFrame.info(e.getMessage());	   
+					
+		        	e.printStackTrace();
+		        	success = false;
+		        }
+	        }while(!success && count < 10);
   
          
+		}
 	}
 	
 	

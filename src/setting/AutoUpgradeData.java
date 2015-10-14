@@ -10,7 +10,7 @@ public class AutoUpgradeData
 	private String time = "";
 	private ArrayList<xy> xyArrayList = new ArrayList<xy>();
 	private boolean swapBack = false;
-	
+	private Date swapDate = null;
 	private String name ="";	
 	
 	public AutoUpgradeData()
@@ -55,4 +55,12 @@ public class AutoUpgradeData
 		this.name = name;
 	}
 	
+	public Date getSwapDate()
+	{
+		return swapDate;
+	}
+	public void setSwapDate(Date d)
+	{
+		this.swapDate = d;
+	}
 }

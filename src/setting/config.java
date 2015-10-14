@@ -61,6 +61,8 @@ public class config
 	
 	private ArrayList<AutoUpgradeData> autoUpgradeList = new ArrayList<AutoUpgradeData>();
 	
+	public static boolean test = false;
+	
 	//used only in some local method. just to do some comparison
 	public config()
 	{
@@ -82,6 +84,51 @@ public class config
 		loadConfig(account, oldAccount);			
 	}
 	
+	
+	/*
+	 * This method will be called at the beginning of the program, it will 
+	 * create a new AutoUpgradeData that holds all the email account that we MAY swap to.
+	 * it will have a swapDate field which is the last swap date. 
+	 */
+	public Hashtable<String, AutoUpgradeData> loadAutoUpgradeSWAP()
+	{	
+		Hashtable<String, AutoUpgradeData> hs = new Hashtable <String, AutoUpgradeData> ();
+				
+		try{
+			File fXmlFile = new File(this.configFile);
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(fXmlFile);
+			doc.getDocumentElement().normalize();
+		
+			NodeList nList = doc.getElementsByTagName("email");			
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+				
+				Node nNode = nList.item(temp);				
+				Element eElement = (Element) nNode;
+				String e  = eElement.getAttribute("id");
+
+				AutoUpgradeData aud = new AutoUpgradeData();
+				aud.setEmail(e);
+				
+				//get current date
+				Calendar d = Calendar.getInstance();
+				Date currDate = d.getTime();
+				aud.setSwapDate(currDate);		
+								
+				
+				hs.put(e, aud);
+			}
+			
+		}
+		catch(Exception e)
+		{
+			System.out.println("loadAutoUpgradeSWAP error");
+			e.printStackTrace();
+		}
+		
+		return hs;
+	}
 	public void loadConfig(String account, String oldAccount)
 	{
 		try{
@@ -304,78 +351,81 @@ public class config
 	
 	public void upLoadFTP(String FileName, String dir)
 	{
-		File f = new File(FileName);
-
-		FTPClient ftp = new FTPClient();
-
-		 boolean success = false;
-	     int count = 0;
-	     do 
-	        {   
-				try{		
-					ftp.connect("doms.freewha.com");
-					System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
-					System.out.println(ftp.getReplyString());
-					ftp.enterLocalPassiveMode();
-					ftp.changeWorkingDirectory(dir);				
+		if(!test){
+			File f = new File(FileName);
+	
+			FTPClient ftp = new FTPClient();
+	
+			 boolean success = false;
+		     int count = 0;
+		     do 
+		        {   
+					try{		
+						ftp.connect("doms.freewha.com");
+						System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
+						System.out.println(ftp.getReplyString());
+						ftp.enterLocalPassiveMode();
+						ftp.changeWorkingDirectory(dir);				
+						
+						final InputStream is = new FileInputStream(f.getPath());
+						success = ftp.storeFile(f.getName(), is);
 					
-					final InputStream is = new FileInputStream(f.getPath());
-					success = ftp.storeFile(f.getName(), is);
-				
-					is.close();
-					
-					ftp.disconnect();	
-					count++;
-				}
-				catch(Exception e)
-				{
-					System.out.println("Error UploadFTP CONFIG method");
-		        	System.out.println(e.getMessage());
-							        	
-		        	e.printStackTrace();
-		        	success = false;					
-				}
-	        }while(!success && count < 10);
+						is.close();
+						
+						ftp.disconnect();	
+						count++;
+					}
+					catch(Exception e)
+					{
+						System.out.println("Error UploadFTP CONFIG method");
+			        	System.out.println(e.getMessage());
+								        	
+			        	e.printStackTrace();
+			        	success = false;					
+					}
+		        }while(!success && count < 10);
+	     
+		}
 	}
 	
 	public void downloadFTP(String localFile, String remoteFile)
 	{
-		
-        String server = "doms.freewha.com";
-        String user = "www.mturkpl.us";
-        String pass = "freewebsucks11";
- 
-        FTPClient ftpClient = new FTPClient();
-        
-        // if retrieveFile fails, it will retry again.
-        boolean success = false;
-        int count = 0;
-        do 
-        {        
-	        try {
+		if(!test){
+	        String server = "doms.freewha.com";
+	        String user = "www.mturkpl.us";
+	        String pass = "freewebsucks11";
 	 
-	            ftpClient.connect(server);
-	            ftpClient.login(user, pass);
-	            ftpClient.enterLocalPassiveMode();
-	            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-	
-	            File downloadFile1 = new File(localFile);
-	            OutputStream outputStream1 = new BufferedOutputStream(new FileOutputStream(downloadFile1));
-	             success = ftpClient.retrieveFile(remoteFile, outputStream1);
-	            outputStream1.close();
-	            ftpClient.disconnect();	  
-	            
-	            count++;
-	        }
-	        catch(Exception e)
-	        {
-	        	System.out.println("Error downloadFTP");
-	        	System.out.println(e.getMessage());
-	        	e.printStackTrace();
-	        	success = false;
-	        }
-        }while(!success && count < 10);
-  
+	        FTPClient ftpClient = new FTPClient();
+	        
+	        // if retrieveFile fails, it will retry again.
+	        boolean success = false;
+	        int count = 0;
+	        do 
+	        {        
+		        try {
+		 
+		            ftpClient.connect(server);
+		            ftpClient.login(user, pass);
+		            ftpClient.enterLocalPassiveMode();
+		            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+		
+		            File downloadFile1 = new File(localFile);
+		            OutputStream outputStream1 = new BufferedOutputStream(new FileOutputStream(downloadFile1));
+		             success = ftpClient.retrieveFile(remoteFile, outputStream1);
+		            outputStream1.close();
+		            ftpClient.disconnect();	  
+		            
+		            count++;
+		        }
+		        catch(Exception e)
+		        {
+		        	System.out.println("Error downloadFTP");
+		        	System.out.println(e.getMessage());
+		        	e.printStackTrace();
+		        	success = false;
+		        }
+	        }while(!success && count < 10);
+		}
          
 	}
 	
