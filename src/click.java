@@ -719,7 +719,7 @@ public class click
 
 					} //for
 					
-					if(orignalEmail.equals(con.getEmail())) //check to se if current email matches orginal, if not then swap back to original
+					if(!orignalEmail.equals(con.getEmail())) //check to se if current email matches orginal, if not then swap back to original
 					{
 						guiFrame.info("Swapping back to original email");
 						swap(orignalEmail,con.getEmail(),false); // swap back
