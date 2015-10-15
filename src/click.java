@@ -687,15 +687,16 @@ public class click
 						AutoUpgradeData  aud = alAutoUpgradeBuilderSTATIC.get(i);
 						String email = aud.getEmail(); //email to swap to
 						boolean swap = isSwapStatic(aud, currDate);
+					//	swap = true; //fh local
 						boolean exist = false;
 						if(swap)
 						{
-							guiFrame.info("Static exceeded will try to swap");
+							guiFrame.info("Static exceeded will try to swap to " + email);
 							exist = isEmailActive(doc, email, ""); // don't compare with current email, simply see if upgrade to email exist
 							
 							if(!exist) //if doesn't exist
 							{								
-								guiFrame.info("Static email is not active swapping...");
+								guiFrame.info("Static email is not active swapping to " + email + "from " + con.getEmail());
 								swap(email,con.getEmail(),false);
 								clickSafeSpot(); // click safe spot to get rid of raided screen
 								Thread.sleep(3000);
@@ -721,7 +722,7 @@ public class click
 					
 					if(!orignalEmail.equals(con.getEmail())) //check to se if current email matches orginal, if not then swap back to original
 					{
-						guiFrame.info("Swapping back to original email");
+						guiFrame.info("Swapping back to original email " + orignalEmail+ " From " +con.getEmail() );
 						swap(orignalEmail,con.getEmail(),false); // swap back
 					}
 				}
@@ -761,9 +762,14 @@ public class click
 		Date swapDate = swapAUD.getSwapDate();
 	//	Date swapDate = aud.getSwapDate();
 		
+		guiFrame.info(email + " last swap time : " + swapDate);
+		
 		// get differecne between curr date and swap date
 		long diff = d.getTime() - swapDate.getTime();		
 		long diffHours = diff / (60 * 60 * 1000);
+		
+		guiFrame.info("long : " + diff);
+		guiFrame.info("Hours : " + diffHours);
 
 		//the difference has to equal or exceed static number
 		if(diffHours >= longStatic)
@@ -1029,6 +1035,8 @@ public class click
 		downloadFTP(config.configFile , "/config/config.xml"); 
 		
 		updateSwapDate(em);
+		
+		guiFrame.info("Swapping from " + oldEmail + " to " + em);
 		
 		config newCon = new config(em, oldEmail); // new account's setting, most importantly I need the slot position
 		
