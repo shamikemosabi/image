@@ -98,7 +98,6 @@ public class click
 		downloadFTP(config.configFile , "/config/config.xml");  
 		setGUIandControl();
 		RunEmailService();	
-
 		
 		
 	//	AutoUpgrade();

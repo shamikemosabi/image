@@ -562,7 +562,8 @@ public class config
 				pos.add(new xy(1379,646)); //click setting
 				pos.add(new xy(723,489)); // click disconnect
 				pos.add(swapSlot.get(slot-1)); // click where your account is
-				pos.add(new xy(889,663)); // click ok
+				//pos.add(new xy(889,663)); // click ok, Okay pos will change when we add more account, lets make it last swapSlots
+				pos.add(swapSlot.get(swapSlot.size()-1));
 				pos.add(new xy(837,507)); // click load
 				pos.add(new xy(607,255)); // click textbox
 				pos.add(new xy(844,255)); // click Okay
