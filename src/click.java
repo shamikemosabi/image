@@ -295,7 +295,8 @@ public class click
 						if(con.work && serviceStopped && sendStopText)  //sendStopText only sends the first time service was stopped.
 						{									// or else each loop it'll keep sending.
 															// might not need these variables anymore (now we change to switch), but lets jus leave it.
-							sendText();
+						    
+							sendText("Bot stopped, safe to connect" , "Services stopped");
 							guiFrame.info("SEND TEXT");
 							sendStopText = false;
 						}
@@ -637,7 +638,7 @@ public class click
 									}
 									else
 									{
-										guiFrame.info("Swap failed, not in main");
+										guiFrame.info("Swap failed, not in main");										
 									}
 									
 								}				
@@ -697,12 +698,13 @@ public class click
 							if(!exist) //if doesn't exist
 							{								
 								guiFrame.info("Static email is not active swapping to " + email + "from " + con.getEmail());
-								swap(email,con.getEmail(),false);
+								String localEmail = con.getEmail();
+								boolean swapStatus = swap(email,localEmail,false);
 								clickSafeSpot(); // click safe spot to get rid of raided screen
 								Thread.sleep(3000);
 								
 								//we should be in the new account now.
-								if(inMain()) // make sure in main.
+								if(inMain() && swapStatus) // make sure in main and swap success
 								{
 									guiFrame.info("Static In main from after swap");
 									setUpScreen();
@@ -713,6 +715,7 @@ public class click
 								else
 								{
 									guiFrame.info("Swap failed, not in main");
+									sendText("Swap failed","swapping from " + localEmail + " to " + email + " variable swapStatus = " + swapStatus);
 								}
 							}
 
@@ -1030,7 +1033,17 @@ public class click
 		hashAutoUpgradeSWAP.put(e, aud);
 		
 	}
-	public void swap(String em, String oldEmail, boolean send) throws Exception
+	
+	/*
+	 * Swapping between 2 accounts
+	 * 
+	 * - sometimes swap will fail because of Blue stack download app screen, or any screen that randomly pops up.
+	*	or can't connect to google play service, so when trying to swithc between account doesn't work
+	
+	* - determine swap is successful if we reach the load village page.
+	*
+	 */
+	public boolean swap(String em, String oldEmail, boolean send) throws Exception
 	{
 		downloadFTP(config.configFile , "/config/config.xml"); 
 		
@@ -1153,7 +1166,7 @@ public class click
 			//might have to update read.txt here.
 			updateReadFile("2");
 			
-			 Thread.sleep(5000); // wait 5 sec before taking screen shot, I want village to load up.
+			 Thread.sleep(10000); // wait 10 sec before taking screen shot, I want village to load up.
 			 
 			//take and send screenshot
 			 if(send)					
@@ -1161,6 +1174,13 @@ public class click
 				 takeCurrentScreenshot(true);		
 			 }
 		 }
+		 else // was not able to reach load village screen. Something happened can't swap successfully
+		 {
+			 // we need to update active email back to what it was.
+			 con = new config(oldEmail, em );			 
+		 }
+		 
+		 return ret;
 		 
 	}
 	
@@ -1556,7 +1576,7 @@ public class click
 		    transport.close();
 		    guiFrame.info("Message Sent");
 	}
-	 public static void sendText() throws Exception
+	 public static void sendText(String sub, String bod) throws Exception
 	 {
 		 
 		 String host = "smtp.gmail.com";
@@ -1588,12 +1608,9 @@ public class click
 		        message.addRecipient(Message.RecipientType.TO, toAddress[i]);
 		    }
 		    
-		    String temp = "Bot stopped, safe to connect";
-
-		    message.setSubject(temp);
-		    String body="Services " + temp;
+		    message.setSubject(sub);
 		   //message.setContent(body, "text/html");
-		    message.setContent(body, "text/plain");
+		    message.setContent(bod, "text/plain");
 		    Transport transport = session.getTransport("smtp");
 		    transport.connect(host, from, pass);
 		    transport.sendMessage(message, message.getAllRecipients());
