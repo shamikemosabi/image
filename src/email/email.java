@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
@@ -37,10 +38,16 @@ public class email implements Runnable{
 	
 	private static String email ="";
 	private static String pw  = "";
-	public email(String e, String p)
+	private static boolean master = false;
+	
+	private static ArrayList<String> alDestEmail = null;
+	
+	public email(String e, String p, ArrayList<String> al )
 	{
 		email = e;
 		pw = p;
+		alDestEmail = al;
+		
 	}
 
  public static void main(String[] args) {
@@ -168,7 +175,15 @@ public class email implements Runnable{
       }
       else if(body.contains("status"))
       {
-    	  last="status";
+    	  if(body.contains("master"))
+    	  {
+    		  last="status:master";
+    	  }
+    	  else
+    	  {
+    		  last="status";
+    	  }
+    	  
       }
       else if(body.contains("connect:"))
       {
@@ -181,7 +196,14 @@ public class email implements Runnable{
       }
       else if(body.contains("screen"))
       {
-    	  last = "screen";
+    	  if(body.contains("master"))
+    	  {
+    		  last = "screen:master";
+    	  }
+    	  else{
+    		  last = "screen";
+    	  }
+    	  
     	  messages[i].setFlag(Flags.Flag.DELETED, true); // flag for delete
       }
       else if(body.contains("swap:"))
@@ -227,9 +249,18 @@ public class email implements Runnable{
 	  {
 		  blah = "2";
 	  }
-	  else if (last.equals("status"))
+	  else if (last.startsWith("status"))
 	  {
-		  blah = "4";
+		  if(last.contains("master"))
+		  {
+			  blah = "4master";
+			  master =  true;
+		  }
+		  else
+		  {
+			  blah = "4";
+		  }
+		 
 	  }
 	  else if (last.startsWith("swap:"))
 	  {		 
@@ -245,8 +276,12 @@ public class email implements Runnable{
 		  //specify my own send text
 		  sendText(session,"Clash of Clans restarting...");
 	  }
-	  else if(last.equals("screen"))
+	  else if(last.startsWith("screen"))
 	  {
+		  if(last.contains("master"))
+		  {
+			  master =  true;
+		  }
 		  blah = blah2;
 		  String fileName = SaveScreenShot();
 		  sendPictureText(fileName);
@@ -271,7 +306,7 @@ public class email implements Runnable{
 		  fw.print(blah);
 		  fw.close();
 		  
-		  if((blah2.equals("2")||blah2.equals("4")) && (blah.equals("4")  || blah.equals("2")))
+		  if((blah2.equals("2")||blah2.startsWith("4")) && (blah.startsWith("4")  || blah.equals("2")))
 		  {
 			  
 		  }
@@ -288,6 +323,8 @@ public class email implements Runnable{
    e.printStackTrace();
 	  
   }
+  
+  master = false; //reset flag
  }
 
 	private String getText(Part p) throws
@@ -373,16 +410,36 @@ public String SaveScreenShot() throws Exception
 	    //String[] to = {"shamikemosabi@gmail.com"}; // added this line
 	    String[] to = {"6462841208@tmomail.net"}; // added this line
 	    
+	    
+	    
 	    MimeMessage message = new MimeMessage(ses);
 	    message.setFrom(new InternetAddress(email));
-	    InternetAddress[] toAddress = new InternetAddress[to.length];
-	    for( int i=0; i < to.length; i++ ) { // changed from a while loop
-	        toAddress[i] = new InternetAddress(to[i]);
-	    }
 	    
-	    for( int i=0; i < toAddress.length; i++) { // changed from a while loop
-	        message.addRecipient(Message.RecipientType.TO, toAddress[i]);
+	    if(master)
+	    {
+		    InternetAddress[] toAddress = new InternetAddress[to.length];
+		    
+		    for( int i=0; i < to.length; i++ ) { // changed from a while loop
+		        toAddress[i] = new InternetAddress(to[i]);
+		    }
+		    
+		    for( int i=0; i < toAddress.length; i++) { // changed from a while loop
+		        message.addRecipient(Message.RecipientType.TO, toAddress[i]);
+		    }
 	    }
+	    else // send to everyone
+	    {
+		    InternetAddress[] toAddress = new InternetAddress[alDestEmail.size()];
+		    
+		    for( int i=0; i < alDestEmail.size(); i++ ) { // changed from a while loop
+		        toAddress[i] = new InternetAddress(alDestEmail.get(i));
+		    }
+		    
+		    for( int i=0; i < toAddress.length; i++) { // changed from a while loop
+		        message.addRecipient(Message.RecipientType.TO, toAddress[i]);
+		    }
+	    }
+
 	    
 	    String temp = s ;
 	    if(s.equals("1")){
@@ -427,14 +484,33 @@ public String SaveScreenShot() throws Exception
 	        multipart.addBodyPart(attachPart);
 	     	        
 		    message.setFrom(new InternetAddress(email));
-		    InternetAddress[] toAddress = new InternetAddress[to.length];
-		    for( int i=0; i < to.length; i++ ) { // changed from a while loop
-		        toAddress[i] = new InternetAddress(to[i]);
+		    
+		    if(master)
+		    {
+			    InternetAddress[] toAddress = new InternetAddress[to.length];
+			    
+			    for( int i=0; i < to.length; i++ ) { // changed from a while loop
+			        toAddress[i] = new InternetAddress(to[i]);
+			    }
+			    
+			    for( int i=0; i < toAddress.length; i++) { // changed from a while loop
+			        message.addRecipient(Message.RecipientType.TO, toAddress[i]);
+			    }
+		    }
+		    else // send to everyone
+		    {
+			    InternetAddress[] toAddress = new InternetAddress[alDestEmail.size()];
+			    
+			    for( int i=0; i < alDestEmail.size(); i++ ) { // changed from a while loop
+			        toAddress[i] = new InternetAddress(alDestEmail.get(i));
+			    }
+			    
+			    for( int i=0; i < toAddress.length; i++) { // changed from a while loop
+			        message.addRecipient(Message.RecipientType.TO, toAddress[i]);
+			    }
 		    }
 		    
-		    for( int i=0; i < toAddress.length; i++) { // changed from a while loop
-		        message.addRecipient(Message.RecipientType.TO, toAddress[i]);
-		    }
+
 		    
 		    message.setContent(multipart);
 		    Transport transport = session.getTransport("smtp");

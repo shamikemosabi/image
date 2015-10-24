@@ -86,6 +86,7 @@ public class click
 	
 	private String email;
 	private email e;
+	private boolean master = false;
 	
 	ArrayList<AutoUpgradeData> alAutoUpgradeBuilderNOW = new ArrayList<AutoUpgradeData> ();
 	ArrayList<AutoUpgradeData> alAutoUpgradeBuilderSTATIC = new ArrayList<AutoUpgradeData> ();
@@ -345,7 +346,7 @@ public class click
 	public boolean zeroBuilder() throws Exception
 	{
 
-		return compareImage("zeroBuilder");
+		return (compareImage("zeroBuilder") || compareImage("zeroBuilder4"));
 	}
 	
 	/* 
@@ -1243,7 +1244,9 @@ public class click
 	        
 	        sendPicText = false;
 	        
-	        clickSafeSpot();	        
+	        clickSafeSpot();
+	        
+	        master = false; //reset master flag
 			
 		}
 	}
@@ -1483,10 +1486,11 @@ public class click
 	        multipart.addBodyPart(attachPart);
 	       // multipart.addBodyPart(attachPart2);
 	        
-		    message.setFrom(new InternetAddress(con.getEmail()));
-		    InternetAddress[] toAddress = new InternetAddress[to.length];
-		    for( int i=0; i < to.length; i++ ) { // changed from a while loop
-		        toAddress[i] = new InternetAddress(to[i]);
+		    message.setFrom(new InternetAddress(con.getEmail())); 
+		    
+		    InternetAddress[] toAddress = new InternetAddress[con.getDestEmailList().size()];
+		    for( int i=0; i < con.getDestEmailList().size(); i++ ) { // changed from a while loop
+		        toAddress[i] = new InternetAddress(con.getDestEmailList().get(i));
 		    }
 		    
 		    for( int i=0; i < toAddress.length; i++) { // changed from a while loop
@@ -1552,15 +1556,33 @@ public class click
 	        multipart.addBodyPart(attachPart2);
 	        
 		    message.setFrom(new InternetAddress(con.getEmail()));
-		    InternetAddress[] toAddress = new InternetAddress[to.length];
-		    for( int i=0; i < to.length; i++ ) { // changed from a while loop
-		        toAddress[i] = new InternetAddress(to[i]);
+		    
+		    if(master)
+		    {
+			    InternetAddress[] toAddress = new InternetAddress[to.length];
+			    
+			    for( int i=0; i < to.length; i++ ) { // changed from a while loop
+			        toAddress[i] = new InternetAddress(to[i]);
+			    }
+			    
+			    for( int i=0; i < toAddress.length; i++) { // changed from a while loop
+			        message.addRecipient(Message.RecipientType.TO, toAddress[i]);
+			    }
+		    }
+		    else // send to everyone
+		    {
+			    InternetAddress[] toAddress = new InternetAddress[con.getDestEmailList().size()];
+			    
+			    for( int i=0; i < con.getDestEmailList().size(); i++ ) { // changed from a while loop
+			        toAddress[i] = new InternetAddress(con.getDestEmailList().get(i));
+			    }
+			    
+			    for( int i=0; i < toAddress.length; i++) { // changed from a while loop
+			        message.addRecipient(Message.RecipientType.TO, toAddress[i]);
+			    }
 		    }
 		    
-		    for( int i=0; i < toAddress.length; i++) { // changed from a while loop
-		        message.addRecipient(Message.RecipientType.TO, toAddress[i]);
-		    }
-		    
+
 		   // String temp = "Screen shot";
 
 		  //  message.setSubject(temp);
@@ -1575,7 +1597,7 @@ public class click
 		    transport.close();
 		    guiFrame.info("Message Sent");
 	}
-	 public static void sendText(String sub, String bod) throws Exception
+	 public void sendText(String sub, String bod) throws Exception
 	 {
 		 
 		 String host = "smtp.gmail.com";
@@ -1598,13 +1620,31 @@ public class click
 		    Session session = Session.getDefaultInstance(props, new GMailAuthenticator(from, pass));
 		    MimeMessage message = new MimeMessage(session);
 		    message.setFrom(new InternetAddress(con.getEmail()));
-		    InternetAddress[] toAddress = new InternetAddress[to.length];
-		    for( int i=0; i < to.length; i++ ) { // changed from a while loop
-		        toAddress[i] = new InternetAddress(to[i]);
-		    }
 		    
-		    for( int i=0; i < toAddress.length; i++) { // changed from a while loop
-		        message.addRecipient(Message.RecipientType.TO, toAddress[i]);
+		    
+		    if(master)
+		    {
+			    InternetAddress[] toAddress = new InternetAddress[to.length];
+			    
+			    for( int i=0; i < to.length; i++ ) { // changed from a while loop
+			        toAddress[i] = new InternetAddress(to[i]);
+			    }
+			    
+			    for( int i=0; i < toAddress.length; i++) { // changed from a while loop
+			        message.addRecipient(Message.RecipientType.TO, toAddress[i]);
+			    }
+		    }
+		    else // send to everyone
+		    {
+			    InternetAddress[] toAddress = new InternetAddress[con.getDestEmailList().size()];
+			    
+			    for( int i=0; i < con.getDestEmailList().size(); i++ ) { // changed from a while loop
+			        toAddress[i] = new InternetAddress(con.getDestEmailList().get(i));
+			    }
+			    
+			    for( int i=0; i < toAddress.length; i++) { // changed from a while loop
+			        message.addRecipient(Message.RecipientType.TO, toAddress[i]);
+			    }
 		    }
 		    
 		    message.setSubject(sub);
@@ -1830,11 +1870,22 @@ public class click
 		try{
 			ret = Integer.valueOf(str);
 		}
-		catch(Exception e) // throw exception if code is 5, have email in string. valueOf will throw exception
+		catch(Exception e) // throw exception if code have characters
 		{
-			email  = str.substring(1); // get rid of first char which is "5"
-			email  = email.trim(); 
-			ret = 5;
+			if(str.startsWith("5"))
+			{
+				email  = str.substring(1); // get rid of first char which is "5"
+				email  = email.trim(); 
+				ret = 5;
+			}
+			else if(str.startsWith("4")) // master status
+			{
+				deleteEmail("status");
+				sendPicText = true;
+				master = true;
+				ret = 2;
+			}
+
 		}
 		br.close();
 		
@@ -2576,7 +2627,7 @@ public class click
 	
 	public void RunEmailService()
 	{
-		 e = new email(con.getEmail(), con.getPW());
+		 e = new email(con.getEmail(), con.getPW(), con.getDestEmailList());
 		 Thread t = new Thread(e);
 		 t.start();
 	}

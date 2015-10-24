@@ -54,6 +54,7 @@ public class config
 	public int deployBarb=0;	
 	public String lootThreshold="";
 	public int slot =0;
+	private ArrayList<String> aldestEmail= null;
 	
 	private xy xyBarrackTrain = null;
 	
@@ -155,7 +156,8 @@ public class config
 					deployBarb = Integer.valueOf(eElement.getElementsByTagName("deployBarb").item(0).getTextContent());
 					lootThreshold = eElement.getElementsByTagName("loot").item(0).getTextContent();
 					slot = Integer.valueOf(eElement.getElementsByTagName("slot").item(0).getTextContent());
-					xyBarrackTrain =  createXY(eElement.getElementsByTagName("barrackTrain").item(0).getTextContent());
+					xyBarrackTrain =  createXY(eElement.getElementsByTagName("barrackTrain").item(0).getTextContent());										
+					aldestEmail = createDestinationEmailArray(eElement.getElementsByTagName("destEmail").item(0).getTextContent());
 				}
 			}
 			
@@ -179,6 +181,18 @@ public class config
 			e.printStackTrace();
 		}
 	}
+	
+	
+	/*
+	 * take string of email, phone numbers, separate them by ',' and load them in arraylist.
+	 */
+	public ArrayList<String> createDestinationEmailArray(String e)
+	{		
+		String[] t = e.split("\\,");		
+		ArrayList<String> temp = new ArrayList<String>(Arrays.asList(t));
+		return temp;
+	}
+	
 	
 	public void setUpSwapSlots(Document doc)
 	{	
@@ -322,7 +336,10 @@ public class config
 		}
 
 	}
-	
+	public ArrayList<String> getDestEmailList()
+	{
+		return aldestEmail;
+	}
 	public ArrayList<AutoUpgradeData> getAutoUpgradeList()
 	{
 		return autoUpgradeList;
@@ -574,7 +591,12 @@ public class config
 			{						
 				//change match pic, to 0 builders
 				s = new struct("zeroBuilder",581,29, 22, 23, ruleFolder+"\\init.jpg",pos);
-			}			
+			}	
+			if(name.equals("zeroBuilder4"))
+			{						
+				//change match pic, to 0 builders
+				s = new struct("zeroBuilder4",581,29, 22, 23, ruleFolder+"\\zeroBuilder4.jpg",pos);
+			}	
 			
 		}
 		else
