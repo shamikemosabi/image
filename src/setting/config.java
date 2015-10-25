@@ -62,7 +62,7 @@ public class config
 	
 	private ArrayList<AutoUpgradeData> autoUpgradeList = new ArrayList<AutoUpgradeData>();
 	
-	public static boolean test = false;
+	public static boolean test = true;
 	
 	//used only in some local method. just to do some comparison
 	public config()
@@ -597,6 +597,14 @@ public class config
 				//change match pic, to 0 builders
 				s = new struct("zeroBuilder4",581,29, 22, 23, ruleFolder+"\\zeroBuilder4.jpg",pos);
 			}	
+			if(name.equals("maxElixir"))
+			{
+				s = new struct("maxElixir",1196,99, 17, 16, ruleFolder+"\\maxElixir.jpg",pos);
+			}
+			if(name.equals("maxGold"))
+			{
+				s = new struct("maxGold",1186,33, 17, 16, ruleFolder+"\\maxGold.jpg",pos);
+			}
 			
 		}
 		else

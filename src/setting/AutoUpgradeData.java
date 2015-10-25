@@ -12,6 +12,7 @@ public class AutoUpgradeData
 	private boolean swapBack = false;
 	private Date swapDate = null;
 	private String name ="";	
+	private boolean lootFull = false;
 	
 	public AutoUpgradeData()
 	{
@@ -62,5 +63,14 @@ public class AutoUpgradeData
 	public void setSwapDate(Date d)
 	{
 		this.swapDate = d;
+	}
+	
+	public boolean getLootFull()
+	{
+		return lootFull;
+	}
+	public void setLootFull(boolean d)
+	{
+		this.lootFull = d;
 	}
 }

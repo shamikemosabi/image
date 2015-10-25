@@ -15,7 +15,9 @@ import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Properties;
@@ -99,7 +101,7 @@ public class click
 		downloadFTP(config.configFile , "/config/config.xml");  
 		setGUIandControl();
 		RunEmailService();	
-		
+			
 		
 	//	AutoUpgrade();
 		/*
@@ -165,6 +167,9 @@ public class click
 				if(inMain())
 				{
 					if(disconnected) GotDisconnected();	
+					
+					
+					updateSwapDate(con.getEmail()); //update last time this email was active
 					
 					AutoUpgrade2();
 					AutoUpgradeBuilder();
@@ -280,6 +285,7 @@ public class click
 					clickSafeSpot(); // click safe spot to be active
 					if(inMain())
 					{
+						updateSwapDate(con.getEmail()); //update last time this email was active
 						AutoUpgrade2();
 						AutoUpgradeBuilder();
 						
@@ -341,6 +347,103 @@ public class click
 			}
 			*/
 		}
+	}
+	
+	
+	/*
+	 * will swap to next account when loot is full
+	 * it will mark lootFull in AutoUpgradeData in hashAutoUpgradeSWAP to true if it's full so we know it's full an dodn't need to bot in it.
+	 * 
+	 * since getSetLootFUll will be call everytime we succesfully swap we have a real time value of it (dont need to full reset)
+	 * only problem I see is if program thinks its full, but I manually upgrade something, program will still think it's full UNTIL it swaps to it.
+	 * So only downside is if I never swap to it, I will always think it's full.
+	 * 
+	 * It will then select next email that has lootFUll= false.
+	 * if all lootFull is true then don't do anything just keep botting at current email
+	 * 
+	 * 
+	 */
+	public void AutoSwapFullLoot() throws Exception
+	{
+		
+		boolean swap = getSetLootFull(con.getEmail());
+		String swapEmail="";
+		if(swap) // loot is full!
+		{
+			swapEmail = getNextRandomEmail();
+			
+			if(!swapEmail.isEmpty()) // if it is empty we dont do anything, it means all email loot is full
+			{
+				sendText("Loot full!", con.getEmail() + "'s loot is full, swaping to " + swapEmail);
+				swap(swapEmail, con.getEmail(), true);
+			}
+			else
+			{
+				guiFrame.info("Every email account's loot is full!");
+			}
+			
+		}
+	}
+	
+	public String getNextRandomEmail()
+	{
+		String ret="";
+	
+		
+		Object[] values = hashAutoUpgradeSWAP.values().toArray(); //convert hash to array
+		ArrayList<Object> n = new ArrayList<Object>(Arrays.asList(values)); // convert array to arraylist
+		Collections.shuffle(n); //shuffle list
+
+		for(int i=0; i < n.size(); i++)
+		{
+			AutoUpgradeData aud = (AutoUpgradeData) n.get(i);
+			boolean full = aud.getLootFull();
+			
+			if(!full) //return the first non full loot
+			{
+				return aud.getEmail();
+			}
+		}
+		
+		// if ret is empty string, it means every email has loot full
+		return ret;
+		
+	}
+	
+	/*	
+	 * check to see if loot is full. 
+	 * if this gets called after autoupgrade2(static or NOW), we will have almost a real time knowledge of if loot is full or not.
+	 * 
+	 * should get call after every successful swap.
+	 * 
+	 * 
+	 */
+	public boolean getSetLootFull(String e)
+	{
+		boolean ret = false;
+		try{
+			AutoUpgradeData aud = hashAutoUpgradeSWAP.get(e);
+			if(compareImage("maxElixir") && compareImage("maxGold"))
+			{
+				guiFrame.info("loot is full for email account " + e);
+				ret = true;
+				aud.setLootFull(ret);
+			}
+			else
+			{
+				ret = false;
+				aud.setLootFull(ret);
+			}
+			
+			hashAutoUpgradeSWAP.put(e, aud);
+		}
+		catch(Exception ex)
+		{
+			guiFrame.info("Error in setLootFull");
+			guiFrame.info(ex.getMessage());
+		}
+		return ret;
+		
 	}
 	
 	public boolean zeroBuilder() throws Exception
@@ -634,7 +737,8 @@ public class click
 										clickAutoUpgrade(aud);
 										AutoUpgradeBuilder();
 										takeCurrentScreenshot(true);
-										clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.								
+										clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.		
+										getSetLootFull(con.getEmail()); //update lootFull
 									}
 									else
 									{
@@ -710,7 +814,8 @@ public class click
 									setUpScreen();
 									clickAutoUpgrade(aud);
 									AutoUpgradeBuilder();									
-									clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.								
+									clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.		
+									getSetLootFull(email); //update lootFull
 								}
 								else
 								{
