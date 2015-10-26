@@ -1,5 +1,12 @@
 @todo
-- auto swap when loot full
+
+- read smart loot from config.xml
+- when swap on static, and it's the current account, lets click on dark elixirs. 
+- dump info from hash, arrays into a file maybe, so I can view it. Stats like when accounts were last swapped, etc...
+- a way to restart bluestack? kill bluestack .exe, and re launch it via cmd?
+
+- Auto BUILD new buildings
+
 
 - currently, command config:, swap: only works IF screen is currently in Village.
   If I call this command and it's mid battle, it will get stuck at return to home screen from battle.
@@ -7,5 +14,3 @@
 
 
 @bug
-
-- config.xml sometimes gets cut off. Not sure if it's FTP problem, or writing from docuemnt to config file problem. 
