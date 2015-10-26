@@ -33,9 +33,15 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
+import email.email;
+
+
 
 public class config
 {
+	public static boolean test = false;
+	
+	
 	ArrayList<struct> data ;
 	struct s = null;
 	public static boolean work = true;
@@ -48,21 +54,20 @@ public class config
 	
 	private xy xyBarrack = null;
 	private xy xyCamp = null;
-	private String email="";
+	private String email2="";
 	private String pw="";
 	public int deployArcher=0;
 	public int deployBarb=0;	
 	public String lootThreshold="";
-	public int slot =0;
-	private ArrayList<String> aldestEmail= null;
+	public int slot =0;	
 	
 	private xy xyBarrackTrain = null;
 	
 	public ArrayList<xy> swapSlot = new ArrayList<xy>();
 	
 	private ArrayList<AutoUpgradeData> autoUpgradeList = new ArrayList<AutoUpgradeData>();
+		
 	
-	public static boolean test = false;
 	
 	//used only in some local method. just to do some comparison
 	public config()
@@ -84,6 +89,7 @@ public class config
 		setup();
 		loadConfig(account, oldAccount);			
 	}
+	
 	
 	
 	/*
@@ -148,7 +154,7 @@ public class config
 				
 				if(e.equals(account)) // if this is same account as what was input
 				{
-					email = e;
+					email2 = e;
 					xyBarrack = createXY(eElement.getElementsByTagName("barrack").item(0).getTextContent());
 					xyCamp = createXY(eElement.getElementsByTagName("camp").item(0).getTextContent());
 					pw = eElement.getElementsByTagName("password").item(0).getTextContent();
@@ -157,7 +163,8 @@ public class config
 					lootThreshold = eElement.getElementsByTagName("loot").item(0).getTextContent();
 					slot = Integer.valueOf(eElement.getElementsByTagName("slot").item(0).getTextContent());
 					xyBarrackTrain =  createXY(eElement.getElementsByTagName("barrackTrain").item(0).getTextContent());										
-					aldestEmail = createDestinationEmailArray(eElement.getElementsByTagName("destEmail").item(0).getTextContent());
+					email.alDestEmail = createDestinationEmailArray(eElement.getElementsByTagName("destEmail").item(0).getTextContent());
+					 
 				}
 			}
 			
@@ -189,7 +196,7 @@ public class config
 	public ArrayList<String> createDestinationEmailArray(String e)
 	{		
 		String[] t = e.split("\\,");		
-		ArrayList<String> temp = new ArrayList<String>(Arrays.asList(t));
+		ArrayList<String> temp = new ArrayList<String>(Arrays.asList(t));				
 		return temp;
 	}
 	
@@ -336,9 +343,11 @@ public class config
 		}
 
 	}
+	
+	// update email's alDestEmail
 	public ArrayList<String> getDestEmailList()
 	{
-		return aldestEmail;
+		return email.alDestEmail;
 	}
 	public ArrayList<AutoUpgradeData> getAutoUpgradeList()
 	{
@@ -749,7 +758,7 @@ public class config
 	}
 	public String getEmail()
 	{
-		return email;
+		return email2;
 	}
 	public String getPW()
 	{

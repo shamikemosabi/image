@@ -40,7 +40,7 @@ public class email implements Runnable{
 	private static String pw  = "";
 	private static boolean master = false;
 	
-	private static ArrayList<String> alDestEmail = null;
+	public static ArrayList<String> alDestEmail = null;
 	
 	public email(String e, String p, ArrayList<String> al )
 	{

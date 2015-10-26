@@ -101,8 +101,7 @@ public class click
 		downloadFTP(config.configFile , "/config/config.xml");  
 		setGUIandControl();
 		RunEmailService();	
-			
-		
+					
 	//	AutoUpgrade();
 		/*
 		 * 
@@ -2751,7 +2750,7 @@ public class click
 	
 	public void RunEmailService()
 	{
-		 e = new email(con.getEmail(), con.getPW(), con.getDestEmailList());
+		 e = new email(con.getEmail(), con.getPW(), con.getDestEmailList());		 		
 		 Thread t = new Thread(e);
 		 t.start();
 	}
