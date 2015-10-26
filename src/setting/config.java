@@ -62,7 +62,7 @@ public class config
 	
 	private ArrayList<AutoUpgradeData> autoUpgradeList = new ArrayList<AutoUpgradeData>();
 	
-	public static boolean test = true;
+	public static boolean test = false;
 	
 	//used only in some local method. just to do some comparison
 	public config()
