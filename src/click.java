@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.DateFormat;
@@ -101,7 +102,22 @@ public class click
 		downloadFTP(config.configFile , "/config/config.xml");  
 		setGUIandControl();
 		RunEmailService();	
-					
+		
+		Process p = Runtime.getRuntime().exec("tasklist");
+		BufferedReader reader = new BufferedReader(new InputStreamReader(
+				   p.getInputStream()));
+		String line;
+		 while ((line = reader.readLine()) != null) {
+
+		  System.out.println(line);
+		  if (line.toLowerCase().contains("hd-frontend")) {
+			  Runtime.getRuntime().exec("taskkill /F /IM HD-Frontend.exe");
+			  break;
+		  }
+		 }
+		 Runtime.getRuntime().exec("C:\\Program Files (x86)\\BlueStacks\\HD-RunApp.exe -p com.supercell.clashofclans -a com.supercell.clashofclans.GameApp");
+
+		 
 	//	AutoUpgrade();
 		/*
 		 * 
