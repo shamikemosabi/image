@@ -132,7 +132,7 @@ public class click
         deployHero("queen");
 		System.exit(0);
 				
-		System.out.println(gotRaided()+"GOT RAIDED");
+		System.out.println(gotRaided()+"GOT RAIDED");mt
 	
 				deployTroops2();
 		System.exit(0);
@@ -173,6 +173,7 @@ public class click
 					
 					AutoUpgrade2();
 					AutoUpgradeBuilder();
+					AutoSwapFullLoot();
 					
 					sendPictureText();
 					setUpScreen();				
@@ -349,6 +350,22 @@ public class click
 		}
 	}
 	
+	public Document createDocFromXML(String s)
+	{	
+		Document doc = null;
+		try{
+			File fXmlFile = new File(s);
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			doc = dBuilder.parse(fXmlFile);
+			doc.getDocumentElement().normalize();
+		}
+		catch(Exception e)
+		{
+			guiFrame.info("error in CreatDocFromXML");			
+		}
+		return doc;
+	}
 	
 	/*
 	 * will swap to next account when loot is full
@@ -368,10 +385,10 @@ public class click
 		
 		boolean swap = getSetLootFull(con.getEmail());
 		String swapEmail="";
-		if(swap) // loot is full!
+		if(swap && guiFrame.getAutoUpgrade()) // loot is full!, only do it for auto upgrade for now maybe?
 		{
 			swapEmail = getNextRandomEmail();
-			
+			//also have to check if email is not active
 			if(!swapEmail.isEmpty()) // if it is empty we dont do anything, it means all email loot is full
 			{
 				sendText("Loot full!", con.getEmail() + "'s loot is full, swaping to " + swapEmail);
@@ -388,7 +405,8 @@ public class click
 	public String getNextRandomEmail()
 	{
 		String ret="";
-	
+		downloadFTP(config.configFile , "/config/config.xml");  //download latest, I need latest active accounts	
+		Document doc  = createDocFromXML(config.configFile);
 		
 		Object[] values = hashAutoUpgradeSWAP.values().toArray(); //convert hash to array
 		ArrayList<Object> n = new ArrayList<Object>(Arrays.asList(values)); // convert array to arraylist
@@ -398,10 +416,11 @@ public class click
 		{
 			AutoUpgradeData aud = (AutoUpgradeData) n.get(i);
 			boolean full = aud.getLootFull();
+			boolean exist = isEmailActive(doc, aud.getEmail() , "");
 			
-			if(!full) //return the first non full loot
+			if((!full) && (!exist))  // not full and not active
 			{
-				return aud.getEmail();
+				return aud.getEmail(); //return the first non full loot
 			}
 		}
 		
