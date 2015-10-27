@@ -103,7 +103,7 @@ public class click
 		setGUIandControl();
 		RunEmailService();	
 
-		 
+		
 	//	AutoUpgrade();
 		/*
 		 * 
@@ -2043,6 +2043,9 @@ public class click
 				deleteEmail("status");
 				sendPicText = true;
 				
+				//let's also update stat when we call status.
+				updateStat();
+				
 			}
 			return 2; // return 2, 4 is just so we know we should take screen shot later, but still return 2 to bot
 		}
@@ -2071,6 +2074,48 @@ public class click
 		{
 			return 2;
 		}
+	}
+	
+	
+	public void updateStat() throws Exception 
+	{
+		// hashAutoUpgradeSWAP, really only have 3 values, email, swapDate, and lootFull
+		Object[] values = hashAutoUpgradeSWAP.values().toArray(); //convert hash to array
+		ArrayList<Object> n = new ArrayList<Object>(Arrays.asList(values)); // convert array to arraylist
+		
+		File f = new File(config.statFile);
+		PrintWriter fw = new PrintWriter(f);
+		
+		for(int i=0; i < n.size(); i ++)
+		{
+			AutoUpgradeData aud = (AutoUpgradeData ) n.get(i);
+			fw.println("Account : " + aud.getEmail());
+			fw.println("Last Swap Date : " + aud.getSwapDate());
+			fw.println("Loot Full : " + aud.getLootFull());
+			fw.println();
+		}
+		
+		//output config's variables
+		
+		fw.println("Current Config Value:");
+		fw.println("Email : " + con.getEmail());
+		fw.println("deployArcher : " + con.getDeployArcher());
+		fw.println("deployBarb : " + con.getDeployBarb());
+		fw.println("Loot Threshold : " + con.getLootThreshold());
+		fw.println("Smart Loot : " + con.getSmartLoot());
+		fw.println();
+		
+		//output system variables:
+		fw.println("System Variable");
+		fw.println("Manual smart loot : " + guiFrame.getSmartLoot());
+		fw.println();
+		
+		
+		fw.close();
+				
+		upLoadFTP(config.statFile,"config");
+		
+		
 	}
 	
 	public void downloadAndLoadConfig()

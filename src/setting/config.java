@@ -51,6 +51,7 @@ public class config
 	public final static String readFile =  System.getProperty("user.dir")+"\\read.txt";
 	public final static String configFile =  System.getProperty("user.dir")+"\\config.xml";
 	public final static String upgradeFile =  System.getProperty("user.dir")+"\\upgrade.xml";
+	public final static String statFile =  System.getProperty("user.dir")+"\\stat.txt";
 	
 	private xy xyBarrack = null;
 	private xy xyCamp = null;
@@ -66,7 +67,7 @@ public class config
 	
 	public ArrayList<xy> swapSlot = new ArrayList<xy>();
 	
-	private ArrayList<AutoUpgradeData> autoUpgradeList = new ArrayList<AutoUpgradeData>();
+	private ArrayList<AutoUpgradeData> autoUpgradeList = new ArrayList<AutoUpgradeData>(); // don't use anymore, only in AutoUpgrade
 		
 	
 	
