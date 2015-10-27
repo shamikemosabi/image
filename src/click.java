@@ -102,20 +102,6 @@ public class click
 		downloadFTP(config.configFile , "/config/config.xml");  
 		setGUIandControl();
 		RunEmailService();	
-		
-		Process p = Runtime.getRuntime().exec("tasklist");
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				   p.getInputStream()));
-		String line;
-		 while ((line = reader.readLine()) != null) {
-
-		  System.out.println(line);
-		  if (line.toLowerCase().contains("hd-frontend")) {
-			  Runtime.getRuntime().exec("taskkill /F /IM HD-Frontend.exe");
-			  break;
-		  }
-		 }
-		 Runtime.getRuntime().exec("C:\\Program Files (x86)\\BlueStacks\\HD-RunApp.exe -p com.supercell.clashofclans -a com.supercell.clashofclans.GameApp");
 
 		 
 	//	AutoUpgrade();
@@ -831,30 +817,42 @@ public class click
 						if(swap)
 						{
 							guiFrame.info("Static exceeded will try to swap to " + email);
-							exist = isEmailActive(doc, email, ""); // don't compare with current email, simply see if upgrade to email exist
+							exist = isEmailActive(doc, email, con.getEmail()); // don't compare with current email, simply see if upgrade to email exist
 							
 							if(!exist) //if doesn't exist
 							{								
-								guiFrame.info("Static email is not active swapping to " + email + "from " + con.getEmail());
-								String localEmail = con.getEmail();
-								boolean swapStatus = swap(email,localEmail,false);
-								clickSafeSpot(); // click safe spot to get rid of raided screen
-								Thread.sleep(3000);
 								
-								//we should be in the new account now.
-								if(inMain() && swapStatus) // make sure in main and swap success
+								if(email.equals(con.getEmail())) // same accont don't swap, all we do is click autoupgrade
 								{
-									guiFrame.info("Static In main from after swap");
+									guiFrame.info("Static In main same account");
+									clickSafeSpot(); // go back to main									
 									setUpScreen();
 									clickAutoUpgrade(aud);
-									AutoUpgradeBuilder();									
-									clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.		
-									getSetLootFull(email); //update lootFull
-								}
+								}								
 								else
 								{
-									guiFrame.info("Swap failed, not in main");
-									sendText("Swap failed","swapping from " + localEmail + " to " + email + " variable swapStatus = " + swapStatus);
+									guiFrame.info("Static email is not active swapping to " + email + "from " + con.getEmail());
+									String localEmail = con.getEmail();
+									boolean swapStatus = swap(email,localEmail,false);
+									clickSafeSpot(); // click safe spot to get rid of raided screen
+									Thread.sleep(3000);
+									
+									//we should be in the new account now.
+									if(inMain() && swapStatus) // make sure in main and swap success
+									{
+										guiFrame.info("Static In main from after swap");
+										setUpScreen();
+										clickAutoUpgrade(aud);
+										AutoUpgradeBuilder();									
+										clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.		
+										getSetLootFull(email); //update lootFull
+									}
+									else
+									{
+										guiFrame.info("Swap failed, not in main");
+										sendText("Swap failed","swapping from " + localEmail + " to " + email + " variable swapStatus = " + swapStatus);
+									}
+								
 								}
 							}
 
@@ -2267,6 +2265,11 @@ public class click
 		guiFrame.info("NEXT!");
 	}
 	
+	
+	public boolean isSmartLoot()
+	{
+		return guiFrame.getSmartLoot() || con.getSmartLoot();
+	}
 	/*
 	 * Really need to improve OCR
 	 */
@@ -2275,7 +2278,7 @@ public class click
 		
 		lootThreshold = Integer.valueOf(con.getLootThreshold());
 		//IF smart loot is on.
-		if(guiFrame.getSmartLoot())
+		if(isSmartLoot())
 		{
 			setLoot();	
 		}

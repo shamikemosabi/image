@@ -1,9 +1,6 @@
 @todo
 
-- read smart loot from config.xml
-- when swap on static, and it's the current account, lets click on dark elixirs. 
 - dump info from hash, arrays into a file maybe, so I can view it. Stats like when accounts were last swapped, etc...
-- a way to restart bluestack? kill bluestack .exe, and re launch it via cmd?
 
 - Auto BUILD new buildings
 

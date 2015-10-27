@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -50,6 +51,7 @@ public class email implements Runnable{
 		
 	}
 
+	 
  public static void main(String[] args) {
 	 
 	/*
@@ -217,6 +219,11 @@ public class email implements Runnable{
       {
     	  last = "config";
       }
+      else if(body.contains("bluestack:"))
+      {
+    	  restartBlueStack();
+    	  messages[i].setFlag(Flags.Flag.DELETED, true); // flag for delete
+      }
       
       System.out.println(last);
     	  
@@ -367,6 +374,37 @@ return null;
 }
 	
 	
+	
+public void restartBlueStack() throws Exception
+{	
+	Process p = Runtime.getRuntime().exec("tasklist");
+	BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+	String line;
+	while ((line = reader.readLine()) != null) 
+	{	  
+	  if (line.toLowerCase().contains("hd-frontend")) 
+	  {
+		  Runtime.getRuntime().exec("taskkill /F /IM HD-Frontend.exe");
+		  break;
+	  }
+	 }
+	
+	try
+	{
+		Runtime.getRuntime().exec("C:\\Program Files (x86)\\BlueStack\\HD-RunApp.exe -p com.supercell.clashofclans -a com.supercell.clashofclans.GameApp");
+	}
+	catch(Exception e)
+	{
+		try{
+			// nested try catch... for where bluestack folder is? maybe there is a better way
+			Runtime.getRuntime().exec("C:\\Program Files (x86)\\BlueStacks\\HD-RunApp.exe -p com.supercell.clashofclans -a com.supercell.clashofclans.GameApp");
+		}
+		catch(Exception e1)
+		{
+			e1.printStackTrace();
+		}
+	}
+}
 public String SaveScreenShot() throws Exception
 	{
 		Robot bot = new Robot();

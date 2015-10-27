@@ -39,7 +39,7 @@ import email.email;
 
 public class config
 {
-	public static boolean test = true;
+	public static boolean test = false;
 	
 	
 	ArrayList<struct> data ;
@@ -60,6 +60,7 @@ public class config
 	public int deployBarb=0;	
 	public String lootThreshold="";
 	public int slot =0;	
+	private boolean smartLoot = false;
 	
 	private xy xyBarrackTrain = null;
 	
@@ -163,7 +164,8 @@ public class config
 					lootThreshold = eElement.getElementsByTagName("loot").item(0).getTextContent();
 					slot = Integer.valueOf(eElement.getElementsByTagName("slot").item(0).getTextContent());
 					xyBarrackTrain =  createXY(eElement.getElementsByTagName("barrackTrain").item(0).getTextContent());										
-					email.alDestEmail = createDestinationEmailArray(eElement.getElementsByTagName("destEmail").item(0).getTextContent());
+					email.alDestEmail = createDestinationEmailArray(eElement.getElementsByTagName("destEmail").item(0).getTextContent());					
+					smartLoot = Boolean.valueOf(eElement.getElementsByTagName("smartLoot").item(0).getTextContent());
 					 
 				}
 			}
@@ -759,6 +761,10 @@ public class config
 	public String getEmail()
 	{
 		return email2;
+	}
+	public boolean getSmartLoot()
+	{
+		return smartLoot;
 	}
 	public String getPW()
 	{
