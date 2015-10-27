@@ -380,6 +380,7 @@ public void restartBlueStack() throws Exception
 	Process p = Runtime.getRuntime().exec("tasklist");
 	BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 	String line;
+	String bsFolder = "";
 	while ((line = reader.readLine()) != null) 
 	{	  
 	  if (line.toLowerCase().contains("hd-frontend")) 
@@ -391,13 +392,15 @@ public void restartBlueStack() throws Exception
 	
 	try
 	{
-		Runtime.getRuntime().exec("C:\\Program Files (x86)\\BlueStack\\HD-RunApp.exe -p com.supercell.clashofclans -a com.supercell.clashofclans.GameApp");
+		bsFolder = "C:\\Program Files (x86)\\BlueStacks\\";
+		Runtime.getRuntime().exec(bsFolder + "HD-RunApp.exe -p com.supercell.clashofclans -a com.supercell.clashofclans.GameApp");
 	}
 	catch(Exception e)
 	{
 		try{
 			// nested try catch... for where bluestack folder is? maybe there is a better way
-			Runtime.getRuntime().exec("C:\\Program Files (x86)\\BlueStacks\\HD-RunApp.exe -p com.supercell.clashofclans -a com.supercell.clashofclans.GameApp");
+			bsFolder = "C:\\Program Files\\BlueStacks\\";
+			Runtime.getRuntime().exec(bsFolder + "HD-RunApp.exe -p com.supercell.clashofclans -a com.supercell.clashofclans.GameApp");
 		}
 		catch(Exception e1)
 		{
