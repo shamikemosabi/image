@@ -2044,7 +2044,11 @@ public class click
 				sendPicText = true;
 				
 				//let's also update stat when we call status.
-				updateStat();
+				// only for autoupgrade machine.
+				if(guiFrame.getAutoUpgrade())
+				{
+					updateStat();
+				}
 				
 			}
 			return 2; // return 2, 4 is just so we know we should take screen shot later, but still return 2 to bot
