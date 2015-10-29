@@ -103,9 +103,9 @@ public class click
 	{
 		downloadFTP(config.configFile , "/config/config.xml");  
 		setGUIandControl();
-		RunEmailService();	
+		RunEmailService();
 		RunUpdateStatService();
-		
+						
 		
 	//	AutoUpgrade();
 		/*
@@ -177,6 +177,7 @@ public class click
 					
 					AutoUpgrade2();
 					AutoUpgradeBuilder();
+					upgradeLab(con.getEmail());
 					AutoSwapFullLoot();
 					
 					sendPictureText();
@@ -293,6 +294,7 @@ public class click
 						updateSwapDate(con.getEmail()); //update last time this email was active
 						AutoUpgrade2();
 						AutoUpgradeBuilder();
+						upgradeLab(con.getEmail());
 						
 					}
 					Thread.sleep(30000);
@@ -352,6 +354,56 @@ public class click
 			}
 			*/
 		}
+	}
+	
+	
+	/*
+	 * reads lab.xml
+	 * 
+	 * account is our email
+	 * loads up all item's XY . each item is troop to upgrade
+	 * 
+	 * goes thru all of them and try to upgrade.
+	 * 
+	 */
+	public void upgradeLab(String account)
+	{
+		downloadFTP(config.labFile , "/config/lab.xml");
+		Document doc  = createDocFromXML(config.labFile);
+		ArrayList<AutoUpgradeData> al = new ArrayList<AutoUpgradeData>();
+		
+		NodeList nList = doc.getElementsByTagName("email");			
+		for (int temp = 0; temp < nList.getLength(); temp++) 
+		{			
+			Node nNode = nList.item(temp);				
+			Element eElement = (Element) nNode;
+			String e  = eElement.getAttribute("id");
+			
+			if(e.equals(account)) // if this is same account as what was input
+			{
+				// position of lab and research
+				NodeList lab = eElement.getElementsByTagName("lab");	
+				NodeList itemList = eElement.getElementsByTagName("items");
+				
+				loadXYnodeList(lab,"pos", al);
+				loadXYnodeList(itemList, "item", al);
+
+			}
+		}
+		
+		//al now contains all XY records
+		try{
+			for(int i = 0; i < al.size(); i ++)
+			{
+				clickAutoUpgrade(al.get(i), 500);
+			}
+		}
+		catch(Exception e)
+		{
+			guiFrame.info("Error in UpgradeLab");
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public Document createDocFromXML(String s)
@@ -493,7 +545,7 @@ public class click
 			
 			for(int i =0; (i < al.size() && !zeroBuilder()); i++)			
 			{	
-				clickAutoUpgrade(al.get(i));
+				clickAutoUpgrade(al.get(i),2000);
 				takeCurrentScreenshot(false);
 				clickSafeSpot();
 				//compare previous cropCurrent image (cropped zero builder of last time) with current zerobuilder
@@ -554,42 +606,32 @@ public class click
 				
 				if(e.equals(account)) // if this is same account as what was input
 				{
-					NodeList itemList = eElement.getElementsByTagName("item");
+					// load elixir and gold separately.
 					
+					NodeList elixirList = eElement.getElementsByTagName("elixir");				// only 1 element	
+					NodeList goldList = eElement.getElementsByTagName("gold");					// only 1 element
 					
-					//loop thru all item that match our account
-					for(int i = 0 ; i < itemList.getLength(); i ++)
-					{						
-						Node itemNode = itemList.item(i);				
-						Element itemEle = (Element) itemNode;
-						
-						AutoUpgradeData aud = new AutoUpgradeData();
-						
-						/*
-						aud.setName(itemEle.getElementsByTagName("name").item(0).getTextContent());
-						aud.getXYArrayList().add(createXY(itemEle.getElementsByTagName("pos").item(0).getTextContent()));
-						aud.getXYArrayList().add(createXY(itemEle.getElementsByTagName("upgrade").item(0).getTextContent()));
-						aud.getXYArrayList().add(createXY(itemEle.getElementsByTagName("click").item(0).getTextContent()));
-						*/
-						NodeList xyList = itemEle.getElementsByTagName("xy");		
-						
-						for (int j = 0; j < xyList.getLength(); j++) 		
-						{		
-							Node n = xyList.item(j);		
-							Element xye = (Element) n;		
-									
-							xy newXY = createXY(xye.getTextContent());		
-							aud.getXYArrayList().add(newXY);		
-											
-						}							
-						alAutoUpgradeBuilder.add(aud);
+					// let's check max gold, always do gold first because we loot gold better
+					if(compareImage("maxGold"))
+					{
+						loadXYnodeList(goldList,"item", alAutoUpgradeBuilder);
+						loadXYnodeList(elixirList,"item", alAutoUpgradeBuilder); // load this as well, in case I run out of gold to upgrade
+					}
+					else if(compareImage("maxElixir"))
+					{
+						loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder);
+						loadXYnodeList(goldList, "item",alAutoUpgradeBuilder);  // in case I dont have elixir, I can still upgrade gold
+					}
+					else // none of the loot is full
+					{
+						// add both, gold first, gold easier too loot and build def is better
+						// please note dark elixir will dup, but I dont care about that
+						loadXYnodeList(goldList,"item", alAutoUpgradeBuilder);
+						loadXYnodeList(elixirList, "item", alAutoUpgradeBuilder);
 					}
 					
-					
 				}
-			}
-			
-						
+			}									
 		}
 		catch(Exception e)
 		{
@@ -598,6 +640,42 @@ public class click
 		}
 		
 		return alAutoUpgradeBuilder;
+	}
+	
+	/*
+	 * n1 takes NodeList that should contain <xy> records
+	 * 
+	 * this method will loop thru the list and add AutoUpgradeData into alAutoUpgradeBuilder
+	 */
+	public void loadXYnodeList(NodeList nl, String tagName, ArrayList<AutoUpgradeData> al)
+	{
+		for(int a = 0 ; a < nl.getLength(); a ++) //should only be 1 length
+		{			
+			Node nNode = nl.item(a);				
+			Element eElement = (Element) nNode;
+			
+			NodeList itemList = eElement.getElementsByTagName(tagName); // get all item
+			for(int i = 0 ; i < itemList.getLength(); i ++)
+			{						
+				Node itemNode = itemList.item(i);				
+				Element itemEle = (Element) itemNode;
+				
+				AutoUpgradeData aud = new AutoUpgradeData();
+
+				NodeList xyList = itemEle.getElementsByTagName("xy");		
+				
+				for (int j = 0; j < xyList.getLength(); j++) 		
+				{		
+					Node n = xyList.item(j);		
+					Element xye = (Element) n;		
+							
+					xy newXY = createXY(xye.getTextContent());		
+					aud.getXYArrayList().add(newXY);		
+									
+				}							
+				al.add(aud);
+			}
+		}
 	}
 	
 	public xy createXY(String s)
@@ -739,7 +817,7 @@ public class click
 									if(inMain()) // make sure in main.
 									{
 										setUpScreen();
-										clickAutoUpgrade(aud);
+										clickAutoUpgrade(aud, 2000);
 										takeCurrentScreenshot(true);
 										clickSafeSpot();
 									}
@@ -757,7 +835,7 @@ public class click
 									{
 										guiFrame.info("In main from after swap");
 										setUpScreen();
-										clickAutoUpgrade(aud);
+										clickAutoUpgrade(aud, 2000);
 										AutoUpgradeBuilder();
 										takeCurrentScreenshot(true);
 										clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.		
@@ -830,7 +908,7 @@ public class click
 									guiFrame.info("Static In main same account");
 									clickSafeSpot(); // go back to main									
 									setUpScreen();
-									clickAutoUpgrade(aud);
+									clickAutoUpgrade(aud, 2000);
 								}								
 								else
 								{
@@ -845,7 +923,7 @@ public class click
 									{
 										guiFrame.info("Static In main from after swap");
 										setUpScreen();
-										clickAutoUpgrade(aud);
+										clickAutoUpgrade(aud, 2000);
 										AutoUpgradeBuilder();									
 										clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.		
 										getSetLootFull(email); //update lootFull
@@ -1003,7 +1081,7 @@ public class click
 						if(inMain()) // make sure in main.
 						{
 							setUpScreen();
-							clickAutoUpgrade(aud);
+							clickAutoUpgrade(aud, 2000);
 							takeCurrentScreenshot(true);
 							clickSafeSpot();
 						}
@@ -1020,7 +1098,7 @@ public class click
 						{
 							setUpScreen();
 							AutoUpgradeBuilder();
-							clickAutoUpgrade(aud);
+							clickAutoUpgrade(aud, 2000);
 							takeCurrentScreenshot(true);
 							clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.
 							if(swapBack)
@@ -1041,14 +1119,14 @@ public class click
 			} // coming out of this IF I need to get new autoupgrade
 		}
 	}
-	public void clickAutoUpgrade(AutoUpgradeData aud) throws Exception
+	public void clickAutoUpgrade(AutoUpgradeData aud, int wait) throws Exception
 	{
 		for(int i=0 ; i < aud.getXYArrayList().size(); i++)
 		{			
-			Thread.sleep(2000);
+			Thread.sleep(wait);
 			cont.mouseMove(aud.getXYArrayList().get(i).getX(), aud.getXYArrayList().get(i).getY()); 
 			cont.mousePress(InputEvent.BUTTON1_MASK);	
-			Thread.sleep(500);
+			Thread.sleep(400);
 			cont.mouseRelease(InputEvent.BUTTON1_MASK);				
 		}
 	}

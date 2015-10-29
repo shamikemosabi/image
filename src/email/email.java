@@ -223,6 +223,9 @@ public class email implements Runnable{
       {
     	  restartBlueStack();
     	  messages[i].setFlag(Flags.Flag.DELETED, true); // flag for delete
+    	  Thread.sleep(10000); // wait 10 sec, take screenshot
+		  String fileName = SaveScreenShot();
+		  sendPictureText(fileName);
       }
       
       System.out.println(last);

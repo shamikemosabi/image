@@ -52,6 +52,7 @@ public class config
 	public final static String configFile =  System.getProperty("user.dir")+"\\config.xml";
 	public final static String upgradeFile =  System.getProperty("user.dir")+"\\upgrade.xml";
 	public final static String statFile =  System.getProperty("user.dir")+"\\stat.txt";
+	public final static String labFile =  System.getProperty("user.dir")+"\\lab.xml";
 	
 	private xy xyBarrack = null;
 	private xy xyCamp = null;
@@ -615,7 +616,7 @@ public class config
 			}
 			if(name.equals("maxGold"))
 			{
-				s = new struct("maxGold",1186,33, 17, 16, ruleFolder+"\\maxGold.jpg",pos);
+				s = new struct("maxGold",1196,33, 17, 16, ruleFolder+"\\maxGold.jpg",pos);
 			}
 			
 		}
