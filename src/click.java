@@ -2163,8 +2163,16 @@ public class click
 			Object[] values = hashAutoUpgradeSWAP.values().toArray(); //convert hash to array
 			ArrayList<Object> n = new ArrayList<Object>(Arrays.asList(values)); // convert array to arraylist
 			
+			// convert arraylist of objects into arraylist of AutoUpgradeData
+			ArrayList<AutoUpgradeData> n1  = new ArrayList<AutoUpgradeData>();
+			for (Object object : n) {				
+				n1.add((AutoUpgradeData) object);
+			}			
+			
 			File f = new File(config.statFile);
-			PrintWriter fw = new PrintWriter(f);
+			PrintWriter fw = new PrintWriter(f);					
+			
+		    Collections.sort(n1, new DateComparator()); //sort by swap date
 			
 			for(int i=0; i < n.size(); i ++)
 			{
