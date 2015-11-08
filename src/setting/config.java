@@ -39,7 +39,7 @@ import email.email;
 
 public class config
 {
-	public static boolean test = true;
+	public static boolean test = false;
 	
 	
 	ArrayList<struct> data ;

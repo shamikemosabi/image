@@ -105,7 +105,7 @@ public class click
 		setGUIandControl();
 		RunEmailService();
 		RunUpdateStatService();
-						
+		RunUpdateWebPage();				
 		
 	//	AutoUpgrade();
 		/*
@@ -175,12 +175,13 @@ public class click
 					
 					updateSwapDate(con.getEmail()); //update last time this email was active
 					
-					AutoUpgrade2();
-					AutoUpgradeBuilder();
-					upgradeLab(con.getEmail());
-					AutoSwapFullLoot();
+					AutoUpgrade2(); // check for swap NOW, Static
+					AutoUpgradeBuilder(); // check if free builder, if so then build
+					upgradeLab(con.getEmail()); // lab upgrade
+					AutoSwapFullLoot(); // check if loot is full, if so then swap
 					
-					sendPictureText();
+					clickAttackLog(); //click attack log/ camp, save pics
+					sendPictureText(); //if email has status, will click to attack log and send pic back
 					setUpScreen();				
 					//if(clickCamp())
 					if(clickBarracksForCamp()) // changed to barracks to check for full camp
@@ -295,6 +296,7 @@ public class click
 						AutoUpgrade2();
 						AutoUpgradeBuilder();
 						upgradeLab(con.getEmail());
+						clickAttackLog();
 						
 					}
 					Thread.sleep(30000);
@@ -546,11 +548,11 @@ public class click
 			for(int i =0; (i < al.size() && !zeroBuilder()); i++)			
 			{	
 				clickAutoUpgrade(al.get(i),2000);
-				takeCurrentScreenshot(false);
+				takeCurrentScreenshot(false,"currentstatus.jpg");
 				clickSafeSpot();
 				//compare previous cropCurrent image (cropped zero builder of last time) with current zerobuilder
 				// The idea is After clickAutoUpgrade(), and my image is still the same it means nothing happened, so there was no 
-				// successful upgrade. If it was different THEN I should send text to show upgrade.
+				// successful upgrade. If`it was different THEN I should send text to show upgrade.
 				
 				//make sure call from zerobuilder() and here does not have any compare image, or else my cropCurrent would be overwritten
 				boolean send = !SameBuilderImage();				
@@ -818,7 +820,7 @@ public class click
 									{
 										setUpScreen();
 										clickAutoUpgrade(aud, 2000);
-										takeCurrentScreenshot(true);
+										takeCurrentScreenshot(true,"currentstatus.jpg");
 										clickSafeSpot();
 									}
 								}
@@ -837,7 +839,7 @@ public class click
 										setUpScreen();
 										clickAutoUpgrade(aud, 2000);
 										AutoUpgradeBuilder();
-										takeCurrentScreenshot(true);
+										takeCurrentScreenshot(true,"currentstatus.jpg");
 										clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.		
 										getSetLootFull(con.getEmail()); //update lootFull
 									}
@@ -1082,7 +1084,7 @@ public class click
 						{
 							setUpScreen();
 							clickAutoUpgrade(aud, 2000);
-							takeCurrentScreenshot(true);
+							takeCurrentScreenshot(true,"currentstatus.jpg");
 							clickSafeSpot();
 						}
 					}
@@ -1099,7 +1101,7 @@ public class click
 							setUpScreen();
 							AutoUpgradeBuilder();
 							clickAutoUpgrade(aud, 2000);
-							takeCurrentScreenshot(true);
+							takeCurrentScreenshot(true,"currentstatus.jpg");
 							clickSafeSpot(); // get rid of any screen, make sure we are in main village page so we can click setting button.
 							if(swapBack)
 							{
@@ -1389,7 +1391,7 @@ public class click
 			//take and send screenshot
 			 if(send)					
 			 {		
-				 takeCurrentScreenshot(true);		
+				 takeCurrentScreenshot(true,"currentstatus.jpg");		
 			 }
 		 }
 		 else // was not able to reach load village screen. Something happened can't swap successfully
@@ -1402,10 +1404,10 @@ public class click
 		 
 	}
 	
-	public void takeCurrentScreenshot(boolean send) throws Exception
+	public void takeCurrentScreenshot(boolean send , String n) throws Exception
 	{
 		BufferedImage screencapture = cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));			
-		String name = "currentstatus.jpg";
+		String name = n;
 		File outputFile = new File(name);
         ImageIO.write(screencapture, "jpg", outputFile);	
         if(send)
@@ -1432,6 +1434,34 @@ public class click
 		hashAutoUpgradeSWAP = con.loadAutoUpgradeSWAP();
 	}
 	
+	/*
+	 * this will click camp, save screen shot,
+	 * click to attack log, save screen shot.
+	 * 
+	 * Then service will upload these imgage files to site
+	 */
+	public void clickAttackLog() throws Exception
+	{
+		clickCamp(); // lets click camp first, get image of camp		
+		con.setName("status");
+		for(int i=0; i< con.getPos().size(); i++)
+		 {
+			 cont.mouseMove(con.getPos().get(i).getX(), con.getPos().get(i).getY());
+			 cont.mousePress(InputEvent.BUTTON1_MASK);	
+			 Thread.sleep(1000);
+			 cont.mouseRelease(InputEvent.BUTTON1_MASK);			
+			 Thread.sleep(2000);
+		 }
+		BufferedImage screencapture = cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+		
+		String name = "currentStatusnWP.jpg";
+		File outputFile = new File(name);
+        ImageIO.write(screencapture, "jpg", outputFile);	
+        clickSafeSpot();
+	}
+	
+	
+	
 	public void sendPictureText() throws Exception
 	{
 		if(sendPicText)
@@ -1453,7 +1483,7 @@ public class click
 			guiFrame.info("Took screen shot");
 			
 			//save current screen into current.jpg
-			String name = "currentstatus.jpg";
+			String name = "currentStatusnWP.jpg";
 			File outputFile = new File(name);
 	        ImageIO.write(screencapture, "jpg", outputFile);	
 	        guiFrame.info("Finished saving to file");
@@ -2154,6 +2184,21 @@ public class click
 		}
 	}
 	
+	/**
+	 * Take current screen shot, take current status page (this will be saved every loop)
+	 * FTP both image to website../acct/con.getEmail()/ directory
+	 * 
+	 * User will access the page via html page in the directory which will display the 2 jpg
+	 * @throws Exception
+	 */
+	public void updateWebPage() throws Exception 
+	{
+		takeCurrentScreenshot(false, "currentScreenWP.jpg");		
+		upLoadFTP(new String[]{"currentScreenWP.jpg","currentStatusnWP.jpg", "currentcamp.jpg"},"config/acct/"+con.getEmail(), FTP.BINARY_FILE_TYPE);
+		
+	}
+	
+	
 	
 	public void updateStat() throws Exception 
 	{
@@ -2174,9 +2219,9 @@ public class click
 			
 		    Collections.sort(n1, new DateComparator()); //sort by swap date
 			
-			for(int i=0; i < n.size(); i ++)
+			for(int i=0; i < n1.size(); i ++)
 			{
-				AutoUpgradeData aud = (AutoUpgradeData ) n.get(i);
+				AutoUpgradeData aud =  n1.get(i);
 				fw.println("Account : " + aud.getEmail());
 				fw.println("Last Swap Date : " + aud.getSwapDate());
 				fw.println("Loot Full : " + aud.getLootFull());
@@ -2210,6 +2255,59 @@ public class click
 		downloadFTP(config.configFile , "/config/config.xml");
 		con = new config(con.getEmail());   // new config object with same account as before, just NEW config.xml
 	}
+	
+	
+	
+	/*overload method, takes string array of multiple file names.
+	 * 
+	 */
+	public void upLoadFTP(String[] FileNames, String dir, int file_type)
+	{
+		
+		if(!config.test) {
+	
+			FTPClient ftp = new FTPClient();
+	
+			 boolean success = false;
+		     int count = 0;
+		     do 
+		        {   
+					try{		
+						ftp.connect("doms.freewha.com");
+						System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
+						System.out.println(ftp.getReplyString());
+						ftp.enterLocalPassiveMode();
+						ftp.changeWorkingDirectory(dir);
+						
+						ftp.setFileType(file_type);
+						
+						for(int i= 0; i < FileNames.length; i ++)
+						{
+							File f = new File(FileNames[i]);
+							final InputStream is = new FileInputStream(f.getPath());
+							success = ftp.storeFile(f.getName(), is);
+							is.close();
+						}
+						
+						ftp.disconnect();	
+						
+						count++;
+					}
+					catch(Exception e)
+					{
+						System.out.println("Error UploadFTP CLICK method");
+			        	System.out.println(e.getMessage());
+			        	
+						guiFrame.info("Error UploadFTP CLICK method");
+						guiFrame.info(e.getMessage());
+			        	e.printStackTrace();
+			        	success = false;					
+					}
+		        }while(!success && count < 10);
+	     
+		}
+	}
+	
 	
 	/*
 	 * uploads FileName to FTP dir
@@ -2912,6 +3010,12 @@ public class click
 		 Thread t = new Thread(updateS);
 		 t.start();
 	}
+	public void RunUpdateWebPage()
+	{
+		UpdateWebPage up = new UpdateWebPage();		 		
+		 Thread t = new Thread(up);
+		 t.start();
+	}	
 	
 	
 	public static void main(String[] args)
@@ -2993,6 +3097,26 @@ public class click
 				}
 			}
 		}
+	 
+	 
+	 class UpdateWebPage implements Runnable{
+			
+			public void run()
+			{
+				while(true) 
+				{ 				
+					try{
+						updateWebPage();
+						Thread.sleep(60000); 
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+		}	 
+	 
 	
 }
 

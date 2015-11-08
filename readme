@@ -1,5 +1,5 @@
 @todo
-- sort stat.txt by time
+- add autoswap to config.xml, it will overwrite any swapping features (full loot, static swap etc...)
 - maybe read last swap date via file?, every thing resets if program restarts.
 
 - Auto BUILD new buildings
