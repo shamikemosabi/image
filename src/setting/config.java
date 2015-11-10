@@ -53,6 +53,7 @@ public class config
 	public final static String upgradeFile =  System.getProperty("user.dir")+"\\upgrade.xml";
 	public final static String statFile =  System.getProperty("user.dir")+"\\stat.txt";
 	public final static String labFile =  System.getProperty("user.dir")+"\\lab.xml";
+	public final static String HashSER = System.getProperty("user.dir")+"\\hash.ser";
 	
 	private xy xyBarrack = null;
 	private xy xyCamp = null;

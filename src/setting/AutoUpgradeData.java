@@ -1,9 +1,11 @@
 package setting;
 
 import setting.config.xy;
+
+import java.io.Serializable;
 import java.util.*;
 
-public class AutoUpgradeData
+public class AutoUpgradeData implements Serializable
 {
 
 	private String email ="";

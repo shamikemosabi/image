@@ -2,15 +2,21 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.DateFormat;
@@ -105,7 +111,8 @@ public class click
 		setGUIandControl();
 		RunEmailService();
 		RunUpdateStatService();
-		RunUpdateWebPage();				
+		RunUpdateWebPage();								
+		
 		
 	//	AutoUpgrade();
 		/*
@@ -338,24 +345,62 @@ public class click
 					s.reset();
 				}
 			}
-
-			/*
-			try{
-			//only at work
-			//send text to me, if service has ebeen stopped:
-			if(config.work && serviceStopped && sendStopText)  //sendStopText only sends the first time service was stopped.
-			{									// or else each loop it'll keep sending.
-				sendText();
-				guiFrame.info("SEND TEXT");
-				sendStopText = false;
-			}
-			}
-			catch(Exception e)
-			{
-				guiFrame.info(e.getMessage());				
-			}
-			*/
 		}
+	}
+	
+	
+	
+	public void seralize(Hashtable o, String s) 
+	{						
+		
+		try{
+			 File f =  new File(s);
+			 OutputStream file = new FileOutputStream(f );
+		     OutputStream buffer = new BufferedOutputStream( file );
+		     ObjectOutput output = new ObjectOutputStream( buffer );
+		      	      
+		      output.writeObject(o);
+		      output.close();
+		      file.close();
+		      buffer.close();		
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			guiFrame.info("Error Seraliz Hashtable");
+			guiFrame.info(e.getMessage());
+		}
+		
+	}
+	
+	public Hashtable deSeralize(Hashtable l, String s) 
+	{			
+		try{			
+			File fileName =  new File(s);
+			InputStream file = new FileInputStream(fileName);
+			InputStream buffer = new BufferedInputStream( file );
+			ObjectInput input = new ObjectInputStream ( buffer );  
+	    		  	    
+			l =  (Hashtable)input.readObject(); 		
+	    
+			file.close();
+			buffer.close();
+			input.close();	    
+		}
+		catch(FileNotFoundException fnfe) // returns a brand new Data, if data.ser does not exist, first time
+		{
+			l = new Hashtable();
+			return l;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			guiFrame.info("Error deSeralize Hashtable");
+			guiFrame.info(e.getMessage());
+		}
+		
+		return l;
+		  
 	}
 	
 	
@@ -1252,6 +1297,10 @@ public class click
 		
 		hashAutoUpgradeSWAP.put(e, aud);
 		
+		
+		seralize(hashAutoUpgradeSWAP, config.HashSER);
+		upLoadFTP(config.HashSER,"config");
+		
 	}
 	
 	/*
@@ -1431,7 +1480,47 @@ public class click
 		guiFrame = new gui();
 		cont = new control(guiFrame, bot);		
 		con = new config(guiFrame.account);
-		hashAutoUpgradeSWAP = con.loadAutoUpgradeSWAP();
+		hashAutoUpgradeSWAP = updateSwapDateFromSER(con.loadAutoUpgradeSWAP());		
+	}
+	
+	
+	/**
+	 * Takes hs, which is from config.loadAutoUpgradeSWAP(), which is from all the account listed in config.xml
+	 * It will read hash.ser, which we also get from FTP, this will contain the updated Hashtable data.
+	 * we will deseralize it into another hashtable, update hash from FTP into my hs.
+	 * @param hs
+	 * @return  hs, updated hs with updated value from hashable from hash.ser
+	 */
+	public Hashtable<String, AutoUpgradeData> updateSwapDateFromSER(Hashtable<String, AutoUpgradeData> hs)
+	{
+		
+		downloadFTP(config.HashSER , "/config/hash.ser");			
+		Hashtable <String, AutoUpgradeData> b = deSeralize(new Hashtable(),config.HashSER);
+		
+		//reason why I'm looping and updating, instead of just using hs from hash.ser is because what if i add new account to config.xml?		
+		Object[] values = b.values().toArray(); //convert hash to array
+		ArrayList<Object> n = new ArrayList<Object>(Arrays.asList(values)); // convert array to arraylist
+		
+		// convert arraylist of objects into arraylist of AutoUpgradeData
+		ArrayList<AutoUpgradeData> n1  = new ArrayList<AutoUpgradeData>();
+		for (Object object : n) {				
+			n1.add((AutoUpgradeData) object);
+		}		
+		
+		for(int i =0 ; i< n1.size(); i++)
+		{
+			//values I want to update with
+			String key = n1.get(i).getEmail();
+			Date d = n1.get(i).getSwapDate();
+			
+			AutoUpgradeData aud = hs.get(key);
+			aud.setSwapDate(d);
+			
+			hs.put(key, aud);
+		}
+		
+		
+		return hs;						
 	}
 	
 	/*
@@ -2329,7 +2418,8 @@ public class click
 						System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
 						System.out.println(ftp.getReplyString());
 						ftp.enterLocalPassiveMode();
-						ftp.changeWorkingDirectory(dir);				
+						ftp.changeWorkingDirectory(dir);	
+						ftp.setFileType(FTP.BINARY_FILE_TYPE);
 						
 						final InputStream is = new FileInputStream(f.getPath());
 						success = ftp.storeFile(f.getName(), is);
