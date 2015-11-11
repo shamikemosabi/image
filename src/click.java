@@ -153,7 +153,7 @@ public class click
 		swap();
 		
       
-		upLoadFTP("config.xml","config");
+//		upLoadFTP("config.xml","config");
 		downloadFTP("config.xml" , "/config/config.xml");
 		System.exit(0);
 		AutoUpgrade();
@@ -180,7 +180,7 @@ public class click
 					if(disconnected) GotDisconnected();	
 					
 					
-					updateSwapDate(con.getEmail()); //update last time this email was active
+					updateSwapDate(con.getEmail(), true, false, false); //update last time this email was active
 					
 					AutoUpgrade2(); // check for swap NOW, Static
 					AutoUpgradeBuilder(); // check if free builder, if so then build
@@ -299,7 +299,7 @@ public class click
 					clickSafeSpot(); // click safe spot to be active
 					if(inMain())
 					{
-						updateSwapDate(con.getEmail()); //update last time this email was active
+						updateSwapDate(con.getEmail(), true, false, false); //update last time this email was active
 						AutoUpgrade2();
 						AutoUpgradeBuilder();
 						upgradeLab(con.getEmail());
@@ -544,20 +544,19 @@ public class click
 	{
 		boolean ret = false;
 		try{
-			AutoUpgradeData aud = hashAutoUpgradeSWAP.get(e);
+			//AutoUpgradeData aud = hashAutoUpgradeSWAP.get(e);
 			if(compareImage("maxElixir") && compareImage("maxGold"))
 			{
 				guiFrame.info("loot is full for email account " + e);
-				ret = true;
-				aud.setLootFull(ret);
+				ret = true;				
+				updateSwapDate(e, false, true, ret);										
 			}
 			else
 			{
 				ret = false;
-				aud.setLootFull(ret);
+				updateSwapDate(e, false, true, ret);	
 			}
-			
-			hashAutoUpgradeSWAP.put(e, aud);
+					
 		}
 		catch(Exception ex)
 		{
@@ -1286,20 +1285,39 @@ public class click
 	 * takes e and see if exist in AutoUpgradeSwap
 	 * it should exist, and we update swapDate with current date.
 	 * it will keep track of when the last time an email swapped was.
+	 * 
+	 * modify method to be general update UpgradeSwap. Specify boolean in parameter to know what to update, date? or loot? or both.. etc...
+	 * 
+	 * @param
+	 * 	 e - email 
+	 * 	 s - boolean to update swap date
+	 *   l - boolean to update loot
+	 *   l2 - actual value to update loot
 	 */
-	public void updateSwapDate(String e)
-	{
-		Calendar d = Calendar.getInstance();
-		Date currDate = d.getTime();
+	public void updateSwapDate(String e, boolean s, boolean l, boolean l2)
+	{		
+		downloadFTP(config.HashSER , "/config/hash.ser");			
+		hashAutoUpgradeSWAP = deSeralize(new Hashtable(),config.HashSER);
 		
 		AutoUpgradeData aud = hashAutoUpgradeSWAP.get(e);
-		aud.setSwapDate(currDate);
+		if(s)
+		{
+			Calendar d = Calendar.getInstance();
+			Date currDate = d.getTime();						
+			aud.setSwapDate(currDate);
+		}
 		
-		hashAutoUpgradeSWAP.put(e, aud);
+		if(l)
+		{
+			aud.setLootFull(l2);
+		}
+			
 		
+		
+		hashAutoUpgradeSWAP.put(e, aud);	
 		
 		seralize(hashAutoUpgradeSWAP, config.HashSER);
-		upLoadFTP(config.HashSER,"config");
+		upLoadFTP(config.HashSER,"config");		
 		
 	}
 	
@@ -1316,7 +1334,7 @@ public class click
 	{
 		downloadFTP(config.configFile , "/config/config.xml"); 
 		
-		updateSwapDate(em);
+		updateSwapDate(em, true, false, false);
 		
 		guiFrame.info("Swapping from " + oldEmail + " to " + em);
 		
@@ -2333,10 +2351,12 @@ public class click
 			fw.println();
 			
 			
-			fw.close();
+			fw.close();					
 					
-			upLoadFTP(config.statFile,"config");		
+			upLoadFTP(config.statFile,"config");
+			
 		}
+
 	}
 	
 	public void downloadAndLoadConfig()
@@ -2411,8 +2431,8 @@ public class click
 	
 			 boolean success = false;
 		     int count = 0;
-		     do 
-		        {   
+		   //  do 
+		   //     {   
 					try{		
 						ftp.connect("doms.freewha.com");
 						System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
@@ -2440,7 +2460,7 @@ public class click
 			        	e.printStackTrace();
 			        	success = false;					
 					}
-		        }while(!success && count < 10);
+		      //  }while(!success && count < 10);
 	     
 		}
 	}
@@ -2457,8 +2477,8 @@ public class click
 	        // if retrieveFile fails, it will retry again.
 	        boolean success = false;
 	        int count = 0;
-	        do 
-	        {        
+	       // do 
+	      //  {        
 		        try {
 		 
 		            ftpClient.connect(server);
@@ -2485,7 +2505,7 @@ public class click
 		        	e.printStackTrace();
 		        	success = false;
 		        }
-	        }while(!success && count < 10);
+	      //  }while(!success && count < 10);
   
          
 		}
