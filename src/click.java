@@ -113,7 +113,6 @@ public class click
 		RunUpdateStatService();
 		RunUpdateWebPage();								
 		
-		
 	//	AutoUpgrade();
 		/*
 		 * 
@@ -1499,6 +1498,10 @@ public class click
 		cont = new control(guiFrame, bot);		
 		con = new config(guiFrame.account);
 		hashAutoUpgradeSWAP = updateSwapDateFromSER(con.loadAutoUpgradeSWAP());		
+		
+		//Let's upload our latest hash, we may have added new account
+		seralize(hashAutoUpgradeSWAP, config.HashSER);
+		upLoadFTP(config.HashSER,"config");		
 	}
 	
 	
