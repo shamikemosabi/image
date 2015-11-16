@@ -126,7 +126,9 @@ public class config
 				Calendar d = Calendar.getInstance();
 				Date currDate = d.getTime();
 				aud.setSwapDate(currDate);		
-								
+							
+				// set auto swap
+				aud.setAutoSwap(Boolean.valueOf(eElement.getElementsByTagName("autoSwap").item(0).getTextContent()));
 				
 				hs.put(e, aud);
 			}

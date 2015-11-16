@@ -112,7 +112,7 @@ public class click
 		RunEmailService();
 		RunUpdateStatService();
 		RunUpdateWebPage();								
-		
+				
 	//	AutoUpgrade();
 		/*
 		 * 
@@ -302,6 +302,7 @@ public class click
 						AutoUpgrade2();
 						AutoUpgradeBuilder();
 						upgradeLab(con.getEmail());
+						AutoSwapFullLoot();
 						clickAttackLog();
 						
 					}
@@ -520,7 +521,7 @@ public class click
 			boolean full = aud.getLootFull();
 			boolean exist = isEmailActive(doc, aud.getEmail() , "");
 			
-			if((!full) && (!exist))  // not full and not active
+			if((!full) && (!exist) && aud.isAutoSwap())  // not full and not active and is autoswap
 			{
 				return aud.getEmail(); //return the first non full loot
 			}
@@ -542,18 +543,19 @@ public class click
 	public boolean getSetLootFull(String e)
 	{
 		boolean ret = false;
+		AutoUpgradeData aud = null; 
 		try{
 			//AutoUpgradeData aud = hashAutoUpgradeSWAP.get(e);
 			if(compareImage("maxElixir") && compareImage("maxGold"))
 			{
 				guiFrame.info("loot is full for email account " + e);
 				ret = true;				
-				updateSwapDate(e, false, true, ret);										
+				aud = updateSwapDate(e, false, true, ret);										
 			}
 			else
 			{
 				ret = false;
-				updateSwapDate(e, false, true, ret);	
+				aud = updateSwapDate(e, false, true, ret);	
 			}
 					
 		}
@@ -562,7 +564,7 @@ public class click
 			guiFrame.info("Error in setLootFull");
 			guiFrame.info(ex.getMessage());
 		}
-		return ret;
+		return ret && aud.isAutoSwap(); // if autoswap is false, don't swap (for client)
 		
 	}
 	
@@ -1287,13 +1289,17 @@ public class click
 	 * 
 	 * modify method to be general update UpgradeSwap. Specify boolean in parameter to know what to update, date? or loot? or both.. etc...
 	 * 
+	 * 
 	 * @param
 	 * 	 e - email 
 	 * 	 s - boolean to update swap date
 	 *   l - boolean to update loot
 	 *   l2 - actual value to update loot
+	 *   
+	 * @ return
+	 * 	-  returns AutoUpgradeData object, this way coming out of method I can have access to more information  
 	 */
-	public void updateSwapDate(String e, boolean s, boolean l, boolean l2)
+	public AutoUpgradeData updateSwapDate(String e, boolean s, boolean l, boolean l2)
 	{		
 		downloadFTP(config.HashSER , "/config/hash.ser");			
 		hashAutoUpgradeSWAP = deSeralize(new Hashtable(),config.HashSER);
@@ -1317,6 +1323,8 @@ public class click
 		
 		seralize(hashAutoUpgradeSWAP, config.HashSER);
 		upLoadFTP(config.HashSER,"config");		
+		
+		return aud;
 		
 	}
 	
@@ -1497,7 +1505,9 @@ public class click
 		guiFrame = new gui();
 		cont = new control(guiFrame, bot);		
 		con = new config(guiFrame.account);
-		hashAutoUpgradeSWAP = updateSwapDateFromSER(con.loadAutoUpgradeSWAP());		
+		//hashAutoUpgradeSWAP = con.loadAutoUpgradeSWAP();
+		hashAutoUpgradeSWAP = updateSwapDateFromSER(con.loadAutoUpgradeSWAP());
+		
 		
 		//Let's upload our latest hash, we may have added new account
 		seralize(hashAutoUpgradeSWAP, config.HashSER);

@@ -15,6 +15,7 @@ public class AutoUpgradeData implements Serializable
 	private Date swapDate = null;
 	private String name ="";	
 	private boolean lootFull = false;
+	private boolean autoSwap = false;
 	
 	public AutoUpgradeData()
 	{
@@ -74,5 +75,13 @@ public class AutoUpgradeData implements Serializable
 	public void setLootFull(boolean d)
 	{
 		this.lootFull = d;
+	}
+
+	public boolean isAutoSwap() {
+		return autoSwap;
+	}
+
+	public void setAutoSwap(boolean autoSwap) {
+		this.autoSwap = autoSwap;
 	}
 }
