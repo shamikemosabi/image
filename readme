@@ -1,5 +1,10 @@
 @todo
-- add autoswap to config.xml, it will overwrite any swapping features (full loot, static swap etc...)
+- if neither gold/elixir full, lets to random and pick one instead of always gold.
+	Maybe a way to calculate which is more gold or elixlir, something to think about.
+	
+- A service that check for stuck pages:
+  Bluestack search for battle stuck - maybe read the return home image, compare it multiple times (+ 20 secs), if image always the saem then means we are stuck
+  try new app page 
 
 - Auto BUILD new buildings
 
