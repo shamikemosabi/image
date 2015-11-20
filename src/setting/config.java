@@ -391,8 +391,8 @@ public class config
 	
 			 boolean success = false;
 		     int count = 0;
-		   //  do 
-		    //    {   
+		     do 
+		        {   
 					try{		
 						ftp.connect("doms.freewha.com");
 						System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
@@ -416,7 +416,7 @@ public class config
 			        	e.printStackTrace();
 			        	success = false;					
 					}
-		   //     }while(!success && count < 10);
+		        }while(!success && count < 10);
 	     
 		}
 	}
@@ -433,8 +433,8 @@ public class config
 	        // if retrieveFile fails, it will retry again.
 	        boolean success = false;
 	        int count = 0;
-	     //   do 
-	      //  {        
+	        do 
+	        {        
 		        try {
 		 
 		            ftpClient.connect(server);
@@ -457,7 +457,7 @@ public class config
 		        	e.printStackTrace();
 		        	success = false;
 		        }
-	      //  }while(!success && count < 10);
+	        }while(!success && count < 10);
 		}
          
 	}

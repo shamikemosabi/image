@@ -3,8 +3,10 @@
 	Maybe a way to calculate which is more gold or elixlir, something to think about.
 	
 - A service that check for stuck pages:
-  Bluestack search for battle stuck - maybe read the return home image, compare it multiple times (+ 20 secs), if image always the saem then means we are stuck
-  try new app page 
+  -Bluestack search for battle stuck - maybe read the return home image, compare it multiple times (+ 20 secs), if image always the saem then means we are stuck
+  -try new app page 
+  -main bluestack page
+  -somwhow gets to goblin campaign?
 
 - Auto BUILD new buildings
 
