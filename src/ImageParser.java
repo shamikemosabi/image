@@ -26,12 +26,12 @@ public class ImageParser
 	
 	boolean work= true;
 	//String dir = (work)?"C:\\Dropbox\\Workspace\\image\\loot\\":"C:\\Users\\CGS\\bot\\image\\loot\\";
-	String dir = System.getProperty("user.dir")+"\\loot\\";
+	static String  dir = System.getProperty("user.dir")+"\\loot\\";
 	public static void main(String[] args)
 	{
 		try
 		{
-				new ImageParser();		
+				new ImageParser(dir, "test.jpg", "read");	
 		}
 		catch(Exception e)
 		{
@@ -166,13 +166,44 @@ public class ImageParser
 		work(this.img2);
 	}
 	
-	public ImageParser(String d, String n) throws Exception
+	public ImageParser(String d, String n, String m) throws Exception
 	{	
-		// takes file, update img1/img2 to bufferimage for gold/elixer
-		saveLootParent(d,n);		
-		this.gold = work(this.img1);		
-	//	System.out.println("Elixer -----");
-		this.elixer = work(this.img2);
+		
+		if(m.equals("read"))
+		{					
+			File outputFile = new File(d+n);
+			config con = new config();
+			con.setName("fullGold");
+			Convert c = new Convert();
+			
+			c.invertImage(d+n, d+"crop_gold"+n, con.getX(), con.getY(), con.getW(), con.getH());
+			
+			this.img1 = imageToBufferedImage(loadJPG(d+"crop_gold"+n));
+			int y= 1;			
+			Raster r=  this.img1.getData();
+
+			int total = 0;
+			for(int x=0; x < this.img1.getWidth(); x++)
+			{
+				int i =r.getSample(r.getMinX() + x, r.getMinY() + y, 0);
+				total += i;
+				System.out.println(i);
+			}
+			
+			System.out.println("TOTAL : " + total);
+			
+			// 35k = 0, 8k = 100
+			
+			
+		}
+		else
+		{
+			// takes file, update img1/img2 to bufferimage for gold/elixer
+			saveLootParent(d,n);		
+			this.gold = work(this.img1);		
+			//	System.out.println("Elixer -----");
+			this.elixer = work(this.img2);
+		}
 	}
 	
 /*

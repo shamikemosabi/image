@@ -621,7 +621,10 @@ public class config
 			{
 				s = new struct("maxGold",1196,33, 17, 16, ruleFolder+"\\maxGold.jpg",pos);
 			}
-			
+			if(name.equals("fullGold"))
+			{				
+				s = new struct("fullGold",1190,50, 175, 6, ruleFolder+"\\init.jpg",pos);
+			}
 		}
 		else
 		{

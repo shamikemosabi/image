@@ -1507,7 +1507,7 @@ public class click
 		con = new config(guiFrame.account);
 		//hashAutoUpgradeSWAP = con.loadAutoUpgradeSWAP();
 		hashAutoUpgradeSWAP = updateSwapDateFromSER(con.loadAutoUpgradeSWAP());
-		
+		//updateSwapDate(con.getEmail(), true, false, false); //update last time this email was active
 		
 		//Let's upload our latest hash, we may have added new account
 		seralize(hashAutoUpgradeSWAP, config.HashSER);
@@ -2751,7 +2751,7 @@ public class click
         
         //Integer comb = Integer.valueOf(gold) + Integer.valueOf(elixer);
 		 
-		ImageParser ip = new ImageParser(System.getProperty("user.dir")+"\\",name);
+		ImageParser ip = new ImageParser(System.getProperty("user.dir")+"\\",name, "");
 		gold  =  ip.gold;
 		elixer = ip.elixer;
 		
@@ -2835,7 +2835,7 @@ public class click
 	    */
 	  //  calculateLoot(gold, elixer, de);
 	    
-	    ImageParser ip = new ImageParser(s,n);
+	    ImageParser ip = new ImageParser(s,n,"");
 		gold  = ip.gold;
 		elixer = ip.elixer;
 		
