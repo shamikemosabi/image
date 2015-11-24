@@ -70,6 +70,8 @@ import setting.AutoUpgradeData;
 import setting.config;
 import setting.config.xy;
 
+import comparator.*;
+
 
 
 
@@ -111,7 +113,9 @@ public class click
 		setGUIandControl();
 		RunEmailService();
 		RunUpdateStatService();
-		RunUpdateWebPage();								
+		RunUpdateWebPage();
+		
+		
 				
 	//	AutoUpgrade();
 		/*
@@ -487,7 +491,7 @@ public class click
 	{
 		
 		boolean swap = getSetLootFull(con.getEmail());
-		String swapEmail="";
+		String swapEmail="";		
 		if(swap && guiFrame.getAutoUpgrade()) // loot is full!, only do it for auto upgrade for now maybe?
 		{
 			swapEmail = getNextRandomEmail();
@@ -513,7 +517,15 @@ public class click
 		
 		Object[] values = hashAutoUpgradeSWAP.values().toArray(); //convert hash to array
 		ArrayList<Object> n = new ArrayList<Object>(Arrays.asList(values)); // convert array to arraylist
-		Collections.shuffle(n); //shuffle list
+		
+		// convert arraylist of objects into arraylist of AutoUpgradeData
+		ArrayList<AutoUpgradeData> n1  = new ArrayList<AutoUpgradeData>();
+		for (Object object : n) {				
+			n1.add((AutoUpgradeData) object);
+		}		
+		
+		Collections.sort(n1, new LootPrecentageComparator()); // sort by least loot first
+		//Collections.shuffle(n); //shuffle list
 
 		for(int i=0; i < n.size(); i++)
 		{
@@ -1588,6 +1600,9 @@ public class click
 			
 			AutoUpgradeData aud = hs.get(key);
 			aud.setSwapDate(d);
+			
+			aud.setTempIntA(n1.get(i).getTempIntA());
+			aud.setTempIntB(n1.get(i).getTempIntB());
 			
 			hs.put(key, aud);
 		}
