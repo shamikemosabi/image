@@ -25,6 +25,8 @@ public class ImageParser
 	protected String gold ="";
 	protected String elixer="";
 	
+	protected int value = 0;
+	
 	boolean work= true;
 	//String dir = (work)?"C:\\Dropbox\\Workspace\\image\\loot\\":"C:\\Users\\CGS\\bot\\image\\loot\\";
 	static String  dir = System.getProperty("user.dir")+"\\loot\\";
@@ -222,8 +224,8 @@ public int getLootValue(String d, String n, String m) throws Exception
 		if(m.startsWith("full"))
 		{							
 			
-			getLootValue(d,n,m);
-			
+			this.value = getLootValue(d,n,m);
+		
 		}
 		else
 		{

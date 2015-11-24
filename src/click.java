@@ -179,7 +179,7 @@ public class click
 					if(disconnected) GotDisconnected();	
 					
 					
-					updateSwapDate(con.getEmail(), true, false, false); //update last time this email was active
+					updateSwapDate(con.getEmail(), true, false, false, false, 0,0); //update last time this email was active
 					
 					AutoUpgrade2(); // check for swap NOW, Static
 					AutoUpgradeBuilder(); // check if free builder, if so then build
@@ -298,7 +298,7 @@ public class click
 					clickSafeSpot(); // click safe spot to be active
 					if(inMain())
 					{
-						updateSwapDate(con.getEmail(), true, false, false); //update last time this email was active
+						updateSwapDate(con.getEmail(), true, false, false, false, 0 ,0); //update last time this email was active
 						AutoUpgrade2();
 						AutoUpgradeBuilder();
 						upgradeLab(con.getEmail());
@@ -544,18 +544,20 @@ public class click
 	{
 		boolean ret = false;
 		AutoUpgradeData aud = null; 
-		try{
-			//AutoUpgradeData aud = hashAutoUpgradeSWAP.get(e);
+
+		try{			
+			setCalculateLootPercentage(e);
+			
 			if(compareImage("maxElixir") && compareImage("maxGold"))
 			{
 				guiFrame.info("loot is full for email account " + e);
 				ret = true;				
-				aud = updateSwapDate(e, false, true, ret);										
+				aud = updateSwapDate(e, false, true, ret, false, 0, 0);										
 			}
 			else
 			{
 				ret = false;
-				aud = updateSwapDate(e, false, true, ret);	
+				aud = updateSwapDate(e, false, true, ret ,false, 0, 0);	
 			}
 					
 		}
@@ -565,6 +567,30 @@ public class click
 			guiFrame.info(ex.getMessage());
 		}
 		return ret && aud.isAutoSwap(); // if autoswap is false, don't swap (for client)
+		
+	}
+	
+	/**
+	 * Takes current screen shot,
+	 * use ImageParser to calculate % of gold/elixir.
+	 * Once we have the %, we call updateSwapDate, this will update % of gold and elixir into hash.ser
+	 * 
+	 * @param e - email 
+	 * 
+	 * @throws Exception
+	 */
+	public void setCalculateLootPercentage(String e) throws Exception
+	{
+		takeCurrentScreenshot(false, "lootValue.jpg");
+		
+		ImageParser ip = new ImageParser(System.getProperty("user.dir")+"\\","lootValue.jpg", "fullGold");
+		int gold = ip.value;
+		
+		ImageParser ip2 = new ImageParser(System.getProperty("user.dir")+"\\","lootValue.jpg", "fullElixir");
+		int elixir = ip2.value;
+		
+
+		updateSwapDate(e, false, false, false, true, gold, elixir);
 		
 	}
 	
@@ -1282,7 +1308,7 @@ public class click
 				
 	}
 	
-	/*
+	/**
 	 * takes e and see if exist in AutoUpgradeSwap
 	 * it should exist, and we update swapDate with current date.
 	 * it will keep track of when the last time an email swapped was.
@@ -1292,14 +1318,24 @@ public class click
 	 * 
 	 * @param
 	 * 	 e - email 
+	 * @param
 	 * 	 s - boolean to update swap date
+	 * @param
 	 *   l - boolean to update loot
+	 *   @param
 	 *   l2 - actual value to update loot
+	 *   @param
+	 *   llootValue - boolean to update  gold / elixir percentage
+	 *   @param
+	 *   gold - actual vaule of gold perecentage
+	 *   @param
+	 *   elixir - actual value of elixir percentage
+	 *   
 	 *   
 	 * @ return
 	 * 	-  returns AutoUpgradeData object, this way coming out of method I can have access to more information  
 	 */
-	public AutoUpgradeData updateSwapDate(String e, boolean s, boolean l, boolean l2)
+	public AutoUpgradeData updateSwapDate(String e, boolean s, boolean l, boolean l2, boolean llootValue, int gold, int elixir )
 	{		
 		downloadFTP(config.HashSER , "/config/hash.ser");			
 		hashAutoUpgradeSWAP = deSeralize(new Hashtable(),config.HashSER);
@@ -1314,7 +1350,13 @@ public class click
 		
 		if(l)
 		{
-			aud.setLootFull(l2);
+			aud.setLootFull(l2);			
+		}
+		
+		if(llootValue)
+		{
+			aud.setTempIntA(gold);
+			aud.setTempIntB(elixir);
 		}
 			
 		
@@ -1341,7 +1383,7 @@ public class click
 	{
 		downloadFTP(config.configFile , "/config/config.xml"); 
 		
-		updateSwapDate(em, true, false, false);
+		updateSwapDate(em, true, false, false, false, 0, 0);
 		
 		guiFrame.info("Swapping from " + oldEmail + " to " + em);
 		
@@ -2344,6 +2386,8 @@ public class click
 				AutoUpgradeData aud =  n1.get(i);
 				fw.println("Account : " + aud.getEmail());
 				fw.println("Last Swap Date : " + aud.getSwapDate());
+				fw.println("Gold % : " + aud.getTempIntA());
+				fw.println("Elixir % : " + aud.getTempIntB());				
 				fw.println("Loot Full : " + aud.getLootFull());
 				fw.println();
 			}
