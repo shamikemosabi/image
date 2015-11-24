@@ -1,13 +1,14 @@
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.*;
 
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
-
 
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageDecoder;
@@ -31,7 +32,14 @@ public class ImageParser
 	{
 		try
 		{
-				new ImageParser(dir, "test.jpg", "read");	
+			
+			Robot b  = new Robot();
+			BufferedImage screencapture = b.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));			
+			String name = dir+"fuck.jpg";
+			File outputFile = new File(name);
+		    ImageIO.write(screencapture, "jpg", outputFile);	
+		    new ImageParser(dir, "fuck.jpg", "fullGold");	
+		    new ImageParser(dir, "fuck.jpg", "fullElixir");	
 		}
 		catch(Exception e)
 		{
@@ -166,34 +174,55 @@ public class ImageParser
 		work(this.img2);
 	}
 	
+public int getLootValue(String d, String n, String m) throws Exception
+{	
+
+		config con = new config();
+		con.setName(m);
+		Convert c = new Convert();
+		
+		c.invertImage(d+n, d+"crop_gold"+n, con.getX(), con.getY(), con.getW(), con.getH());
+		
+		this.img1 = imageToBufferedImage(loadJPG(d+"crop_gold"+n));
+		int y= 1;			
+		Raster r=  this.img1.getData();
+	
+		int total = 0;
+		for(int x=0; x < this.img1.getWidth(); x++)
+		{
+			int i =r.getSample(r.getMinX() + x, r.getMinY() + y, 0);
+			total += i;			
+		}
+			
+		
+		int ret=0;
+		
+		if(m.equals("fullGold"))
+		{
+			ret = 100 - ((total - 8000) / 270);
+			
+		}
+		else if(m.equals("fullElixir"))
+		{
+			ret = 100 - ((total - 20000) / 160);
+		}
+			
+		if(ret<0) ret =0;
+		
+		if(ret > 100) ret = 100;
+		
+		System.out.println(ret);
+		
+		return ret;
+		
+}
 	public ImageParser(String d, String n, String m) throws Exception
 	{	
 		
-		if(m.equals("read"))
-		{					
-			File outputFile = new File(d+n);
-			config con = new config();
-			con.setName("fullGold");
-			Convert c = new Convert();
+		if(m.startsWith("full"))
+		{							
 			
-			c.invertImage(d+n, d+"crop_gold"+n, con.getX(), con.getY(), con.getW(), con.getH());
-			
-			this.img1 = imageToBufferedImage(loadJPG(d+"crop_gold"+n));
-			int y= 1;			
-			Raster r=  this.img1.getData();
-
-			int total = 0;
-			for(int x=0; x < this.img1.getWidth(); x++)
-			{
-				int i =r.getSample(r.getMinX() + x, r.getMinY() + y, 0);
-				total += i;
-				System.out.println(i);
-			}
-			
-			System.out.println("TOTAL : " + total);
-			
-			// 35k = 0, 8k = 100
-			
+			getLootValue(d,n,m);
 			
 		}
 		else

@@ -625,6 +625,10 @@ public class config
 			{				
 				s = new struct("fullGold",1190,50, 175, 6, ruleFolder+"\\init.jpg",pos);
 			}
+			if(name.equals("fullElixir"))
+			{				
+				s = new struct("fullElixir",1190,115, 175, 6, ruleFolder+"\\init.jpg",pos);
+			}
 		}
 		else
 		{
