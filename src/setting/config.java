@@ -39,7 +39,7 @@ import email.email;
 
 public class config
 {
-	public static boolean test = false;
+	public static boolean test = false; 
 	
 	
 	ArrayList<struct> data ;
@@ -56,7 +56,7 @@ public class config
 	public final static String HashSER = System.getProperty("user.dir")+"\\hash.ser";
 	
 	private xy xyBarrack = null;
-	private xy xyCamp = null;
+	private ArrayList<xy> ArrayXYCamp = null;
 	private String email2="";
 	private String pw="";
 	public int deployArcher=0;
@@ -64,6 +64,7 @@ public class config
 	public String lootThreshold="";
 	public int slot =0;	
 	private boolean smartLoot = false;
+	private boolean barrackBoost= false;
 	
 	private xy xyBarrackTrain = null;
 	
@@ -162,7 +163,7 @@ public class config
 				{
 					email2 = e;
 					xyBarrack = createXY(eElement.getElementsByTagName("barrack").item(0).getTextContent());
-					xyCamp = createXY(eElement.getElementsByTagName("camp").item(0).getTextContent());
+					ArrayXYCamp = createXYfromPipes(eElement.getElementsByTagName("camp").item(0).getTextContent());
 					pw = eElement.getElementsByTagName("password").item(0).getTextContent();
 					deployArcher = Integer.valueOf(eElement.getElementsByTagName("deployArcher").item(0).getTextContent());
 					deployBarb = Integer.valueOf(eElement.getElementsByTagName("deployBarb").item(0).getTextContent());
@@ -171,7 +172,8 @@ public class config
 					xyBarrackTrain =  createXY(eElement.getElementsByTagName("barrackTrain").item(0).getTextContent());										
 					email.alDestEmail = createDestinationEmailArray(eElement.getElementsByTagName("destEmail").item(0).getTextContent());					
 					smartLoot = Boolean.valueOf(eElement.getElementsByTagName("smartLoot").item(0).getTextContent());
-					 
+					barrackBoost = Boolean.valueOf(eElement.getElementsByTagName("barrackBoost").item(0).getTextContent());
+					
 				}
 			}
 			
@@ -382,6 +384,31 @@ public class config
 		return temp;
 	}
 	
+	/**
+	 * 
+	 * @param s - string of coordinate, seprated by pipes |
+	 * 
+	 * @return arraylist of xy containing all the coordinates
+	 */
+	public ArrayList<xy> createXYfromPipes(String s)
+	{
+		ArrayList<xy> temp = new ArrayList<xy>();
+		
+		 String[] splitArray = s.split("\\|");
+		 
+		 for(int i=0; i < splitArray.length; i ++)
+		 {
+			 String str = splitArray[i];
+			 int a = Integer.valueOf(str.substring(0, str.indexOf(",")));
+			 int b = Integer.valueOf(str.substring(str.indexOf(",") + 1, str.length()));
+			 xy tempXY = new xy(a,b);
+			 
+			 temp.add(tempXY);
+		 }	
+
+		return temp;
+	}	
+	
 	public void upLoadFTP(String FileName, String dir)
 	{
 		if(!test){
@@ -481,8 +508,12 @@ public class config
 			}
 			else if(name.equals("camp"))
 			{
-				//pos.add(new xy(359,466)); //click camp				
-				pos.add(xyCamp);
+				//pos.add(new xy(359,466)); //click camp	
+				// xyCamp is now an arraylist of XY objects
+				for(int i=0; i < ArrayXYCamp.size(); i ++)
+				{
+					pos.add(ArrayXYCamp.get(i));
+				}				
 				pos.add(new xy(660, 739)); // click info
 				
 				/*
@@ -629,6 +660,37 @@ public class config
 			{				
 				s = new struct("fullElixir",1190,115, 175, 6, ruleFolder+"\\init.jpg",pos);
 			}
+			if(name.equals("barrackBoost"))
+			{
+				// this only works on MAX barracks, currently lvl 10. (there is no upgrade button)  so only 4 button when not boosted
+				pos.add(xyBarrack);
+				pos.add(new xy(788,735)); // boost all button
+				pos.add(new xy(721,495)); // pay with gem
+				
+				// match on middle of the Boost All image (2 clocks)
+				s = new struct("barrackBoost",754,724, 58, 18, ruleFolder+"\\barrackBoost.jpg",pos);
+			}
+			if(name.equals("try"))
+			{				
+				pos.add(new xy(1001,591)); // Try these apps button
+				
+				//match on bluestack icon middle top
+				s = new struct("try",648,28, 153, 115, ruleFolder+"\\try.jpg",pos);
+			}
+			if(name.equals("search"))
+			{				
+				pos.add(new xy(80,745)); // Return home button
+				
+				//match on return home, the women's head
+				s = new struct("search",42,714, 82, 39, ruleFolder+"\\search.jpg",pos);
+			}	
+			if(name.equals("bluestack"))
+			{				
+				pos.add(new xy(309,192)); // click last open app (should be clash of clan)
+				
+				//match on search button
+				s = new struct("bluestack",54,139, 87, 87, ruleFolder+"\\bluestack.jpg",pos);
+			}	
 		}
 		else
 		{
@@ -860,5 +922,13 @@ public class config
 		{
 			return y;
 		}
+	}
+
+	public boolean isBarrackBost() {
+		return barrackBoost;
+	}
+
+	public void setBarrackBost(boolean barrackBost) {
+		this.barrackBoost = barrackBost;
 	}
 }

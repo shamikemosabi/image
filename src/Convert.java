@@ -2,7 +2,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
+
+import org.apache.commons.lang3.RandomStringUtils;
 
 class Convert
 {
@@ -31,8 +34,12 @@ class Convert
             inputFile = ImageIO.read(new File(imageName));
             
              cropImage = inputFile.getSubimage(x1, y1, w, h);
-            File out = new File("crop.jpg");
+             
+     		String ranStr = RandomStringUtils.randomAlphanumeric(8);
+            File out = new File("crop"+ranStr+".jpg");
             ImageIO.write(cropImage, "jpg", out);
+            
+            out.delete();
             
             
         } catch (IOException e) {
@@ -55,6 +62,7 @@ class Convert
             ImageIO.write(cropImage, "jpg", outputFile);
         } catch (IOException e) {
             e.printStackTrace();
+            
         }
     }
     

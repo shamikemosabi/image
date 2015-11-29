@@ -57,6 +57,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.*;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -69,7 +70,6 @@ import email.email;
 import setting.AutoUpgradeData;
 import setting.config;
 import setting.config.xy;
-
 import comparator.*;
 
 
@@ -111,10 +111,12 @@ public class click
 	{
 		downloadFTP(config.configFile , "/config/config.xml");  
 		setGUIandControl();
+		
+		
 		RunEmailService();
 		RunUpdateStatService();
 		RunUpdateWebPage();
-		
+		RunCheckForStuckPages();
 		
 				
 	//	AutoUpgrade();
@@ -175,8 +177,8 @@ public class click
 				int value = isServiceStarted2(con.readFile);				
 				//while((config.work)?isServiceStarted("C:\\Documents and Settings\\dhwang\\My Documents\\read.txt"):true)	
 				switch(value)
-				{	
 				
+				{	
 				case 2:
 				if(inMain())
 				{
@@ -186,13 +188,37 @@ public class click
 					updateSwapDate(con.getEmail(), true, false, false, false, 0,0); //update last time this email was active
 					
 					AutoUpgrade2(); // check for swap NOW, Static
-					AutoUpgradeBuilder(); // check if free builder, if so then build
-					upgradeLab(con.getEmail()); // lab upgrade
-					AutoSwapFullLoot(); // check if loot is full, if so then swap
-					
-					clickAttackLog(); //click attack log/ camp, save pics
+					AutoUpgradeBuilder(); // check if free builder, if so then build					
+					AutoSwapFullLoot(); // check if loot is full, if so then swap										
 					sendPictureText(); //if email has status, will click to attack log and send pic back
-					setUpScreen();				
+					setUpScreen();			
+					
+					//has to be after screen setup
+					upgradeLab(con.getEmail()); // lab upgrade
+					clickSafeSpot();
+					clickAttackLog(); //click attack log/ camp, save pics
+					
+					
+					barrackBoost();
+					
+					
+					//Let's train troops first
+					guiFrame.info("Train troops");				
+					if(clickBarracks()) // click barracks, make sure we clicked
+					{
+						guiFrame.info("we are in barracks");
+						for(int i=0; i< 2; i++) // only 4 barracks right now
+						{
+							trainBarbs();
+							trainArchs();
+						}
+						
+						clickSafeSpot(); // get out of barracks screen out to main
+						clickSafeSpot();// do it twice to loose focuse of barracks from before just in case
+						// clicking it when it has focus is loosing focus						
+					}	
+					
+					
 					//if(clickCamp())
 					if(clickBarracksForCamp()) // changed to barracks to check for full camp
 					{
@@ -201,24 +227,9 @@ public class click
 						clickSafeSpot(); // get out to main screen
 						clickAttack();// click attack to go to find match queue					
 					}
-					else // come here either misclicked OR barracks is not full so need to train
-					{
-						guiFrame.info("need to train troops");
-						clickSafeSpot(); // get out of camp, go back to main
-						clickSafeSpot();// do it twice to loose focuse of barracks from before just in case
-										// clicking it when it has focus is loosing focus
-						if(clickBarracks()) // click barracks, make sure we clicked
-						{
-							guiFrame.info("we are in barracks");
-							for(int i=0; i< 2; i++) // only 4 barracks right now
-							{
-								trainBarbs();
-								trainArchs();
-							}
-							
-							clickSafeSpot(); // get out of barracks screen out to main
-						}	
-					}
+					
+				
+					
 				}
 				if(inFindPage())
 				{
@@ -353,7 +364,37 @@ public class click
 	}
 	
 	
-	
+	public void barrackBoost() throws Exception 
+	{
+		guiFrame.info("Barrack boost value: " + con.isBarrackBost());
+		
+		if(con.isBarrackBost())
+		{
+			con.setName("barrackBoost");
+		    cont.mouseMove(con.getPos().get(0).getX(), con.getPos().get(0).getY()); // click first one, which is barracks
+			cont.mousePress(InputEvent.BUTTON1_MASK);
+			cont.mouseRelease(InputEvent.BUTTON1_MASK);			
+			Thread.sleep(1000);
+			
+			
+			//we should have clicked the barracks
+			//lets compare image and see if we need to boost
+			 
+			boolean needToBoost = compareImage("barrackBoost");
+			if(needToBoost)
+			{
+				for(int i= 1; i  < con.getPos().size(); i++) // i = 1, dont need to click barrack again
+				{
+					cont.mouseMove(con.getPos().get(i).getX(), con.getPos().get(i).getY());
+					cont.mousePress(InputEvent.BUTTON1_MASK);
+					cont.mouseRelease(InputEvent.BUTTON1_MASK);			
+					Thread.sleep(1000);
+				}
+			}
+			
+		}
+		
+	}
 	public void seralize(Hashtable o, String s) 
 	{						
 		
@@ -800,7 +841,7 @@ public class click
 			try{
 				alAutoUpgradeBuilderNOW.clear();
 				alAutoUpgradeBuilderSTATIC.clear();
-				downloadFTP(config.configFile , "/config/config.xml"); 
+				downloadAndLoadConfig(); // get latest config, also update config object (it will have latest config)
 				
 				File fXmlFile = new File(config.configFile);
 				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -978,7 +1019,7 @@ public class click
 						AutoUpgradeData  aud = alAutoUpgradeBuilderSTATIC.get(i);
 						String email = aud.getEmail(); //email to swap to
 						boolean swap = isSwapStatic(aud, currDate);
-					//	swap = true; //fh local
+				
 						boolean exist = false;
 						if(swap)
 						{
@@ -2376,6 +2417,66 @@ public class click
 	}
 	
 	
+	/**
+	 * separate thread that checks for known stuck pages
+	 * tries to click out of them
+	 * 
+	 * @throws Exception
+	 */
+	public void checkForStuckPages() throws Exception
+	{
+		boolean temp ;
+		
+		String [] array = {"bluestack", "try", "search"};
+		
+		for(int i = 0 ; i< array.length; i++)
+		{
+			guiFrame.info("comparing " + array[i]);
+			config newConfig = new config();
+			newConfig.setName(array[i]);			
+			temp= compareImage(array[i], false, newConfig);			
+
+						
+			if(temp)
+			{
+				guiFrame.info("Match on " + array[i]);
+				
+				//loop 5 times
+				for(int j = 0 ; j < 5 ; j++)
+				{					
+					temp= compareImage(array[i], false, newConfig);
+					
+					guiFrame.info("loop " +j+ " match is " + temp );
+					//sleep 5 seconds
+					Thread.sleep(5000);
+					
+					//if temp is false, doesn't match we break
+					if(!temp)
+					{
+						break;
+					}
+				}
+				
+				
+				// if temp is still true then it means we are stuck
+				// we need to click stuff to get out
+
+				for(int ii=0; ii < newConfig.getPos().size(); ii++)
+				 {
+					 cont.mouseMove(newConfig.getPos().get(ii).getX(), newConfig.getPos().get(ii).getY());
+					 cont.mousePress(InputEvent.BUTTON1_MASK);			 
+					 cont.mouseRelease(InputEvent.BUTTON1_MASK);			
+					 Thread.sleep(1000);
+				 }
+				
+			}
+			
+		}
+		
+		
+	}
+	
+	
 	
 	public void updateStat() throws Exception 
 	{
@@ -2680,7 +2781,7 @@ public class click
 	
 	public boolean isSmartLoot()
 	{
-		return guiFrame.getSmartLoot() || con.getSmartLoot();
+		return con.getSmartLoot() && (!con.isBarrackBost()); // if boosting barracks don't smart loot
 	}
 	/*
 	 * Really need to improve OCR
@@ -3137,6 +3238,43 @@ public class click
 		return ret;
 	}
 	
+	/**
+	 * 
+	 * @param s - set name string, like barracks, etc... the image to compares
+	 * @param save - nothing so far not sure why I added this
+	 * @param configure - specify the config instead of using our main config "con", this is because we now have threads calling compareImage
+	 * @return - true if the image matches
+	 * 
+	 * @throws Exception
+	 */
+	public boolean compareImage(String s , boolean save, config configure) throws Exception
+	{
+		boolean ret = false;		 
+		BufferedImage screencapture = cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+		
+		//save current screen into current.jpg
+		String name = "current"+s+".jpg";
+		File outputFile = new File(name);
+	    ImageIO.write(screencapture, "jpg", outputFile);
+	
+       
+	    configure.setName(s);
+       Convert c = new Convert();
+       
+       c.invertImage(name, "crop"+name, configure.getX(), configure.getY(), configure.getW(), configure.getH());
+       // Now I will have the current screen image, inverted and cropped
+       
+       
+       //do the same for our //rule/main.jpg
+       c.invertImage(configure.getFile(), "crop"+configure.getName()+".jpg", configure.getX(), configure.getY(), configure.getW(), configure.getH());
+       
+       ImageCompare ic = new ImageCompare("crop"+name, "crop"+configure.getName()+".jpg");
+       ret =  ic.setupAndCompare(ic);
+      // guiFrame.info(ret);
+       
+		return ret;
+	}
+	
 	/*
 	 * make sure screen is zoomed out and scrolled up.
 	 * This is important for main village screen because we need to know where army camps, training camps are located
@@ -3164,7 +3302,7 @@ public class click
 			 cont.mouseMove(con.getPos().get(i).getX(), con.getPos().get(i).getY());
 			 cont.mousePress(InputEvent.BUTTON1_MASK);			 
 			 cont.mouseRelease(InputEvent.BUTTON1_MASK);			
-			 Thread.sleep(1000);
+			 Thread.sleep(200);
 		 }
 		 
 		 clickSafeSpot();
@@ -3198,6 +3336,13 @@ public class click
 		 Thread t = new Thread(up);
 		 t.start();
 	}	
+	
+	public void RunCheckForStuckPages()
+	{
+		StuckPage up = new StuckPage();		 		
+		 Thread t = new Thread(up);
+		 t.start();
+	}		
 	
 	
 	public static void main(String[] args)
@@ -3297,7 +3442,25 @@ public class click
 					}
 				}
 			}
-		}	 
+		}	
+	 
+	 class StuckPage implements Runnable{
+			
+			public void run()
+			{
+				while(true) 
+				{ 				
+					try{
+						checkForStuckPages();
+						Thread.sleep(10000); 
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}
+		}	
 	 
 	
 }
