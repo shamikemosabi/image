@@ -201,7 +201,7 @@ public class click
 					
 					barrackBoost();
 					
-					
+					clickSafeSpot();
 					//Let's train troops first
 					guiFrame.info("Train troops");				
 					if(clickBarracks()) // click barracks, make sure we clicked
@@ -3452,7 +3452,7 @@ public class click
 				{ 				
 					try{
 						checkForStuckPages();
-						Thread.sleep(10000); 
+						Thread.sleep(60000); 
 					}
 					catch(Exception e)
 					{
