@@ -201,7 +201,7 @@ public class click
 					
 					barrackBoost();
 					
-					
+					clickSafeSpot();
 					//Let's train troops first
 					guiFrame.info("Train troops");				
 					if(clickBarracks()) // click barracks, make sure we clicked
@@ -598,8 +598,7 @@ public class click
 		boolean ret = false;
 		AutoUpgradeData aud = null; 
 
-		try{			
-			setCalculateLootPercentage(e);
+		try{
 			
 			if(compareImage("maxElixir") && compareImage("maxGold"))
 			{
@@ -662,6 +661,8 @@ public class click
 	public void AutoUpgradeBuilder() throws Exception
 	{
 		ArrayList<AutoUpgradeData>  al;
+		
+		setCalculateLootPercentage(con.getEmail());
 		
 		//if screen is setup, and have builder
 		if(isScreenSetup() && (!zeroBuilder()) )
@@ -737,23 +738,39 @@ public class click
 					NodeList elixirList = eElement.getElementsByTagName("elixir");				// only 1 element	
 					NodeList goldList = eElement.getElementsByTagName("gold");					// only 1 element
 					
-					// let's check max gold, always do gold first because we loot gold better
-					if(compareImage("maxGold"))
-					{
-						loadXYnodeList(goldList,"item", alAutoUpgradeBuilder);
-						loadXYnodeList(elixirList,"item", alAutoUpgradeBuilder); // load this as well, in case I run out of gold to upgrade
-					}
-					else if(compareImage("maxElixir"))
+					
+					AutoUpgradeData aud = hashAutoUpgradeSWAP.get(account);
+					
+					int gold = aud.getTempIntA();
+					int elixir = aud.getTempIntB();
+					
+					
+					// if there are nore elixir, always build elixir first
+					if(elixir > gold)
 					{
 						loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder);
 						loadXYnodeList(goldList, "item",alAutoUpgradeBuilder);  // in case I dont have elixir, I can still upgrade gold
 					}
-					else // none of the loot is full
+					// there are more gold, and difference exceeds 20%
+					else if((gold - elixir) > 20) 
 					{
-						// add both, gold first, gold easier too loot and build def is better
-						// please note dark elixir will dup, but I dont care about that
-						loadXYnodeList(goldList,"item", alAutoUpgradeBuilder);
-						loadXYnodeList(elixirList, "item", alAutoUpgradeBuilder);
+						loadXYnodeList(goldList, "item",alAutoUpgradeBuilder);
+						loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder);
+					}
+					else // gold is more but the difference is less the 20% , lets do random
+					{
+						Random r  = new Random();
+						int i = r.nextInt(2);
+						if(i%2==0)
+						{
+							loadXYnodeList(goldList, "item",alAutoUpgradeBuilder);
+							loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder);
+						}
+						else
+						{
+							loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder);
+							loadXYnodeList(goldList, "item",alAutoUpgradeBuilder);							
+						}
 					}
 					
 				}
@@ -3452,7 +3469,7 @@ public class click
 				{ 				
 					try{
 						checkForStuckPages();
-						Thread.sleep(10000); 
+						Thread.sleep(60000); 
 					}
 					catch(Exception e)
 					{
