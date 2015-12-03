@@ -202,6 +202,8 @@ public class click
 					barrackBoost();
 					
 					clickSafeSpot();
+					clickSafeSpot(); // do it twice, if we ran out of gem for barrack boost, the first clicksafespot will only get rid of the 
+									// gem screen, the barrack will still be clicked
 					//Let's train troops first
 					guiFrame.info("Train troops");				
 					if(clickBarracks()) // click barracks, make sure we clicked
@@ -1035,7 +1037,8 @@ public class click
 				}
 				
 				//static, only for auto upgrade option
-				if(guiFrame.getAutoUpgrade() && alAutoUpgradeBuilderSTATIC.size() > 0)
+				// config has to have autoSwap true. (client account will have autoSwap = false)
+				if(guiFrame.getAutoUpgrade() && con.isAutoSwap() && alAutoUpgradeBuilderSTATIC.size() > 0)
 				{	
 					String orignalEmail = con.getEmail();
 					for(int i= 0 ;  i< alAutoUpgradeBuilderSTATIC.size(); i++)
@@ -1177,6 +1180,8 @@ public class click
 	/**
 	 *  check auto upgrade list if there is anything to upgrade, if there is 
 	 *  we will swap to that account upgrade and swap back to originaly account and continue botting.
+	 *  
+	 *  @deprecated
 	 */
 	public void AutoUpgrade() throws Exception
 	{	
@@ -1280,8 +1285,9 @@ public class click
 			cont.mouseRelease(InputEvent.BUTTON1_MASK);				
 		}
 	}
-	/*
+	/**
 	 * String t - is my time , which is the ID attribute for pos tag
+	 * @deprecated
 	 */
 	public boolean workOnConfigFile(String t, String upgradeEmail, String oldEmail)
 	{

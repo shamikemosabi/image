@@ -65,6 +65,7 @@ public class config
 	public int slot =0;	
 	private boolean smartLoot = false;
 	private boolean barrackBoost= false;
+	private boolean autoSwap = false; // current config autoSwap
 	
 	private xy xyBarrackTrain = null;
 	
@@ -128,7 +129,8 @@ public class config
 				Date currDate = d.getTime();
 				aud.setSwapDate(currDate);		
 							
-				// set auto swap
+				// set auto swap, I need this to be in AutoUpgradeData object because I need to know the value of OTHER account's value. Not just current.
+				// I need to know the value before I swap to the new config.
 				aud.setAutoSwap(Boolean.valueOf(eElement.getElementsByTagName("autoSwap").item(0).getTextContent()));
 				
 				hs.put(e, aud);
@@ -173,6 +175,7 @@ public class config
 					email.alDestEmail = createDestinationEmailArray(eElement.getElementsByTagName("destEmail").item(0).getTextContent());					
 					smartLoot = Boolean.valueOf(eElement.getElementsByTagName("smartLoot").item(0).getTextContent());
 					barrackBoost = Boolean.valueOf(eElement.getElementsByTagName("barrackBoost").item(0).getTextContent());
+					autoSwap = Boolean.valueOf(eElement.getElementsByTagName("autoSwap").item(0).getTextContent());
 					
 				}
 			}
@@ -871,6 +874,13 @@ public class config
 	public ArrayList<xy> getPos()
 	{
 		return s.pos;
+	}
+	public boolean isAutoSwap() {
+		return autoSwap;
+	}
+
+	public void setAutoSwap(boolean autoSwap) {
+		this.autoSwap = autoSwap;
 	}
 	
 	

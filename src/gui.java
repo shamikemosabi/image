@@ -57,13 +57,13 @@ public class gui extends JFrame
 		frame = new JFrame("");
 		txtArea = new JTextArea();
 		chxSmartLoot =  new JCheckBox("Smart Loot");
-		chxSmartLoot.setSelected(true);
+		chxSmartLoot.setSelected(false);
 		
 		chxDebugMode = new JCheckBox("Debug Mode");
 		chxDebugMode.setSelected(bDebugMode);
 		
 		chxAutoUpgrade = new JCheckBox("Auto Upgrade");
-		chxAutoUpgrade.setSelected(bAutoUpgrade);
+		chxAutoUpgrade.setSelected(false);
 		
 		
 		//txtArea.setPreferredSize( new Dimension( 200, 300) );
