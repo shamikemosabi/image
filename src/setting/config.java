@@ -65,7 +65,7 @@ public class config
 	public int slot =0;	
 	private boolean smartLoot = false;
 	private boolean barrackBoost= false;
-	private boolean autoSwap = false; // current config autoSwap
+	private boolean autoSwap = true; // current config autoSwap
 	
 	private xy xyBarrackTrain = null;
 	
@@ -449,6 +449,49 @@ public class config
 		        }while(!success && count < 10);
 	     
 		}
+	}
+	
+	/**
+	 * The idea is to separate out multiple config files.
+	 * I suspect because I am now calling click.downloadAndLoadConfig every loop
+	 * there is a higher chance of conflict if multiple machine is running and are accessing config.xml.
+	 * 
+	 * This is bad for my client account with autoSwap = false.
+	 * 
+	 * So the idea is to check if autoSwap is true or false.
+	 * If it is true, then this means the account is one of my docogo accounts and I'm running AutoUpgrade with this.
+	 * in this case I will continue reading the MAIN config.xml
+	 * 
+	 * If autoSwap is false, for my clients, then I want to read a different config file which will be in
+	 * "config/acct/ACOUNTNAME/config.xml.
+	 * Hopefully there won't be conflcit anymore.
+	 * 
+	 * 
+	 * 
+	 * The only problem right now is that, The INITIAL call from setGUIandControl() I wont know if autoSwap is true or false
+	 * because I get autoSwap from config.xml.
+	 * 
+	 * So in this case we can just check autoSwap anyways, because it initialzes as true, which means this account is mine
+	 * which means it has to use MAIN config.xml, and if it's a client's account I need it to look at the main config.xml only
+	 * the first time (I have not setup autoSwap yet).  
+	 * 
+	 * 
+	 * 
+	 * @return
+	 */
+	public String getFTPConfigPath()
+	{
+		String ret="";
+		
+		if(this.isAutoSwap()) // main CONFIG.XML
+		{
+			
+		}
+		else
+		{
+			
+		}
+		return "";
 	}
 	
 	public void downloadFTP(String localFile, String remoteFile)
