@@ -175,7 +175,7 @@ public class click
 			try{
 				// change to case statement. 2=bot, 1=stay active dont bot, 0= stop bot.
 				int value = isServiceStarted2(con.readFile);				
-				//while((config.work)?isServiceStarted("C:\\Documents and Settings\\dhwang\\My Documents\\read.txt"):true)	
+				//while((config.work)?isServiceStarted("C:\\Documents and Settings\\dhwang\\My Documents\\read.txt"):true)
 				switch(value)
 				
 				{	
@@ -670,9 +670,9 @@ public class click
 			guiFrame.info("Builder free and screen setup");
 			al = loadUpgradeBuilder(con.getEmail());
 			
-			for(int i =0; (i < al.size() && !zeroBuilder()); i++)			
+			for(int i =0; (i < al.size() && ( al.get(i).getName().equals("wall") || !zeroBuilder())); i++)	// if walls dont need to check builder		
 			{	
-				clickAutoUpgrade(al.get(i),2000);
+				clickAutoUpgrade(al.get(i),500);
 				takeCurrentScreenshot(false,"currentstatus.jpg");
 				clickSafeSpot();
 				//compare previous cropCurrent image (cropped zero builder of last time) with current zerobuilder
@@ -680,7 +680,12 @@ public class click
 				// successful upgrade. If`it was different THEN I should send text to show upgrade.
 				
 				//make sure call from zerobuilder() and here does not have any compare image, or else my cropCurrent would be overwritten
-				boolean send = !SameBuilderImage();				
+				
+				boolean send = false;
+				if(!al.get(i).getName().equals("wall"))
+				{
+					send = !SameBuilderImage();	
+				}	
 								
 				 if(send)
 		        {
@@ -805,7 +810,8 @@ public class click
 				
 				AutoUpgradeData aud = new AutoUpgradeData();
 
-				NodeList xyList = itemEle.getElementsByTagName("xy");		
+				NodeList xyList = itemEle.getElementsByTagName("xy");	
+				String name = itemEle.getElementsByTagName("name").item(0).getTextContent();
 				
 				for (int j = 0; j < xyList.getLength(); j++) 		
 				{		
@@ -814,6 +820,7 @@ public class click
 							
 					xy newXY = createXY(xye.getTextContent());		
 					aud.getXYArrayList().add(newXY);		
+					aud.setName(name);
 									
 				}							
 				al.add(aud);
