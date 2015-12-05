@@ -109,7 +109,7 @@ public class click
 	
 	public click() throws Exception
 	{
-		downloadFTP(config.configFile , "/config/config.xml");  
+		//downloadFTP(config.configFile , "/config/config.xml", true);  
 		setGUIandControl();
 		
 		
@@ -462,7 +462,7 @@ public class click
 	 */
 	public void upgradeLab(String account)
 	{
-		downloadFTP(config.labFile , "/config/lab.xml");
+		downloadFTP(config.labFile , "/config/lab.xml", false);
 		Document doc  = createDocFromXML(config.labFile);
 		ArrayList<AutoUpgradeData> al = new ArrayList<AutoUpgradeData>();
 		
@@ -555,7 +555,7 @@ public class click
 	public String getNextRandomEmail()
 	{
 		String ret="";
-		downloadFTP(config.configFile , "/config/config.xml");  //download latest, I need latest active accounts	
+		downloadFTP(config.configFile , "/config/config.xml", false);  //download latest, I need latest active accounts
 		Document doc  = createDocFromXML(config.configFile);
 		
 		Object[] values = hashAutoUpgradeSWAP.values().toArray(); //convert hash to array
@@ -722,7 +722,7 @@ public class click
 	{
 		ArrayList<AutoUpgradeData> alAutoUpgradeBuilder = new ArrayList<AutoUpgradeData> ();
 		try{					
-			downloadFTP(config.upgradeFile , "/config/upgrade.xml");
+			downloadFTP(config.upgradeFile , "/config/upgrade.xml", false);
 			
 			File fXmlFile = new File(config.upgradeFile);
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -867,7 +867,7 @@ public class click
 			try{
 				alAutoUpgradeBuilderNOW.clear();
 				alAutoUpgradeBuilderSTATIC.clear();
-				downloadAndLoadConfig(); // get latest config, also update config object (it will have latest config)
+				downloadAndLoadConfig(false); // get latest config, also update config object (it will have latest config)
 				
 				File fXmlFile = new File(config.configFile);
 				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -1023,7 +1023,7 @@ public class click
 							StreamResult result = new StreamResult(new File(con.configFile));
 							transformer.transform(source, result);
 							
-							upLoadFTP(con.configFile,"config"); 	
+							upLoadFTP(con.configFile,"config", false); 	
 						}
 						catch(Exception e)
 						{
@@ -1218,7 +1218,7 @@ public class click
 				guiFrame.info("have auto upgrade");
 				
 				//first thing i have to do is download config file. Just to make sure I have the most updated file
-				downloadFTP(config.configFile , "/config/config.xml");
+				//downloadFTP(config.configFile , "/config/config.xml");
 				// second thing I want to do is to see if it still exist in config file. if it does I want to get rid of it
 				// and go ahead and swap - > upgrade.
 				// if it doesn't exist then don't do anything because it's been removed!, OR most likely been done by another bot
@@ -1232,7 +1232,7 @@ public class click
 					if(oldEmail.equals(upgradeEmail)) // same account dont need to swap
 					{
 						guiFrame.info("same account don't need to swap");
-						con = new config(oldEmail); //just to re download config, get new autoUpgrade
+					//	con = new config(oldEmail, true); //just to re download config, get new autoUpgrade
 						if(inMain()) // make sure in main.
 						{
 							setUpScreen();
@@ -1268,7 +1268,7 @@ public class click
 				}
 				else
 				{
-					con = new config(oldEmail); //get new autoUpgrade
+				//	con = new config(oldEmail, true); //get new autoUpgrade
 				}
 			
 			} // coming out of this IF I need to get new autoupgrade
@@ -1308,7 +1308,7 @@ public class click
 			 
 			 if(exist)
 			 {
-				 upLoadFTP(con.configFile,"config");
+				// upLoadFTP(con.configFile,"config");
 			 }
 		
 		}
@@ -1420,7 +1420,7 @@ public class click
 	 */
 	public AutoUpgradeData updateSwapDate(String e, boolean s, boolean l, boolean l2, boolean llootValue, int gold, int elixir )
 	{		
-		downloadFTP(config.HashSER , "/config/hash.ser");			
+		downloadFTP(config.HashSER , "/config/hash.ser", false);			
 		hashAutoUpgradeSWAP = deSeralize(new Hashtable(),config.HashSER);
 		
 		AutoUpgradeData aud = hashAutoUpgradeSWAP.get(e);
@@ -1447,7 +1447,7 @@ public class click
 		hashAutoUpgradeSWAP.put(e, aud);	
 		
 		seralize(hashAutoUpgradeSWAP, config.HashSER);
-		upLoadFTP(config.HashSER,"config");		
+		upLoadFTP(config.HashSER,"config", false);		
 		
 		return aud;
 		
@@ -1464,7 +1464,7 @@ public class click
 	 */
 	public boolean swap(String em, String oldEmail, boolean send) throws Exception
 	{
-		downloadFTP(config.configFile , "/config/config.xml"); 
+		//downloadFTP(config.configFile , "/config/config.xml");  do i need this? when I make the new config object I download config already
 		
 		updateSwapDate(em, true, false, false, false, 0, 0);
 		
@@ -1629,14 +1629,14 @@ public class click
 	{
 		guiFrame = new gui();
 		cont = new control(guiFrame, bot);		
-		con = new config(guiFrame.account);
+		con = new config(guiFrame.account, true, true);
 		//hashAutoUpgradeSWAP = con.loadAutoUpgradeSWAP();
 		hashAutoUpgradeSWAP = updateSwapDateFromSER(con.loadAutoUpgradeSWAP());
 		//updateSwapDate(con.getEmail(), true, false, false); //update last time this email was active
 		
 		//Let's upload our latest hash, we may have added new account
 		seralize(hashAutoUpgradeSWAP, config.HashSER);
-		upLoadFTP(config.HashSER,"config");		
+		upLoadFTP(config.HashSER,"config", false);		
 	}
 	
 	
@@ -1650,7 +1650,7 @@ public class click
 	public Hashtable<String, AutoUpgradeData> updateSwapDateFromSER(Hashtable<String, AutoUpgradeData> hs)
 	{
 		
-		downloadFTP(config.HashSER , "/config/hash.ser");			
+		downloadFTP(config.HashSER , "/config/hash.ser", false);			
 		Hashtable <String, AutoUpgradeData> b = deSeralize(new Hashtable(),config.HashSER);
 		
 		//reason why I'm looping and updating, instead of just using hs from hash.ser is because what if i add new account to config.xml?		
@@ -2421,7 +2421,7 @@ public class click
 		}
 		else if(ret==6) // download new config.xml file and load new config object
 		{
-			downloadAndLoadConfig();
+			downloadAndLoadConfig(true);
 			deleteEmail("config");
 			updateReadFile("1");
 			return 1; // let the next email service update actual read value
@@ -2556,21 +2556,24 @@ public class click
 			
 			fw.close();					
 					
-			upLoadFTP(config.statFile,"config");
+			upLoadFTP(config.statFile,"config", false);
 			
 		}
 
 	}
 	
-	public void downloadAndLoadConfig()
+	public void downloadAndLoadConfig(boolean forceFTP)
 	{
-		downloadFTP(config.configFile , "/config/config.xml");
-		con = new config(con.getEmail());   // new config object with same account as before, just NEW config.xml
+		downloadFTP(config.configFile , "/config/config.xml", forceFTP);
+		con = new config(con.getEmail(), forceFTP, con.isAutoSwap());   // new config object with same account as before, just NEW config.xml
 	}
 	
 	
 	
 	/*overload method, takes string array of multiple file names.
+	 * 
+	 * 
+	 * always try to FTP. I want to see web page stuff even for clients.
 	 * 
 	 */
 	public void upLoadFTP(String[] FileNames, String dir, int file_type)
@@ -2624,10 +2627,10 @@ public class click
 	/*
 	 * uploads FileName to FTP dir
 	 */
-	public void upLoadFTP(String FileName, String dir)
+	public void upLoadFTP(String FileName, String dir, boolean forceFTP)
 	{
 		
-		if(!config.test) {
+		if(!config.test && (forceFTP || con.isAutoSwap())){				
 			File f = new File(FileName);
 	
 			FTPClient ftp = new FTPClient();
@@ -2668,9 +2671,9 @@ public class click
 		}
 	}
 	
-	public void downloadFTP(String localFile, String remoteFile)
+	public void downloadFTP(String localFile, String remoteFile, boolean forceFTP)
 	{
-		if(!config.test){
+		if(!config.test && (forceFTP || con.isAutoSwap())){			
 	        String server = "doms.freewha.com";
 	        String user = "www.mturkpl.us";
 	        String pass = "freewebsucks11";

@@ -78,22 +78,32 @@ public class config
 	//used only in some local method. just to do some comparison
 	public config()
 	{
-		setup();
+		//setup();
 	}
 	
 	//only specify new account, just add account
-	public config(String account)
+	/*
+	 * this gets called either the first time from setGUIandControl, which we NEED to new config file.
+	 * 
+	 * or it gets called from downloadAndLoadConfig 
+	 * 
+	 * which gets called from AutoUpgrade2 (we don't FTP if autoswap is false)	
+	 * or it gets called from isServiceStarted2 ( we NEED to FTP )
+	 */
+	public config(String account, boolean forceFTP, boolean con_autoSwap)
 	{
-		setup();
-		loadConfig(account,"");
+	//	setup();
+		downloadFTP(config.configFile , "/config/config.xml", forceFTP, con_autoSwap); 
+		loadConfig(account,"", forceFTP);
 				
 	}
 	
 	// specify new and old account , called from swap. we need to add account and delete oldAccount from active
 	public config(String account, String oldAccount)
 	{
-		setup();
-		loadConfig(account, oldAccount);			
+		//setup();
+		downloadFTP(config.configFile , "/config/config.xml", true, true); // only calls from swap, when we swap we NEED to get latest config
+		loadConfig(account, oldAccount, true);			
 	}
 	
 	
@@ -145,7 +155,7 @@ public class config
 		
 		return hs;
 	}
-	public void loadConfig(String account, String oldAccount)
+	public void loadConfig(String account, String oldAccount, boolean forceFTP)
 	{
 		try{
 			File fXmlFile = new File(this.configFile);
@@ -186,10 +196,10 @@ public class config
 			createAutoUpgrade(doc);	
 			
 			
-			addActiveEmail(doc , account);
+			addActiveEmail(doc , account, forceFTP);
 			if(!oldAccount.isEmpty())
 			{
-				deleteActiveEmail(doc, oldAccount);
+				deleteActiveEmail(doc, oldAccount, forceFTP);
 			}
 			
 			
@@ -228,7 +238,7 @@ public class config
 	}
 	
 	
-	public void deleteActiveEmail(Document doc, String oldAccount)
+	public void deleteActiveEmail(Document doc, String oldAccount, boolean forceFTP)
 	{
 		boolean exist = false;
 		Node active = doc.getElementsByTagName("active").item(0); //should only be  1 active
@@ -258,7 +268,7 @@ public class config
 				StreamResult result = new StreamResult(new File(this.configFile));
 				transformer.transform(source, result);
 				
-				 upLoadFTP(this.configFile,"config");
+				 upLoadFTP(this.configFile,"config", forceFTP);
 			}
 			catch(Exception e)
 			{
@@ -271,7 +281,7 @@ public class config
 	
 	
 	// if email does not already exist then add it.
-	public void addActiveEmail(Document doc, String account)
+	public void addActiveEmail(Document doc, String account, boolean forceFTP)
 	{
 		boolean exist = false;
 		NodeList nList = doc.getElementsByTagName("activeEmail");
@@ -307,7 +317,7 @@ public class config
 				StreamResult result = new StreamResult(new File(this.configFile));
 				transformer.transform(source, result);
 				
-				 upLoadFTP(this.configFile,"config");
+				 upLoadFTP(this.configFile,"config", forceFTP);
 			}
 			catch(Exception e)
 			{
@@ -367,7 +377,7 @@ public class config
 	}
 	public void setup()
 	{
-		downloadFTP(config.configFile , "/config/config.xml");  
+		//downloadFTP(config.configFile , "/config/config.xml");  
 		
 		/*
 		swapSlot.add(new xy(508,286));  
@@ -412,9 +422,10 @@ public class config
 		return temp;
 	}	
 	
-	public void upLoadFTP(String FileName, String dir)
+	public void upLoadFTP(String FileName, String dir , boolean forceFTP)
 	{
-		if(!test){
+		
+		if(!test && (forceFTP || this.isAutoSwap())){			
 			File f = new File(FileName);
 	
 			FTPClient ftp = new FTPClient();
@@ -494,9 +505,20 @@ public class config
 		return "";
 	}
 	
-	public void downloadFTP(String localFile, String remoteFile)
+	
+	
+	/**
+	 * 
+	 *  Need a way to NOT FTP for autoswap = false. (client's account)
+	 * 
+	 * @param localFile
+	 * @param remoteFile
+	 * @param forceFTP - force ftp
+	 */
+	
+	public void downloadFTP(String localFile, String remoteFile, boolean forceFTP, boolean con_autoSwap)
 	{
-		if(!test){
+		if(!test && (forceFTP || con_autoSwap)){
 	        String server = "doms.freewha.com";
 	        String user = "www.mturkpl.us";
 	        String pass = "freewebsucks11";

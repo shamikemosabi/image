@@ -36,14 +36,14 @@ public class gui extends JFrame
 	private JScrollPane scroller= null;
 	
 	private boolean isStarted = true;   // if set to false, program should stop. checked by control object
-	private boolean bSmartLoot = true;
+	private boolean bSmartLoot = false;
 	private boolean bDebugMode = false; //if set to true, program will save loot imgages, logs
 	
 	private JCheckBox chxSmartLoot = null;
 	private JCheckBox chxDebugMode = null;
 	
 	private JCheckBox chxAutoUpgrade = null;	
-	private boolean bAutoUpgrade = true;
+	private boolean bAutoUpgrade = false;
 	
 	public static String account = "";
 	
@@ -57,13 +57,13 @@ public class gui extends JFrame
 		frame = new JFrame("");
 		txtArea = new JTextArea();
 		chxSmartLoot =  new JCheckBox("Smart Loot");
-		chxSmartLoot.setSelected(false);
+		chxSmartLoot.setSelected(bSmartLoot);
 		
 		chxDebugMode = new JCheckBox("Debug Mode");
 		chxDebugMode.setSelected(bDebugMode);
 		
 		chxAutoUpgrade = new JCheckBox("Auto Upgrade");
-		chxAutoUpgrade.setSelected(false);
+		chxAutoUpgrade.setSelected(bAutoUpgrade);
 		
 		
 		//txtArea.setPreferredSize( new Dimension( 200, 300) );
