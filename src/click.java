@@ -2431,6 +2431,11 @@ public class click
 		else if(ret==6) // download new config.xml file and load new config object
 		{
 			downloadAndLoadConfig(true);
+			
+			// also download other xml files
+			downloadFTP(config.labFile , "/config/lab.xml", true);
+			downloadFTP(config.upgradeFile , "/config/upgrade.xml", true);	
+			
 			deleteEmail("config");
 			updateReadFile("1");
 			return 1; // let the next email service update actual read value
@@ -2572,9 +2577,8 @@ public class click
 	}
 	
 	public void downloadAndLoadConfig(boolean forceFTP)
-	{
-		downloadFTP(config.configFile , "/config/config.xml", forceFTP);
-		con = new config(con.getEmail(), forceFTP, con.isAutoSwap());   // new config object with same account as before, just NEW config.xml
+	{		
+		con = new config(con.getEmail(), forceFTP, con.isAutoSwap());   // new config object with same account as before, just NEW config.xml	
 	}
 	
 	
