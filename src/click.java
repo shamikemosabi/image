@@ -479,8 +479,8 @@ public class click
 				NodeList lab = eElement.getElementsByTagName("lab");	
 				NodeList itemList = eElement.getElementsByTagName("items");
 				
-				loadXYnodeList(lab,"pos", al);
-				loadXYnodeList(itemList, "item", al);
+				loadXYnodeList(lab,"pos", al, true);
+				loadXYnodeList(itemList, "item", al, true);
 
 			}
 		}
@@ -751,18 +751,20 @@ public class click
 					int gold = aud.getTempIntA();
 					int elixir = aud.getTempIntB();
 					
+					boolean threshold = (gold > 90 || elixir > 90);
+					
 					
 					// if there are nore elixir, always build elixir first
 					if(elixir > gold)
 					{
-						loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder);
-						loadXYnodeList(goldList, "item",alAutoUpgradeBuilder);  // in case I dont have elixir, I can still upgrade gold
+						loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder, threshold);
+						loadXYnodeList(goldList, "item",alAutoUpgradeBuilder, threshold);  // in case I dont have elixir, I can still upgrade gold
 					}
 					// there are more gold, and difference exceeds 20%
 					else if((gold - elixir) > 20) 
 					{
-						loadXYnodeList(goldList, "item",alAutoUpgradeBuilder);
-						loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder);
+						loadXYnodeList(goldList, "item",alAutoUpgradeBuilder, threshold);
+						loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder, threshold);
 					}
 					else // gold is more but the difference is less the 20% , lets do random
 					{
@@ -770,13 +772,13 @@ public class click
 						int i = r.nextInt(2);
 						if(i%2==0)
 						{
-							loadXYnodeList(goldList, "item",alAutoUpgradeBuilder);
-							loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder);
+							loadXYnodeList(goldList, "item",alAutoUpgradeBuilder, threshold);
+							loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder, threshold);
 						}
 						else
 						{
-							loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder);
-							loadXYnodeList(goldList, "item",alAutoUpgradeBuilder);							
+							loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder, threshold);
+							loadXYnodeList(goldList, "item",alAutoUpgradeBuilder, threshold);							
 						}
 					}
 					
@@ -796,8 +798,12 @@ public class click
 	 * n1 takes NodeList that should contain <xy> records
 	 * 
 	 * this method will loop thru the list and add AutoUpgradeData into alAutoUpgradeBuilder
+	 * 
+	 * 
+	 * @param - added third parameter, to check to see if loot percentage value exceeds a certain value. 
+	 * if it does then we add walls., if not then don't bother with walls, we just waste time trying to upgrade it.
 	 */
-	public void loadXYnodeList(NodeList nl, String tagName, ArrayList<AutoUpgradeData> al)
+	public void loadXYnodeList(NodeList nl, String tagName, ArrayList<AutoUpgradeData> al, boolean threshold)
 	{
 		for(int a = 0 ; a < nl.getLength(); a ++) //should only be 1 length
 		{			
@@ -815,17 +821,20 @@ public class click
 				NodeList xyList = itemEle.getElementsByTagName("xy");	
 				String name = itemEle.getElementsByTagName("name").item(0).getTextContent();
 				
-				for (int j = 0; j < xyList.getLength(); j++) 		
-				{		
-					Node n = xyList.item(j);		
-					Element xye = (Element) n;		
-							
-					xy newXY = createXY(xye.getTextContent());		
-					aud.getXYArrayList().add(newXY);		
-					aud.setName(name);
-									
-				}							
-				al.add(aud);
+				if( !name.equals("wall") ||  threshold)
+				{
+					for (int j = 0; j < xyList.getLength(); j++) 		
+					{		
+						Node n = xyList.item(j);		
+						Element xye = (Element) n;		
+								
+						xy newXY = createXY(xye.getTextContent());		
+						aud.getXYArrayList().add(newXY);		
+						aud.setName(name);
+										
+					}							
+					al.add(aud);
+				}
 			}
 		}
 	}
