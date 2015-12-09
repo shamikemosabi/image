@@ -743,7 +743,7 @@ public class config
 				pos.add(new xy(1001,591)); // Try these apps button
 				
 				//match on bluestack icon middle top
-				s = new struct("try",648,28, 153, 115, ruleFolder+"\\try.jpg",pos);
+				s = new struct("try",648,36, 153, 115, ruleFolder+"\\try.jpg",pos);
 			}
 			if(name.equals("search"))
 			{				
