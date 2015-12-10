@@ -275,7 +275,8 @@ public class email implements Runnable{
 	  else if (last.startsWith("swap:"))
 	  {		 
 		  last = last.replace("swap:", "5");
-		  blah = last; // should look like "5 blah@gmail.com"		  
+		  blah = last; // should look like "5 blah@gmail.com"		
+		  master =  true; // ANY SWAP commands should only alert me
 	  }
 	  else if (last.startsWith("connect:"))
 	  {
