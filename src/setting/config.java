@@ -592,8 +592,10 @@ public class config
 			else if(name.equals("find")) // matching queue
 			{
 				pos.add(new xy(285, 634)); // click find a match
-				pos.add(new xy(772, 470)); // in case shield is on, click okay
-				s = new struct("find",	204, 610, 141, 66, ruleFolder+"\\find.jpg",pos);
+				pos.add(new xy(725, 541)); // press okay to subtract shield
+				
+				//match on the townhall image 
+				s = new struct("find",	202, 283, 140, 133, ruleFolder+"\\find.jpg",pos);
 			}
 			else if(name.equals("init")) // main village, with screen setup (zoomed out and scrolledup)
 			{

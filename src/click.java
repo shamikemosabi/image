@@ -111,7 +111,7 @@ public class click
 	{
 		//downloadFTP(config.configFile , "/config/config.xml", true);  
 		setGUIandControl();
-		
+		System.out.println(inMain());
 		
 		RunEmailService();
 		RunUpdateStatService();
@@ -194,7 +194,7 @@ public class click
 					setUpScreen();			
 					
 					//has to be after screen setup
-					upgradeLab(con.getEmail()); // lab upgrade
+					//upgradeLab(con.getEmail()); // lab upgrade FH LOCAL
 					clickSafeSpot();
 					clickAttackLog(); //click attack log/ camp, save pics
 					
