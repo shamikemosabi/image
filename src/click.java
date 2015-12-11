@@ -110,8 +110,7 @@ public class click
 	public click() throws Exception
 	{
 		//downloadFTP(config.configFile , "/config/config.xml", true);  
-		setGUIandControl();
-		System.out.println(inMain());
+		setGUIandControl();		
 		
 		RunEmailService();
 		RunUpdateStatService();
@@ -2437,7 +2436,8 @@ public class click
 			downloadFTP(config.upgradeFile , "/config/upgrade.xml", true);	
 			
 			deleteEmail("config");
-			updateReadFile("1");
+			//updateReadFile("1"); // why not update to 2??
+			updateReadFile("2");
 			return 1; // let the next email service update actual read value
 		}
 		else // in case for some reason, value read is not any of the numbers, lets just default to bot.
