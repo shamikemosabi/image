@@ -175,7 +175,27 @@ public class click
 			try{
 				// change to case statement. 2=bot, 1=stay active dont bot, 0= stop bot.
 				int value = isServiceStarted2(con.readFile);				
-				//while((config.work)?isServiceStarted("C:\\Documents and Settings\\dhwang\\My Documents\\read.txt"):true)
+				//while((config.work)?isServiceStarted("C:\\Documents and Settings\\dhwang\\My Documents\\read.txt"):true)				
+				
+				// Always checking end of battle will allow us to not get stuck.
+				// for example let's say we are in middle of deploying troops. Email service reads a 6(load config) , 5 (swap) 
+				// read.txt now is not 2 anymore, loops out of deploy droops, read value is now say 5, 
+				// bluestack screen is still technically can be in battle (maybe queen didn't get deployed, so will wait till time finishes)
+				// So since read value is 5, we will check if inMain(), if we are then we swap, other wise keep looping.
+				// WE WILL NEVER GET OUT OF THE END OF BATTLE SCREEN UNLESS READ IS 2 again.
+				// BY Always checking end of battle dispite read value, we are guarrantee to not get stuck., I can now swap , config: anytime I want
+				
+				if(endOfBattle())
+				{
+					returnHomeFromBattle();
+					disconnected = false;
+					if(s.isStarted())
+					{
+						guiFrame.info("Stopping Stop Watch");
+						s.reset();			
+					}
+				}
+				
 				switch(value)
 				
 				{	
@@ -2602,6 +2622,7 @@ public class click
 		     do 
 		        {   
 					try{		
+						count++;
 						ftp.connect("doms.freewha.com");
 						System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
 						System.out.println(ftp.getReplyString());
@@ -2620,7 +2641,7 @@ public class click
 						
 						ftp.disconnect();	
 						
-						count++;
+						
 					}
 					catch(Exception e)
 					{
@@ -2654,6 +2675,7 @@ public class click
 		     do 
 		        {   
 					try{		
+						count++;
 						ftp.connect("doms.freewha.com");
 						System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
 						System.out.println(ftp.getReplyString());
@@ -2668,7 +2690,7 @@ public class click
 						
 						ftp.disconnect();	
 						
-						count++;
+						
 					}
 					catch(Exception e)
 					{
@@ -2700,7 +2722,7 @@ public class click
 	        do 
 	        {        
 		        try {
-		 
+		        	count++;
 		            ftpClient.connect(server);
 		            ftpClient.login(user, pass);
 		            ftpClient.enterLocalPassiveMode();
@@ -2711,8 +2733,7 @@ public class click
 		             success = ftpClient.retrieveFile(remoteFile, outputStream1);
 		            outputStream1.close();
 		            ftpClient.disconnect();	  
-		            
-		            count++;
+		            		            
 		        }
 		        catch(Exception e)
 		        {

@@ -434,7 +434,8 @@ public class config
 		     int count = 0;
 		     do 
 		        {   
-					try{		
+					try{	
+						count++;
 						ftp.connect("doms.freewha.com");
 						System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
 						System.out.println(ftp.getReplyString());
@@ -447,7 +448,7 @@ public class config
 						is.close();
 						
 						ftp.disconnect();	
-						count++;
+						
 					}
 					catch(Exception e)
 					{
@@ -531,6 +532,7 @@ public class config
 	        do 
 	        {        
 		        try {
+		        	count++;
 		 
 		            ftpClient.connect(server);
 		            ftpClient.login(user, pass);
@@ -543,7 +545,7 @@ public class config
 		            outputStream1.close();
 		            ftpClient.disconnect();	  
 		            
-		            count++;
+		            
 		        }
 		        catch(Exception e)
 		        {
