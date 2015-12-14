@@ -112,6 +112,7 @@ public class click
 		//downloadFTP(config.configFile , "/config/config.xml", true);  
 		setGUIandControl();		
 		
+		
 		RunEmailService();
 		RunUpdateStatService();
 		RunUpdateWebPage();
