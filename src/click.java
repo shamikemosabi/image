@@ -697,6 +697,7 @@ public class click
 				clickAutoUpgrade(al.get(i),500);
 				takeCurrentScreenshot(false,"currentstatus.jpg");
 				clickSafeSpot();
+				clickSafeSpot(); // click twice incase, don't have enough money, there are now 2 
 				//compare previous cropCurrent image (cropped zero builder of last time) with current zerobuilder
 				// The idea is After clickAutoUpgrade(), and my image is still the same it means nothing happened, so there was no 
 				// successful upgrade. If`it was different THEN I should send text to show upgrade.
