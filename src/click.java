@@ -2865,7 +2865,7 @@ public class click
 			setLoot();	
 		}
 		
-		if( isBaseInactive()&& saveLootParent() )
+		if( isBaseInactive()&&  saveLootParent() ) 
 		{
 			guiFrame.info("Base is inactive, loot is good lets attack!");
 			return true;

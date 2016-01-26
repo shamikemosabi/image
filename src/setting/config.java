@@ -569,7 +569,8 @@ public class config
 			{				
 				pos.add(new xy(89,743)); // click attack button
 				//change match pic, to builders head
-				s = new struct("main",520,21, 37, 38, ruleFolder+"\\main.jpg",pos);
+				//s = new struct("main",520,21, 37, 38, ruleFolder+"\\main.jpg",pos);
+				s = new struct("main",506,22, 39, 42, ruleFolder+"\\main.jpg",pos);
 			}
 			else if(name.equals("camp_full"))
 			{
