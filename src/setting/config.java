@@ -623,10 +623,10 @@ public class config
 				s = new struct("end",661,719, 111, 48, ruleFolder+"\\end.jpg",pos); //return home
 			}
 			else if(name.equals("gold")){				
-				s = new struct("gold",64,87, 110, 24, ruleFolder+"\\gold.jpg",pos);			      			       
+				s = new struct("gold",68,95, 110, 27, ruleFolder+"\\gold.jpg",pos);			      			       
 			}
 			else if(name.equals("elixer")){				
-				s = new struct("elixer",59,125, 110, 24, ruleFolder+"\\elixer.jpg",pos);
+				s = new struct("elixer",66,134, 110, 26, ruleFolder+"\\elixer.jpg",pos);
 			}
 			
 			else if(name.equals("safe"))

@@ -110,7 +110,7 @@ public class click
 	public click() throws Exception
 	{
 		//downloadFTP(config.configFile , "/config/config.xml", true);  
-		setGUIandControl();		
+		setGUIandControl();					
 		
 		
 		RunEmailService();
