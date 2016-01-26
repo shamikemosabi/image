@@ -575,7 +575,7 @@ public class config
 			else if(name.equals("camp_full"))
 			{
 				//use barracks jpg different coordinate, match on All Camps Full!
-				s = new struct("camp_full",692,174, 122, 25, ruleFolder+"\\barracks.jpg",pos); 
+				s = new struct("camp_full",683,117, 168, 36, ruleFolder+"\\barracks.jpg",pos); 
 			}
 			else if(name.equals("camp"))
 			{
@@ -611,16 +611,16 @@ public class config
 				pos.add(xyBarrackTrain); //click train
 				
 				//match on Troop capacity after training:
-				s = new struct("barracks",	562, 298, 203, 21, ruleFolder+"\\barracks.jpg",pos);				
+				s = new struct("barracks",	629, 288, 256, 24, ruleFolder+"\\barracks.jpg",pos);				
 			}
 			else if(name.equals("battle")){
 				
-				pos.add(new xy(1316,612)); //click next
-				s = new struct("battle",31, 648, 121, 28, ruleFolder+"\\battle.jpg",pos);	//match on end battle
+				pos.add(new xy(1296,673)); //click next
+				s = new struct("battle",33, 695, 128, 28, ruleFolder+"\\battle.jpg",pos);	//match on end battle
 			}
 			else if(name.equals("end")){
-				pos.add(new xy(718,686)); //click return home			
-				s = new struct("end",666,669, 105, 48, ruleFolder+"\\end.jpg",pos);
+				pos.add(new xy(714,743)); //click return home			
+				s = new struct("end",661,719, 111, 48, ruleFolder+"\\end.jpg",pos); //return home
 			}
 			else if(name.equals("gold")){				
 				s = new struct("gold",64,87, 110, 24, ruleFolder+"\\gold.jpg",pos);			      			       
@@ -645,23 +645,23 @@ public class config
 			}
 			else if(name.equals("barbs"))
 			{
-				pos.add(new xy(450,400)); // position of barb in camp
-				pos.add(new xy(1159,398)); // next button
-				pos.add(new xy(254,764)); // position in battle screen
+				pos.add(new xy(354,464)); // position of barb in camp
+				pos.add(new xy(1293,429)); // next button
+				pos.add(new xy(229,812)); // position in battle screen
 				s = new struct("barbs",221,698,55, 68, ruleFolder+"\\barbs.jpg",pos); 
 			}
 			else if(name.equals("archs"))
 			{
-				pos.add(new xy(590,408)); // position of archs in camp
-				pos.add(new xy(1159,398)); // next button
-				pos.add(new xy(344,750)); // position in battle screen
+				pos.add(new xy(570,460)); // position of archs in camp
+				pos.add(new xy(1293,429)); // next button
+				pos.add(new xy(318,810)); // position in battle screen
 				s = new struct("archs",317,701, 54, 59, ruleFolder+"\\archs.jpg",pos); 
 			}
 			else if(name.equals("king"))
 			{				
 				
-				pos.add(new xy(431,746));
-				s = new struct("king",400,726, 70, 43, ruleFolder+"\\king.jpg",pos);  //new queen position
+				pos.add(new xy(414,807));
+				s = new struct("king",383,776, 64, 58, ruleFolder+"\\king.jpg",pos);  //new queen position
 				
 			}
 			else if(name.equals("inactive"))
@@ -685,27 +685,28 @@ public class config
 			else if(name.equals("queen"))
 			{
 				//pos.add(new xy(408,706));
-				pos.add(new xy(431,746));
-				s = new struct("queen",400,726, 70, 43, ruleFolder+"\\queen.jpg",pos);  //new queen position
+				pos.add(new xy(414,807));
+				s = new struct("queen",383,776, 64, 58, ruleFolder+"\\queen.jpg",pos);  //new queen position																
 			}
 			else  if(name.equals("status"))
 			{
 				pos.add(new xy(63,187));
-				pos.add(new xy(666,106));
+				pos.add(new xy(635,60));
 				s = new struct("status",0,0,0,0, ruleFolder+"\\status.jpg",pos);
 			}
 			else if(name.equals("swap"))
 			{
-				pos.add(new xy(1379,646)); //click setting
-				pos.add(new xy(723,489)); // click disconnect
+				pos.add(new xy(1383,694)); //click setting
+				pos.add(new xy(738,58)); // click setting tab
+				pos.add(new xy(745,537)); // click disconnect
 				pos.add(swapSlot.get(slot-1)); // click where your account is
 				//pos.add(new xy(889,663)); // click ok, Okay pos will change when we add more account, lets make it last swapSlots
 				pos.add(swapSlot.get(swapSlot.size()-1));
-				pos.add(new xy(837,507)); // click load
-				pos.add(new xy(607,255)); // click textbox
-				pos.add(new xy(844,255)); // click Okay
+				pos.add(new xy(869,562)); // click load
+				pos.add(new xy(477,340)); // click textbox
+				pos.add(new xy(880,338)); // click Okay
 				
-				s = new struct("swap",613,285,217,37, ruleFolder+"\\swap.jpg",pos);
+				s = new struct("swap",580,269,284,55, ruleFolder+"\\swap.jpg",pos); //load Image
 			}
 			if(name.equals("zeroBuilder"))
 			{						
@@ -755,7 +756,7 @@ public class config
 				pos.add(new xy(80,745)); // Return home button
 				
 				//match on return home, the women's head
-				s = new struct("search",42,714, 82, 39, ruleFolder+"\\search.jpg",pos);
+				s = new struct("search",62,774, 50, 39, ruleFolder+"\\search.jpg",pos);
 			}	
 			if(name.equals("bluestack"))
 			{				
@@ -765,131 +766,7 @@ public class config
 				s = new struct("bluestack",54,139, 87, 87, ruleFolder+"\\bluestack.jpg",pos);
 			}	
 		}
-		else
-		{
-			
-			if(name.equals("main")) // main village
-			{
-				pos.add(new xy(81,655));
-				s = new struct("main",462,20, 32, 35, ruleFolder+"\\main.jpg",pos);
-			}
-			else if(name.equals("camp")) // when click army camp
-			{
-				pos.add(new xy(332,416)); //click camp
-				pos.add(new xy(581, 668)); // click info	
-				s = new struct("camp",	495, 137, 268, 29, ruleFolder+"\\camp.jpg",pos); 
-			}
-			else if(name.equals("camp_full")) // full army camp, 200/200
-			{
-				//pos.add(new xy(332,416)); //click camp
-				//pos.add(new xy(581, 668)); // click info
-				pos.add(new xy(455,265)); //click barracks
-				pos.add(new xy(764,633)); //click train
-				s = new struct("camp_full",	352, 553, 158, 31, ruleFolder+"\\camp_full.jpg",pos);
-			}
-			else if(name.equals("find")) // matching queue
-			{
-				pos.add(new xy(260, 560)); // click find a match
-				pos.add(new xy(772, 470)); // in case shield is on, click okay
-				s = new struct("find",	185, 541, 121, 61, ruleFolder+"\\find.jpg",pos);
-			}
-			else if(name.equals("init")) // main village, with screen setup (zoomed out and scrolledup)
-			{
-				s = new struct("init",	880, 28, 100, 50, ruleFolder+"\\init.jpg",pos);				
-			}
-			else if(name.equals("barracks"))
-			{
-				pos.add(new xy(455,265)); //click barracks
-				pos.add(new xy(764,633)); //click train
-				//pos.add(new xy(745,673)); //click train for boosted barracks
-				s = new struct("init",	439, 564, 426, 22, ruleFolder+"\\barracks.jpg",pos);	
-				
-			}
-			else if(name.equals("safe"))
-			{
-				pos.add(new xy(1245,42)); 
-				s = new struct("safe",0,0, 0, 0, ruleFolder+"\\safe.jpg",pos); 
-			}
-			else if(name.equals("barbs"))
-			{
-				pos.add(new xy(404,356)); // position of barb in camp
-				pos.add(new xy(1025,375)); // next button
-				pos.add(new xy(225,672)); // barbs position in battle
-				
-				s = new struct("barbs",197,621, 49, 56, ruleFolder+"\\barbs.jpg",pos); 
-			}
-			else if(name.equals("archs"))
-			{
-				pos.add(new xy(523,355)); // position of archs in camp
-				pos.add(new xy(1025,375)); // next button
-				pos.add(new xy(306,658)); // archer position in battle
-				s = new struct("archs",282,619, 50, 61, ruleFolder+"\\archs.jpg",pos); 
-			}
-			else if(name.equals("gold")){				
-				s = new struct("gold",57,77, 89, 22, ruleFolder+"\\gold.jpg",pos);			      			       
-			}
-			else if(name.equals("elixer")){				
-				s = new struct("elixer",55,110, 90, 25, ruleFolder+"\\elixer.jpg",pos);
-			}
-			else if(name.equals("battle")){
-				
-				pos.add(new xy(1160,547)); //click next
-				//mathc on "end Battle" button
-				s = new struct("battle",35, 557, 97, 24, ruleFolder+"\\battle.jpg",pos);	
-			}
-			else if(name.equals("end")){
-				pos.add(new xy(657,623)); //click return home			
-				s = new struct("end",589,590, 93, 49, ruleFolder+"\\end.jpg",pos);
-			}
-			else if(name.equals("attack"))
-			{				
-				pos.add(new xy(219,304));
-				pos.add(new xy(714,90)); //363
-				pos.add(new xy(823,766)); //363
-				pos.add(new xy(194,570)); //363
-				s = new struct("attack",0,0, 0, 0, ruleFolder+"\\attack.jpg",pos); 
-			}
-			else if(name.equals("king"))
-			{
-				pos.add(new xy(391,658));
-				s = new struct("king",366,628, 44, 57, ruleFolder+"\\king.jpg",pos); 
-			}
-			else if(name.equals("inactive"))
-			{
-				//pos.add(new xy(391,658));
-				s = new struct("inactive",24,25, 19, 16, ruleFolder+"\\inactive.jpg",pos); 
-			}
-			
-			else if(name.equals("raided"))
-			{
-				pos.add(new xy(70,671)); // click return home
-				s = new struct("raided",29,636, 86, 76, ruleFolder+"\\raided.jpg",pos); 
-			}
 
-			
-			else if(name.equals("de")) // used to see if DE exist
-			{				
-				s = new struct("de",33,148, 21, 21, ruleFolder+"\\de.jpg",pos); 
-			}
-			else if(name.equals("de_amt")) // used to get DE amount
-			{				
-				s = new struct("de",54,142, 77, 25, ruleFolder+"\\de.jpg",pos); 
-			}
-			else if(name.equals("status"))
-			{
-				pos.add(new xy(48,578)); // click inbox
-				pos.add(new xy(577,90)); // click attack log
-				s = new struct("status",0,0, 0, 0, ruleFolder+"\\status.jpg",pos); 
-			}
-			else if(name.equals("queen"))
-			{
-				pos.add(new xy(391,658));
-				s = new struct("queen",358,626, 44, 57, ruleFolder+"\\queen.jpg",pos); 
-			}
-
-			
-		}
-		
 	}
 	
 	
