@@ -567,7 +567,7 @@ public class config
 		{
 			if(name.equals("main"))
 			{				
-				pos.add(new xy(89,743)); // click attack button
+				pos.add(new xy(86,806)); // click attack button
 				//change match pic, to builders head
 				//s = new struct("main",520,21, 37, 38, ruleFolder+"\\main.jpg",pos);
 				s = new struct("main",506,22, 39, 42, ruleFolder+"\\main.jpg",pos);
@@ -594,7 +594,7 @@ public class config
 			}
 			else if(name.equals("find")) // matching queue
 			{
-				pos.add(new xy(285, 634)); // click find a match
+				pos.add(new xy(337, 636)); // click find a match
 				pos.add(new xy(725, 541)); // press okay to subtract shield
 				
 				//match on the townhall image 
@@ -631,7 +631,7 @@ public class config
 			
 			else if(name.equals("safe"))
 			{
-				pos.add(new xy(1396,42)); 
+				pos.add(new xy(1425,13)); 
 				s = new struct("safe",0,0, 0, 0, ruleFolder+"\\safe.jpg",pos); 
 			}
 			else if(name.equals("attack"))
@@ -667,7 +667,7 @@ public class config
 			else if(name.equals("inactive"))
 			{
 				//pos.add(new xy(391,658));
-				s = new struct("inactive",25,29, 23, 18, ruleFolder+"\\inactive.jpg",pos); 
+				s = new struct("inactive",24,31, 30, 25, ruleFolder+"\\inactive.jpg",pos); 
 			}
 			else if(name.equals("raided"))
 			{
