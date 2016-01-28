@@ -671,8 +671,8 @@ public class config
 			}
 			else if(name.equals("raided"))
 			{
-				pos.add(new xy(89,743)); // click return home
-				s = new struct("raided",49,712, 68, 47, ruleFolder+"\\raided.jpg",pos); 
+				pos.add(new xy(89,797)); // click return home
+				s = new struct("raided",44,761, 86, 52, ruleFolder+"\\raided.jpg",pos); 
 			}
 			else if(name.equals("de")) // used to see if DE exist
 			{				

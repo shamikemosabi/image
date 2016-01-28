@@ -1509,12 +1509,18 @@ public class click
 		 cont.mouseRelease(InputEvent.BUTTON1_MASK);	
 		 Thread.sleep(1000);
 		 
+			cont.mouseMove(newCon.getPos().get(1).getX(), newCon.getPos().get(1).getY()); // move to setting tab
+			cont.mousePress(InputEvent.BUTTON1_MASK);	
+			 Thread.sleep(1000);
+			 cont.mouseRelease(InputEvent.BUTTON1_MASK);	
+			 Thread.sleep(1000);
+			 
 		 int temp = 0;
 		 boolean ret  =false ;
 		 while(temp < 10)
 		 {
 			Thread.sleep(500);
-			cont.mouseMove(newCon.getPos().get(1).getX(), newCon.getPos().get(1).getY()); // move to disconnect
+			cont.mouseMove(newCon.getPos().get(2).getX(), newCon.getPos().get(2).getY()); // move to disconnect
 			cont.mousePress(InputEvent.BUTTON1_MASK);	
 			 Thread.sleep(1000);
 			 cont.mouseRelease(InputEvent.BUTTON1_MASK);	
@@ -1525,13 +1531,13 @@ public class click
 			 
 			 Thread.sleep(7000);
 			 
-			 cont.mouseMove(newCon.getPos().get(2).getX(), newCon.getPos().get(2).getY()); // move to account
+			 cont.mouseMove(newCon.getPos().get(3).getX(), newCon.getPos().get(3).getY()); // move to account
 			cont.mousePress(InputEvent.BUTTON1_MASK);	
 			Thread.sleep(1000);
 			 cont.mouseRelease(InputEvent.BUTTON1_MASK);
 			 
 			 // move to OK
-			 cont.mouseMove(newCon.getPos().get(3).getX(), newCon.getPos().get(3).getY()); 
+			 cont.mouseMove(newCon.getPos().get(4).getX(), newCon.getPos().get(4).getY()); 
 			cont.mousePress(InputEvent.BUTTON1_MASK);	
 			Thread.sleep(1000);
 			 cont.mouseRelease(InputEvent.BUTTON1_MASK);
@@ -1553,14 +1559,14 @@ public class click
 		 {
 			 // we are at load village screen.
 			 //click load
-			 cont.mouseMove(newCon.getPos().get(4).getX(), newCon.getPos().get(4).getY()); 
+			 cont.mouseMove(newCon.getPos().get(5).getX(), newCon.getPos().get(5).getY()); 
 			 cont.mousePress(InputEvent.BUTTON1_MASK);	
 			 Thread.sleep(1000);
 			 cont.mouseRelease(InputEvent.BUTTON1_MASK);	
 			 Thread.sleep(2000);
 			 
 			 //click textbox
-			 cont.mouseMove(newCon.getPos().get(5).getX(), newCon.getPos().get(5).getY()); 
+			 cont.mouseMove(newCon.getPos().get(6).getX(), newCon.getPos().get(6).getY()); 
 			 cont.mousePress(InputEvent.BUTTON1_MASK);	
 			 Thread.sleep(1000);
 			 cont.mouseRelease(InputEvent.BUTTON1_MASK);	
@@ -1593,7 +1599,7 @@ public class click
 			 Thread.sleep(1000);
 			 
 			 //click okay
-			 cont.mouseMove(newCon.getPos().get(6).getX(), newCon.getPos().get(6).getY()); 
+			 cont.mouseMove(newCon.getPos().get(7).getX(), newCon.getPos().get(7).getY()); 
 			 cont.mousePress(InputEvent.BUTTON1_MASK);	
 			 Thread.sleep(1000);
 			 cont.mouseRelease(InputEvent.BUTTON1_MASK);	
