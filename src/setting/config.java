@@ -720,19 +720,19 @@ public class config
 			}	
 			if(name.equals("maxElixir"))
 			{
-				s = new struct("maxElixir",1196,99, 17, 16, ruleFolder+"\\maxElixir.jpg",pos);
+				s = new struct("maxElixir",1174,102, 17, 16, ruleFolder+"\\maxElixir.jpg",pos);
 			}
 			if(name.equals("maxGold"))
 			{
-				s = new struct("maxGold",1196,33, 17, 16, ruleFolder+"\\maxGold.jpg",pos);
+				s = new struct("maxGold",1174,33, 17, 16, ruleFolder+"\\maxGold.jpg",pos);
 			}
 			if(name.equals("fullGold"))
 			{				
-				s = new struct("fullGold",1190,50, 175, 6, ruleFolder+"\\init.jpg",pos);
+				s = new struct("fullGold",1174,53, 186, 6, ruleFolder+"\\maxGold.jpg",pos);
 			}
 			if(name.equals("fullElixir"))
 			{				
-				s = new struct("fullElixir",1190,115, 175, 6, ruleFolder+"\\init.jpg",pos);
+				s = new struct("fullElixir",1174,124, 186, 6, ruleFolder+"\\maxElixir.jpg",pos);
 			}
 			if(name.equals("barrackBoost"))
 			{
