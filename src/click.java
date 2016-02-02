@@ -111,7 +111,7 @@ public class click
 	{
 		//downloadFTP(config.configFile , "/config/config.xml", true);  
 		setGUIandControl();					
-		
+		// deployHero("queen");
 		
 		RunEmailService();
 		RunUpdateStatService();
@@ -614,15 +614,25 @@ public class click
 	 * should get call after every successful swap.
 	 * 
 	 * 
+	 * ** RE WRITE, uses loot % to see if loot full
+	 * 
+	 * 
 	 */
 	public boolean getSetLootFull(String e)
 	{
 		boolean ret = false;
 		AutoUpgradeData aud = null; 
 
+		aud = hashAutoUpgradeSWAP.get(e);
+		
+		int gold = aud.getTempIntA();
+		int elixir = aud.getTempIntB();
+		
+		
+		
 		try{
 			
-			if(compareImage("maxElixir") && compareImage("maxGold"))
+			if(gold > 90 &&  elixir > 90)
 			{
 				guiFrame.info("loot is full for email account " + e);
 				ret = true;				
