@@ -111,7 +111,7 @@ public class click
 	{
 		//downloadFTP(config.configFile , "/config/config.xml", true);  
 		setGUIandControl();					
-		// deployHero("queen");
+		//System.out.println(compareImage("queen"));
 		
 		RunEmailService();
 		RunUpdateStatService();
