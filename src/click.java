@@ -2609,7 +2609,7 @@ public class click
 			
 			fw.close();					
 					
-			upLoadFTP(config.statFile,"config", false);
+			upLoadFTP(config.statFile,"config", true);
 			
 		}
 
