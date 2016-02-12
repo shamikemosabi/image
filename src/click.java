@@ -102,6 +102,9 @@ public class click
 	ArrayList<AutoUpgradeData> alAutoUpgradeBuilderNOW = new ArrayList<AutoUpgradeData> ();
 	ArrayList<AutoUpgradeData> alAutoUpgradeBuilderSTATIC = new ArrayList<AutoUpgradeData> ();
 	
+	ArrayList<AutoUpgradeData> alAutoLootSwap = new ArrayList<AutoUpgradeData> ();
+	int intAutoLootSwap = 0;
+	boolean lAutoLootswap = true;
 	//every time I swap to the new account, the new account will get swapDate updated with current date.
 	static Hashtable<String, AutoUpgradeData> hashAutoUpgradeSWAP = new Hashtable <String, AutoUpgradeData> ();
 	
@@ -194,6 +197,31 @@ public class click
 						guiFrame.info("Stopping Stop Watch");
 						s.reset();			
 					}
+					
+					lAutoLootswap = true; // came out of battle can autolootswap now
+					
+					
+					//only do this for auto loot swap
+					Thread.sleep(1000);
+					if(inMain())
+					{
+						setUpScreen();	
+						guiFrame.info("Train troops");				
+						if(clickBarracks()) // click barracks, make sure we clicked
+						{
+							guiFrame.info("we are in barracks");
+							for(int i=0; i< 2; i++) // only 4 barracks right now
+							{
+								trainBarbs();
+								trainArchs();
+							}
+							
+							clickSafeSpot(); // get out of barracks screen out to main
+							clickSafeSpot();// do it twice to loose focuse of barracks from before just in case
+							// clicking it when it has focus is loosing focus						
+						}	
+						
+					}
 				}
 				
 				switch(value)
@@ -276,6 +304,7 @@ public class click
 					// * which means we NEVER return home from battle.
 					 
 					disconnected = true;
+					lAutoLootswap = false; 
 					boolean attack = false;
 					
 					if(!s.isStarted())
@@ -310,6 +339,29 @@ public class click
 						guiFrame.info("Stopping Stop Watch");
 						s.reset();			
 					}
+					lAutoLootswap = true;
+					
+					//only do this for auto loot swap
+					if(inMain())
+					{
+						setUpScreen();	
+						guiFrame.info("Train troops");				
+						if(clickBarracks()) // click barracks, make sure we clicked
+						{
+							guiFrame.info("we are in barracks");
+							for(int i=0; i< 2; i++) // only 4 barracks right now
+							{
+								trainBarbs();
+								trainArchs();
+							}
+							
+							clickSafeSpot(); // get out of barracks screen out to main
+							clickSafeSpot();// do it twice to loose focuse of barracks from before just in case
+							// clicking it when it has focus is loosing focus						
+						}	
+						
+					}
+					
 				}
 				
 				if(gotRaided())
@@ -1078,8 +1130,9 @@ public class click
 				
 				//static, only for auto upgrade option
 				// config has to have autoSwap true. (client account will have autoSwap = false)
-				// take out con.isAutoSwap(), I'm having problem with VPN getting stuck downloading. so I'm changing isAutoSwap to false, but I still want to autoupgrade
-				if(guiFrame.getAutoUpgrade() && alAutoUpgradeBuilderSTATIC.size() > 0)
+
+				if(false && con.isAutoSwap() && alAutoUpgradeBuilderSTATIC.size() > 0)
+
 				{	
 					String orignalEmail = con.getEmail();
 					for(int i= 0 ;  i< alAutoUpgradeBuilderSTATIC.size(); i++)
@@ -1142,7 +1195,95 @@ public class click
 					}
 				}
 				
-			}
+				guiFrame.info("Auto loot swap started");
+				if(guiFrame.getAutoUpgrade()  && alAutoUpgradeBuilderSTATIC.size() > 0 && lAutoLootswap)
+				{
+					
+
+					// if empty then lets pick 4 random
+					if(alAutoLootSwap.size() == 0)
+					{
+						long seed = System.nanoTime();
+						Collections.shuffle(alAutoUpgradeBuilderSTATIC, new Random(seed));
+						int c=0;
+						
+						//first add my own account
+						
+						AutoUpgradeData  audO = new AutoUpgradeData();
+						audO.setEmail(con.getEmail());
+						alAutoLootSwap.add(audO);
+						
+						// randomly take 3 accounts
+						for(int i=0; i < alAutoUpgradeBuilderSTATIC.size(); i++)
+						{					
+							AutoUpgradeData  aud = alAutoUpgradeBuilderSTATIC.get(i);
+							String email = aud.getEmail(); //email to swap to
+							
+							boolean exist = isEmailActive(doc, email, con.getEmail()); 
+							
+							if((!con.getEmail().equals(email))  && (!exist))
+							{
+								alAutoLootSwap.add(aud);
+								c++;
+							}
+							
+							if(c>2)
+							{
+								break;
+							}
+							
+						}
+						
+						intAutoLootSwap = 0;
+					}
+					
+					
+					String orignalEmail = con.getEmail();
+					
+	
+					AutoUpgradeData  aud = alAutoLootSwap.get(intAutoLootSwap);
+					String email = aud.getEmail(); //email to swap to
+					
+					boolean exist = isEmailActive(doc, email, orignalEmail); 
+						
+					if(!exist)
+					{
+						
+						if(!email.equals(orignalEmail)) // same accont don't swap, don't do anything
+						{
+							guiFrame.info("Auto loot swap " + email + "from " + con.getEmail());
+								
+							boolean swapStatus = swap(email,orignalEmail,false);
+							clickSafeSpot(); // click safe spot to get rid of raided screen
+							Thread.sleep(3000);
+						
+								
+							//we should be in the new account now.
+							if(inMain() && swapStatus) // make sure in main and swap success
+							{
+								guiFrame.info("Auto loot swap In main from after swap");
+									
+								intAutoLootSwap++;
+								if(intAutoLootSwap==alAutoLootSwap.size()) intAutoLootSwap=0;
+		
+							}
+							else
+							{
+								guiFrame.info("Auto loot swap failed, not in main");
+								sendText("Auto loot swap failed","swapping from " + orignalEmail + " to " + email + " variable swapStatus = " + swapStatus);
+							}
+						}
+						else
+						{
+							intAutoLootSwap++;
+						}
+	
+					}
+	
+				}
+				
+				
+			} //try
 		
 			catch(Exception e)
 			{
