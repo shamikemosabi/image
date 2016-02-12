@@ -390,7 +390,7 @@ public class click
 						updateSwapDate(con.getEmail(), true, false, false, false, 0 ,0); //update last time this email was active
 						AutoUpgrade2();
 						AutoUpgradeBuilder();
-						upgradeLab(con.getEmail());
+						//upgradeLab(con.getEmail());
 						AutoSwapFullLoot();
 						clickAttackLog();
 						
@@ -844,7 +844,7 @@ public class click
 						loadXYnodeList(goldList, "item",alAutoUpgradeBuilder, threshold);  // in case I dont have elixir, I can still upgrade gold
 					}
 					// there are more gold, and difference exceeds 20%
-					else if((gold - elixir) > 20) 
+					else if((gold - elixir) > 10) 
 					{
 						loadXYnodeList(goldList, "item",alAutoUpgradeBuilder, threshold);
 						loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder, threshold);
@@ -1130,7 +1130,9 @@ public class click
 				
 				//static, only for auto upgrade option
 				// config has to have autoSwap true. (client account will have autoSwap = false)
+
 				if(false && con.isAutoSwap() && alAutoUpgradeBuilderSTATIC.size() > 0)
+
 				{	
 					String orignalEmail = con.getEmail();
 					for(int i= 0 ;  i< alAutoUpgradeBuilderSTATIC.size(); i++)
