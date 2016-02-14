@@ -39,7 +39,7 @@ import email.email;
 
 public class config
 {
-	public static boolean test = false; 
+	public static boolean test = true; 
 	
 	
 	ArrayList<struct> data ;
@@ -436,8 +436,10 @@ public class config
 		        {   
 					try{	
 						count++;
-						ftp.connect("doms.freewha.com");
-						System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
+						//ftp.connect("doms.freewha.com");
+						//System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
+						ftp.connect("clash.comxa.com");
+						System.out.println(ftp.login("a3607640","fuckyou11"));		
 						System.out.println(ftp.getReplyString());
 						ftp.enterLocalPassiveMode();
 						ftp.changeWorkingDirectory(dir);				
@@ -534,8 +536,11 @@ public class config
 		        try {
 		        	count++;
 		 
-		            ftpClient.connect(server);
-		            ftpClient.login(user, pass);
+		        	ftpClient.connect("clash.comxa.com");
+					System.out.println(ftpClient.login("a3607640","fuckyou11"));		
+					
+		           // ftpClient.connect(server);
+		          //  ftpClient.login(user, pass);
 		            ftpClient.enterLocalPassiveMode();
 		            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 		

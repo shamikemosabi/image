@@ -1227,7 +1227,7 @@ public class click
 								c++;
 							}
 							
-							if(c>2)
+							if(c>1)
 							{
 								break;
 							}
@@ -1237,6 +1237,8 @@ public class click
 						intAutoLootSwap = 0;
 					}
 					
+					guiFrame.info("Auto loot swap array size : " + alAutoLootSwap.size());
+					guiFrame.info("Auto loot swap index : " + intAutoLootSwap);
 					
 					String orignalEmail = con.getEmail();
 					
@@ -1244,10 +1246,14 @@ public class click
 					AutoUpgradeData  aud = alAutoLootSwap.get(intAutoLootSwap);
 					String email = aud.getEmail(); //email to swap to
 					
-					boolean exist = isEmailActive(doc, email, orignalEmail); 
+				//	boolean exist = isEmailActive(doc, email, orignalEmail); 
 						
-					if(!exist)
-					{
+				//	if(!exist)
+				//	{
+						intAutoLootSwap++;
+						if(intAutoLootSwap==alAutoLootSwap.size()) intAutoLootSwap=0;
+						
+						guiFrame.info("Auto loot swap index after increase: " + intAutoLootSwap);
 						
 						if(!email.equals(orignalEmail)) // same accont don't swap, don't do anything
 						{
@@ -1263,22 +1269,15 @@ public class click
 							{
 								guiFrame.info("Auto loot swap In main from after swap");
 									
-								intAutoLootSwap++;
-								if(intAutoLootSwap==alAutoLootSwap.size()) intAutoLootSwap=0;
-		
+
 							}
 							else
 							{
-								guiFrame.info("Auto loot swap failed, not in main");
-								sendText("Auto loot swap failed","swapping from " + orignalEmail + " to " + email + " variable swapStatus = " + swapStatus);
+								guiFrame.info("Auto loot swap failed, not in main");								
 							}
 						}
-						else
-						{
-							intAutoLootSwap++;
-						}
-	
-					}
+
+				//	}
 	
 				}
 				
@@ -2782,9 +2781,13 @@ public class click
 		        {   
 					try{		
 						count++;
-						ftp.connect("doms.freewha.com");
-						System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
+						//ftp.connect("doms.freewha.com");
+						ftp.connect("clash.comxa.com");
+						System.out.println(ftp.login("a3607640","fuckyou11"));		
 						System.out.println(ftp.getReplyString());
+						
+						//System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
+						//System.out.println(ftp.getReplyString());
 						ftp.enterLocalPassiveMode();
 						ftp.changeWorkingDirectory(dir);
 						
@@ -2835,9 +2838,13 @@ public class click
 		        {   
 					try{		
 						count++;
-						ftp.connect("doms.freewha.com");
-						System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
+						ftp.connect("clash.comxa.com");
+						System.out.println(ftp.login("a3607640","fuckyou11"));		
 						System.out.println(ftp.getReplyString());
+						
+					//ftp.connect("doms.freewha.com");
+					//	System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
+						//System.out.println(ftp.getReplyString());
 						ftp.enterLocalPassiveMode();
 						ftp.changeWorkingDirectory(dir);	
 						ftp.setFileType(FTP.BINARY_FILE_TYPE);
@@ -2882,8 +2889,11 @@ public class click
 	        {        
 		        try {
 		        	count++;
-		            ftpClient.connect(server);
-		            ftpClient.login(user, pass);
+		        	ftpClient.connect("clash.comxa.com");
+					System.out.println(ftpClient.login("a3607640","fuckyou11"));		
+					
+		            //ftpClient.connect(server);
+		            //ftpClient.login(user, pass);
 		            ftpClient.enterLocalPassiveMode();
 		            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 		
