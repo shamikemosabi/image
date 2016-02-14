@@ -2650,7 +2650,7 @@ public class click
 	{
 		boolean temp ;
 		
-		String [] array = {"bluestack", "try", "search"};
+		String [] array = {"bluestack", "try", "search", "loadVillage"};
 		
 		for(int i = 0 ; i< array.length; i++)
 		{

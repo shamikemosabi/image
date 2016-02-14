@@ -769,7 +769,12 @@ public class config
 				
 				//match on search button
 				s = new struct("bluestack",54,139, 87, 87, ruleFolder+"\\bluestack.jpg",pos);
-			}	
+			}
+			if(name.equals("loadVillage"))
+			{
+				pos.add(new xy(569,556)); // click cancel
+				s = new struct("swap",580,269,284,55, ruleFolder+"\\swap.jpg",pos); //load Image
+			}
 		}
 
 	}
