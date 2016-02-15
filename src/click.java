@@ -237,7 +237,7 @@ public class click
 					
 					AutoUpgrade2(); // check for swap NOW, Static
 					AutoUpgradeBuilder(); // check if free builder, if so then build					
-					AutoSwapFullLoot(); // check if loot is full, if so then swap										
+					//AutoSwapFullLoot(); // check if loot is full, if so then swap										
 					sendPictureText(); //if email has status, will click to attack log and send pic back
 					setUpScreen();			
 					
@@ -725,7 +725,7 @@ public class click
 		ImageParser ip2 = new ImageParser(System.getProperty("user.dir")+"\\","lootValue.jpg", "fullElixir");
 		int elixir = ip2.value;
 		
-
+		guiFrame.info("Calculating loot precentage gold : " + gold + " elixir : " + elixir);
 		updateSwapDate(e, false, false, false, true, gold, elixir);
 		
 	}
@@ -834,23 +834,26 @@ public class click
 					int gold = aud.getTempIntA();
 					int elixir = aud.getTempIntB();
 					
+					guiFrame.info("Loading upgrade builder gold : " + gold + " elixir : " + elixir);
+					
 					boolean threshold = (gold > 90 || elixir > 90);
 					
 					
-					// if there are nore elixir, always build elixir first
-					if(elixir > gold)
-					{
+					// if there are nore gold, always build gold first
+					if(gold > elixir)
+					{						
+						loadXYnodeList(goldList, "item",alAutoUpgradeBuilder, threshold); 
 						loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder, threshold);
-						loadXYnodeList(goldList, "item",alAutoUpgradeBuilder, threshold);  // in case I dont have elixir, I can still upgrade gold
 					}
 					// there are more gold, and difference exceeds 20%
-					else if((gold - elixir) > 10) 
+					else if((elixir - gold) > 20) 
 					{
-						loadXYnodeList(goldList, "item",alAutoUpgradeBuilder, threshold);
 						loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder, threshold);
+						loadXYnodeList(goldList, "item",alAutoUpgradeBuilder, threshold);					
 					}
 					else // gold is more but the difference is less the 20% , lets do random
 					{
+						/*
 						Random r  = new Random();
 						int i = r.nextInt(2);
 						if(i%2==0)
@@ -863,6 +866,10 @@ public class click
 							loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder, threshold);
 							loadXYnodeList(goldList, "item",alAutoUpgradeBuilder, threshold);							
 						}
+						
+						*/
+						loadXYnodeList(goldList, "item",alAutoUpgradeBuilder, threshold);
+						loadXYnodeList(elixirList, "item",alAutoUpgradeBuilder, threshold);
 					}
 					
 				}
@@ -1262,16 +1269,16 @@ public class click
 							boolean swapStatus = swap(email,orignalEmail,false);
 							clickSafeSpot(); // click safe spot to get rid of raided screen
 							Thread.sleep(3000);
-						
 								
 							//we should be in the new account now.
 							if(inMain() && swapStatus) // make sure in main and swap success
 							{
 								guiFrame.info("Auto loot swap In main from after swap");
-									
+								clickSafeSpot();
+								setUpScreen(); //set ups screen so when I come out of this method I can autobuilderupgrade
 
 							}
-							else
+							else // if it takes too long to load village, lets just not setupscreen.
 							{
 								guiFrame.info("Auto loot swap failed, not in main");								
 							}
@@ -2650,7 +2657,7 @@ public class click
 	{
 		boolean temp ;
 		
-		String [] array = {"bluestack", "try", "search", "loadVillage"};
+		String [] array = {"bluestack", "try", "search", "loadVillage", "confirm"};
 		
 		for(int i = 0 ; i< array.length; i++)
 		{

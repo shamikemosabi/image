@@ -600,7 +600,7 @@ public class config
 			else if(name.equals("find")) // matching queue
 			{
 				pos.add(new xy(337, 636)); // click find a match
-				pos.add(new xy(725, 541)); // press okay to subtract shield
+				//pos.add(new xy(725, 541)); // press okay to subtract shield
 				
 				//match on the townhall image 
 				s = new struct("find",	202, 283, 140, 133, ruleFolder+"\\find.jpg",pos);
@@ -774,6 +774,11 @@ public class config
 			{
 				pos.add(new xy(569,556)); // click cancel
 				s = new struct("swap",580,269,284,55, ruleFolder+"\\swap.jpg",pos); //load Image
+			}
+			if(name.equals("confirm"))
+			{
+				pos.add(new xy(994,57)); // click cancel
+				s = new struct("swap",423,378,575,73, ruleFolder+"\\confirm.jpg",pos); //load Image
 			}
 		}
 
