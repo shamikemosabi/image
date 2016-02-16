@@ -113,7 +113,7 @@ public class click
 	public click() throws Exception
 	{
 		//downloadFTP(config.configFile , "/config/config.xml", true);  
-		setGUIandControl();					
+		setGUIandControl();	
 		//System.out.println(compareImage("queen"));
 		
 		RunEmailService();
@@ -237,7 +237,7 @@ public class click
 					
 					AutoUpgrade2(); // check for swap NOW, Static
 					AutoUpgradeBuilder(); // check if free builder, if so then build					
-					//AutoSwapFullLoot(); // check if loot is full, if so then swap										
+					AutoSwapFullLoot(); // check if loot is full, if so then swap										
 					sendPictureText(); //if email has status, will click to attack log and send pic back
 					setUpScreen();			
 					
@@ -624,6 +624,120 @@ public class click
 		}
 	}
 	
+	
+	public void AutoSwapFullLoot2() throws Exception
+	{
+		downloadFTP(config.configFile , "/config/config.xml", false); 
+		Document doc  = createDocFromXML(config.configFile);
+		
+		boolean swap = getSetLootFull(con.getEmail());
+		String swapEmail="";		
+		if(swap && guiFrame.getAutoUpgrade()) // loot is full!, only do it for auto upgrade for now maybe?
+		{
+			swapEmail = getNextRandomEmail2();
+			
+			for(int i=0; i < alAutoLootSwap.size(); i ++)
+			{
+				AutoUpgradeData aud = alAutoLootSwap.get(i);
+				if(aud.getEmail().equals(con.getEmail()))
+				{
+					alAutoLootSwap.remove(i);
+					break;
+				}
+				
+			}
+			AutoUpgradeData aud = new AutoUpgradeData();
+			aud.setEmail(swapEmail);
+			
+			alAutoLootSwap.add(aud);
+			
+			
+			//update config.xml 
+			// add swapEmail to lootEmail
+			// remove current email from <loot>
+			removeFromDoc(doc, con.getEmail(), "loot", "lootEmail");
+			addToDoc(doc, swapEmail, "loot", "lootEmail");
+			
+		}
+		
+	}
+	
+	public void addToDoc(Document doc, String e, String root, String node)
+	{
+		
+		boolean exist = false;
+		NodeList nList = doc.getElementsByTagName(root);
+		for (int temp = 0; temp < nList.getLength(); temp++) 
+		{
+			Node nNode = nList.item(temp);				
+			Element eElement = (Element) nNode;
+			String email  = eElement.getTextContent();
+			//String email = eElement.getAttribute("id");
+			if(email.equals(e))
+			{
+				exist = true;
+				break;
+			}
+			
+		}
+		
+		if(!exist)
+		{
+			
+			Node active = doc.getElementsByTagName(root).item(0); 
+			// append a new node
+			Element age = doc.createElement(node);
+			age.appendChild(doc.createTextNode(e));
+			active.appendChild(age);
+		}
+		
+		
+		
+	}
+	
+	public void removeFromDoc(Document doc, String e, String root, String node)
+	{
+
+		Node active = doc.getElementsByTagName(root).item(0); 
+		NodeList nList = doc.getElementsByTagName(node);
+		for (int temp = 0; temp < nList.getLength(); temp++) 
+		{
+			Node nNode = nList.item(temp);				
+			Element eElement = (Element) nNode;
+			String email  = eElement.getTextContent();
+			if(email.equals(e))
+			{	
+				active.removeChild(nNode);			
+			}
+			
+		}
+		
+	}
+	
+	// grabs email from upgrade , picks one email not in auto swap loot array.
+	public String getNextRandomEmail2()
+	{	
+	
+		
+		String ret="";
+		long seed = System.nanoTime();
+		Collections.shuffle(alAutoUpgradeBuilderSTATIC, new Random(seed));
+		
+		for (int temp = 0; temp < alAutoUpgradeBuilderSTATIC.size(); temp++) 
+		{		
+			String email = alAutoUpgradeBuilderSTATIC.get(temp).getEmail();
+			if(!alAutoLootSwap.contains(email))
+			{
+				ret = email;
+				break;
+			}
+			
+		}
+		
+		
+		return ret;
+	}
+	
 	public String getNextRandomEmail()
 	{
 		String ret="";
@@ -702,7 +816,7 @@ public class click
 			guiFrame.info("Error in setLootFull");
 			guiFrame.info(ex.getMessage());
 		}
-		return ret && aud.isAutoSwap(); // if autoswap is false, don't swap (for client)
+		return ret ;//&& aud.isAutoSwap(); // if autoswap is false, don't swap (for client)
 		
 	}
 	
@@ -1207,43 +1321,7 @@ public class click
 				{
 					
 
-					// if empty then lets pick 4 random
-					if(alAutoLootSwap.size() == 0)
-					{
-						long seed = System.nanoTime();
-						Collections.shuffle(alAutoUpgradeBuilderSTATIC, new Random(seed));
-						int c=0;
-						
-						//first add my own account
-						
-						AutoUpgradeData  audO = new AutoUpgradeData();
-						audO.setEmail(con.getEmail());
-						alAutoLootSwap.add(audO);
-						
-						// randomly take 3 accounts
-						for(int i=0; i < alAutoUpgradeBuilderSTATIC.size(); i++)
-						{					
-							AutoUpgradeData  aud = alAutoUpgradeBuilderSTATIC.get(i);
-							String email = aud.getEmail(); //email to swap to
-							
-							boolean exist = isEmailActive(doc, email, con.getEmail()); 
-							
-							if((!con.getEmail().equals(email))  && (!exist))
-							{
-								alAutoLootSwap.add(aud);
-								c++;
-							}
-							
-							if(c>1)
-							{
-								break;
-							}
-							
-						}
-						
-						intAutoLootSwap = 0;
-					}
-					
+					setUpAutoLootSwapList(doc);
 					guiFrame.info("Auto loot swap array size : " + alAutoLootSwap.size());
 					guiFrame.info("Auto loot swap index : " + intAutoLootSwap);
 					
@@ -1299,6 +1377,73 @@ public class click
 		
 		
 	}
+	
+	
+	
+	
+	
+	public ArrayList<AutoUpgradeData> getArrayFromDoc (Document d)
+	{
+		ArrayList<AutoUpgradeData> alAUD = new ArrayList<AutoUpgradeData>();
+		NodeList nList = d.getElementsByTagName("lootEmail");
+		
+		for (int temp = 0; temp < nList.getLength(); temp++) 
+		{
+			Node nNode = nList.item(temp);				
+			Element eElement = (Element) nNode;
+			String email  = eElement.getTextContent();	
+			
+			AutoUpgradeData aud = new AutoUpgradeData();
+			aud.setEmail(email);
+			alAUD.add(aud);
+		}
+		
+		
+		return alAUD;
+	}
+	
+
+public void setUpAutoLootSwapList(Document doc)
+{
+	
+	// only the first time we run the program
+	if(alAutoLootSwap.size() == 0)
+	{
+		long seed = System.nanoTime();
+		Collections.shuffle(alAutoUpgradeBuilderSTATIC, new Random(seed));
+		int c=0;
+		
+		//first add my own account
+		
+		AutoUpgradeData  audO = new AutoUpgradeData();
+		audO.setEmail(con.getEmail());
+		alAutoLootSwap.add(audO);
+		
+		ArrayList<AutoUpgradeData> tempArrayList = getArrayFromDoc(doc);
+		
+		for(int i=0; i < tempArrayList.size(); i++)
+		{					
+			AutoUpgradeData  aud = alAutoUpgradeBuilderSTATIC.get(i);
+			String email = aud.getEmail(); //email to swap to
+			
+			boolean exist = isEmailActive(doc, email, con.getEmail()); 
+			
+			if((!con.getEmail().equals(email))  && (!exist))
+			{
+				alAutoLootSwap.add(aud);
+				c++;
+			}
+			
+			if(c>1)
+			{
+				break;
+			}
+			
+		}
+		
+		intAutoLootSwap = 0;
+	}
+}
 	
 	
 	/*

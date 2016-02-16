@@ -201,7 +201,7 @@ public int getLootValue(String d, String n, String m) throws Exception
 		
 		if(m.equals("fullGold"))
 		{
-			ret = 100 - ((total - 8000) / 270);
+			ret = 100 - ((total - 14000) / 270);
 			
 		}
 		else if(m.equals("fullElixir"))
