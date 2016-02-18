@@ -237,7 +237,7 @@ public class click
 					
 					AutoUpgrade2(); // check for swap NOW, Static
 					AutoUpgradeBuilder(); // check if free builder, if so then build					
-					AutoSwapFullLoot(); // check if loot is full, if so then swap										
+					//AutoSwapFullLoot(); // check if loot is full, if so then swap										
 					sendPictureText(); //if email has status, will click to attack log and send pic back
 					setUpScreen();			
 					
@@ -1421,7 +1421,8 @@ public void setUpAutoLootSwapList(Document doc)
 		
 		ArrayList<AutoUpgradeData> tempArrayList = getArrayFromDoc(doc);
 		
-		for(int i=0; i < tempArrayList.size(); i++)
+		//for(int i=0; i < tempArrayList.size(); i++)
+		for(int i=0; i < alAutoUpgradeBuilderSTATIC.size(); i++)
 		{					
 			AutoUpgradeData  aud = alAutoUpgradeBuilderSTATIC.get(i);
 			String email = aud.getEmail(); //email to swap to
@@ -1840,11 +1841,12 @@ public void setUpAutoLootSwapList(Document doc)
 			 cont.mouseRelease(InputEvent.BUTTON1_MASK);
 			 
 			 // move to OK
+			 /*
 			 cont.mouseMove(newCon.getPos().get(4).getX(), newCon.getPos().get(4).getY()); 
 			cont.mousePress(InputEvent.BUTTON1_MASK);	
 			Thread.sleep(1000);
 			 cont.mouseRelease(InputEvent.BUTTON1_MASK);
-			 
+			 */
 			 
 			 Thread.sleep(7000); //wait 7 seconds for load village to show up.
 			 
