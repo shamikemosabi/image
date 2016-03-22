@@ -20,10 +20,10 @@ import com.sun.image.codec.jpeg.*;
 	/* create a runable demo thing. */
 	public static void main(String[] args) {
 		// Create a compare object specifying the 2 images for comparison.
-		ImageCompare ic = new ImageCompare("cropcurrent.jpg", "cropmain.jpg");
+		ImageCompare ic = new ImageCompare("cropcurrent.jpg", "cropbarracks.jpg");
 		// Set the comparison parameters. 
 		//   (num vertical regions, num horizontal regions, sensitivity, stabilizer)
-		ic.setParameters(8, 6, 5, 10);
+		ic.setParameters(8, 6, 5, 5);
 		// Display some indication of the differences in the image.
 		ic.setDebugMode(2);
 		// Compare.
@@ -40,6 +40,13 @@ import com.sun.image.codec.jpeg.*;
 	public boolean setupAndCompare(ImageCompare ic)
 	{
 		ic.setParameters(8, 6, 5, 10);
+		ic.setDebugMode(0);
+		 ic.compare();	
+		return ic.match();
+	}
+	public boolean setupAndCompare(ImageCompare ic,int a, int b, int c, int d)
+	{
+		ic.setParameters(a, b, c, d);
 		ic.setDebugMode(0);
 		 ic.compare();	
 		return ic.match();

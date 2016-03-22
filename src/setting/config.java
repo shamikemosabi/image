@@ -580,7 +580,7 @@ public class config
 			else if(name.equals("camp_full"))
 			{
 				//use barracks jpg different coordinate, match on All Camps Full!
-				s = new struct("camp_full",683,117, 168, 36, ruleFolder+"\\barracks.jpg",pos); 
+				s = new struct("camp_full",691,186, 128, 25, ruleFolder+"\\barracks.jpg",pos); 
 			}
 			else if(name.equals("camp"))
 			{
@@ -616,7 +616,7 @@ public class config
 				pos.add(xyBarrackTrain); //click train
 				
 				//match on Troop capacity after training:
-				s = new struct("barracks",	629, 288, 256, 24, ruleFolder+"\\barracks.jpg",pos);				
+				s = new struct("barracks",	650, 317, 143, 23, ruleFolder+"\\barracks.jpg",pos);				
 			}
 			else if(name.equals("battle")){
 				
@@ -650,15 +650,15 @@ public class config
 			}
 			else if(name.equals("barbs"))
 			{
-				pos.add(new xy(354,464)); // position of barb in camp
-				pos.add(new xy(1293,429)); // next button
+				pos.add(new xy(433,446)); // position of barb in camp
+				pos.add(new xy(1191,418)); // next button
 				pos.add(new xy(229,812)); // position in battle screen
 				s = new struct("barbs",221,698,55, 68, ruleFolder+"\\barbs.jpg",pos); 
 			}
 			else if(name.equals("archs"))
 			{
-				pos.add(new xy(570,460)); // position of archs in camp
-				pos.add(new xy(1293,429)); // next button
+				pos.add(new xy(570,447)); // position of archs in camp
+				pos.add(new xy(1191,418)); // next button
 				pos.add(new xy(318,810)); // position in battle screen
 				s = new struct("archs",317,701, 54, 59, ruleFolder+"\\archs.jpg",pos); 
 			}
@@ -696,22 +696,22 @@ public class config
 			else  if(name.equals("status"))
 			{
 				pos.add(new xy(63,187));
-				pos.add(new xy(635,60));
+				pos.add(new xy(648,103));
 				s = new struct("status",0,0,0,0, ruleFolder+"\\status.jpg",pos);
 			}
 			else if(name.equals("swap"))
 			{
 				pos.add(new xy(1383,694)); //click setting
-				pos.add(new xy(738,58)); // click setting tab
+				pos.add(new xy(738,114)); // click setting tab
 				pos.add(new xy(745,537)); // click disconnect
 				pos.add(swapSlot.get(slot-1)); // click where your account is
 				//pos.add(new xy(889,663)); // click ok, Okay pos will change when we add more account, lets make it last swapSlots
 				pos.add(swapSlot.get(swapSlot.size()-1));
 				pos.add(new xy(869,562)); // click load
-				pos.add(new xy(477,340)); // click textbox
-				pos.add(new xy(880,338)); // click Okay
+				pos.add(new xy(549,275)); // click textbox
+				pos.add(new xy(853,269)); // click Okay
 				
-				s = new struct("swap",580,269,284,55, ruleFolder+"\\swap.jpg",pos); //load Image
+				s = new struct("swap",602,302,237,47, ruleFolder+"\\swap.jpg",pos); //load Image
 			}
 			if(name.equals("zeroBuilder"))
 			{						

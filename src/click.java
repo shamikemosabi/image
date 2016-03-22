@@ -112,9 +112,11 @@ public class click
 	
 	public click() throws Exception
 	{
+		
 		//downloadFTP(config.configFile , "/config/config.xml", true);  
 		setGUIandControl();	
-		//System.out.println(compareImage("queen"));
+	//	System.out.println(compareImage("queen"));
+
 		
 		RunEmailService();
 		RunUpdateStatService();
@@ -3489,7 +3491,8 @@ public void setUpAutoLootSwapList(Document doc)
 			 Thread.sleep(1000);
 		 }		 
 		 
-		return (compareImage("barracks")||compareImage("camp_full")); //just need to amke sure 
+		 
+		return (compareImage("barracks", 8, 6, 5, 5)||compareImage("camp_full", 8, 6, 5, 5)); //just need to amke sure 
 	}
 	
 	/**
@@ -3601,6 +3604,37 @@ public void setUpAutoLootSwapList(Document doc)
 		return ret;
 	}
 	
+	
+	public boolean compareImage(String s, int a, int b, int c1, int d) throws Exception
+	{
+		boolean ret = false;		 
+		BufferedImage screencapture = cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+		
+		//save current screen into current.jpg
+		String name = "current.jpg";
+		File outputFile = new File(name);
+       ImageIO.write(screencapture, "jpg", outputFile);
+              
+       con.setName(s);
+       Convert c = new Convert();
+       
+       c.invertImage(name, "crop"+name, con.getX(), con.getY(), con.getW(), con.getH());
+       // Now I will have the current screen image, inverted and cropped
+       
+       
+       //do the same for our //rule/main.jpg
+       c.invertImage(con.getFile(), "crop"+con.getName()+".jpg", con.getX(), con.getY(), con.getW(), con.getH());
+       
+       ImageCompare ic = new ImageCompare("crop"+name, "crop"+con.getName()+".jpg");
+       ret =  ic.setupAndCompare(ic, a, b, c1, d);
+
+      // guiFrame.info(ret);
+       
+		return ret;
+	}
+	
+	
+	
 	public boolean compareImage(String s , boolean save) throws Exception
 	{
 		boolean ret = false;		 
@@ -3624,6 +3658,7 @@ public void setUpAutoLootSwapList(Document doc)
        
        ImageCompare ic = new ImageCompare("crop"+name, "crop"+con.getName()+".jpg");
        ret =  ic.setupAndCompare(ic);
+    
       // guiFrame.info(ret);
        
 		return ret;
