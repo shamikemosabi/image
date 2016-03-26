@@ -772,12 +772,12 @@ public class config
 			}
 			if(name.equals("loadVillage"))
 			{
-				pos.add(new xy(569,556)); // click cancel
+				pos.add(new xy(611,533)); // click cancel
 				s = new struct("swap",580,269,284,55, ruleFolder+"\\swap.jpg",pos); //load Image
 			}
 			if(name.equals("confirm"))
 			{
-				pos.add(new xy(994,57)); // click cancel
+				pos.add(new xy(942,41)); // click cancel
 				s = new struct("swap",423,378,575,73, ruleFolder+"\\confirm.jpg",pos); //load Image
 			}
 		}
