@@ -3512,7 +3512,8 @@ public void setUpAutoLootSwapList(Document doc)
 			 Thread.sleep(1000);
 		 }		 
 		 
-		return compareImage("camp_full");		
+		//return compareImage("camp_full");
+		 return compareImage("camp_full", 8, 6, 5, 5);
 	}
 	public void clickAttack() throws Exception
 	{		
