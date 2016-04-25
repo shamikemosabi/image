@@ -123,54 +123,6 @@ public class click
 		RunUpdateWebPage();
 		RunCheckForStuckPages();
 		
-				
-	//	AutoUpgrade();
-		/*
-		 * 
-		 * 		
-		AutoUpgradeData aud = new AutoUpgradeData();
-
-		Calendar d = Calendar.getInstance();
-		Date currDate = d.getTime();
-		
-		String t = "10/12/2015 9:22 PM";
-		aud.setEmail("docogo1@gmail.com");
-		
-		DateFormat format = new SimpleDateFormat("MM/dd/yyyy h:mm a");
-		Date date = format.parse(t);	
-		
-		aud.setSwapDate(date);
-		aud.setTime("static2");
-		isSwapStatic(aud, currDate);
-		
-		
-		BufferedImage screencapture =cont.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
-		String name = "current.jpg";
-		File outputFile = new File(name);
-        ImageIO.write(screencapture, "jpg", outputFile);	
-        
-        System.out.println(compareImage("queen"));
-        deployHero("queen");
-		System.exit(0);
-				
-		System.out.println(gotRaided()+"GOT RAIDED");mt
-	
-				deployTroops2();
-		System.exit(0);
-		saveLootParent("C:\\Users\\shami_000\\Documents\\GitHub\\image\\rule\\", "current.jpg");
-		
-			email = "docogo.two@gmail.com";
-		swap();
-		
-      
-//		upLoadFTP("config.xml","config");
-		downloadFTP("config.xml" , "/config/config.xml");
-		System.exit(0);
-		AutoUpgrade();
-		System.exit(0);
-				AutoUpgradeBuilder();
-		System.exit(0);
-	*/
 
 
 		
@@ -231,6 +183,7 @@ public class click
 				{	
 				case 2:
 				if(inMain())
+				
 				{
 					if(disconnected) GotDisconnected();	
 					
@@ -239,7 +192,7 @@ public class click
 					
 					AutoUpgrade2(); // check for swap NOW, Static
 					AutoUpgradeBuilder(); // check if free builder, if so then build					
-					//AutoSwapFullLoot(); // check if loot is full, if so then swap										
+					AutoSwapFullLoot2(); // check if loot is full, if so then swap										
 					sendPictureText(); //if email has status, will click to attack log and send pic back
 					setUpScreen();			
 					
@@ -627,6 +580,11 @@ public class click
 	}
 	
 	
+	/**
+	 * we do this now because we now do multi bot/swap, 
+	 * need a new way of swapping when loot is full  driven by alAutoLootSwap array
+	 * @throws Exception
+	 */
 	public void AutoSwapFullLoot2() throws Exception
 	{
 		downloadFTP(config.configFile , "/config/config.xml", false); 
@@ -656,12 +614,33 @@ public class click
 			
 			//update config.xml 
 			// add swapEmail to lootEmail
-			// remove current email from <loot>
-			removeFromDoc(doc, con.getEmail(), "loot", "lootEmail");
-			addToDoc(doc, swapEmail, "loot", "lootEmail");
+			// remove current email from <lootRoot>
+			removeFromDoc(doc, con.getEmail(), "lootRoot", "lootEmail");
+			addToDoc(doc, swapEmail, "lootRoot", "lootEmail");
+			writeToXML(doc, config.configFile);
+			
 			
 		}
 		
+	}
+	
+	
+	public void writeToXML(Document doc, String file)
+	{
+		try{
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File(file));
+			transformer.transform(source, result);
+			
+			 upLoadFTP(file,"config", false);
+		}
+		catch(Exception e)
+		{
+			guiFrame.info("Error in writeToXML");
+			guiFrame.info(e.getMessage());			
+		}
 	}
 	
 	public void addToDoc(Document doc, String e, String root, String node)
@@ -728,7 +707,8 @@ public class click
 		for (int temp = 0; temp < alAutoUpgradeBuilderSTATIC.size(); temp++) 
 		{		
 			String email = alAutoUpgradeBuilderSTATIC.get(temp).getEmail();
-			if(!alAutoLootSwap.contains(email))
+			
+			if(!autoUpgradeDataContains(alAutoLootSwap, email))											
 			{
 				ret = email;
 				break;
@@ -738,6 +718,27 @@ public class click
 		
 		
 		return ret;
+	}
+	
+	/**
+	 * Need an easy way for array list that holds AutoUpgradeData
+	 * to see if an email is in it or not.
+	 * 
+	 * @return true if string is in, false otherwise
+	 */
+	public boolean autoUpgradeDataContains(ArrayList<AutoUpgradeData> al, String email)
+	{
+		
+		for(int i=0; i < al.size(); i ++)
+		{
+			if(al.get(i).getEmail().equals(email))
+			{
+				return true;
+			}
+		}
+		
+		return false;
+		
 	}
 	
 	public String getNextRandomEmail()
@@ -1423,10 +1424,10 @@ public void setUpAutoLootSwapList(Document doc)
 		
 		ArrayList<AutoUpgradeData> tempArrayList = getArrayFromDoc(doc);
 		
-		//for(int i=0; i < tempArrayList.size(); i++)
-		for(int i=0; i < alAutoUpgradeBuilderSTATIC.size(); i++)
+		for(int i=0; i < tempArrayList.size(); i++)
+		//for(int i=0; i < alAutoUpgradeBuilderSTATIC.size(); i++)
 		{					
-			AutoUpgradeData  aud = alAutoUpgradeBuilderSTATIC.get(i);
+			AutoUpgradeData  aud = tempArrayList.get(i);
 			String email = aud.getEmail(); //email to swap to
 			
 			boolean exist = isEmailActive(doc, email, con.getEmail()); 
@@ -1437,7 +1438,7 @@ public void setUpAutoLootSwapList(Document doc)
 				c++;
 			}
 			
-			if(c>1)
+			if(c>2)
 			{
 				break;
 			}
@@ -2937,9 +2938,9 @@ public void setUpAutoLootSwapList(Document doc)
 		        {   
 					try{		
 						count++;
-						//ftp.connect("doms.freewha.com");
-						ftp.connect("clash.comxa.com");
-						System.out.println(ftp.login("a3607640","fuckyou11"));		
+						ftp.connect("doms.freewha.com");						
+						
+						System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
 						System.out.println(ftp.getReplyString());
 						
 						//System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
@@ -2994,13 +2995,10 @@ public void setUpAutoLootSwapList(Document doc)
 		        {   
 					try{		
 						count++;
-						ftp.connect("clash.comxa.com");
-						System.out.println(ftp.login("a3607640","fuckyou11"));		
+											
+						ftp.connect("doms.freewha.com");
+						System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
 						System.out.println(ftp.getReplyString());
-						
-					//ftp.connect("doms.freewha.com");
-					//	System.out.println(ftp.login("www.mturkpl.us","freewebsucks11"));		
-						//System.out.println(ftp.getReplyString());
 						ftp.enterLocalPassiveMode();
 						ftp.changeWorkingDirectory(dir);	
 						ftp.setFileType(FTP.BINARY_FILE_TYPE);
@@ -3045,11 +3043,9 @@ public void setUpAutoLootSwapList(Document doc)
 	        {        
 		        try {
 		        	count++;
-		        	ftpClient.connect("clash.comxa.com");
-					System.out.println(ftpClient.login("a3607640","fuckyou11"));		
-					
-		            //ftpClient.connect(server);
-		            //ftpClient.login(user, pass);
+		        							
+		            ftpClient.connect(server);
+		            ftpClient.login(user, pass);
 		            ftpClient.enterLocalPassiveMode();
 		            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 		
