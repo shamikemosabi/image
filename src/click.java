@@ -587,7 +587,7 @@ public class click
 	 */
 	public void AutoSwapFullLoot2() throws Exception
 	{
-		downloadFTP(config.configFile , "/config/config.xml", false); 
+		//downloadFTP(config.configFile , "/config/config.xml", false); 
 		Document doc  = createDocFromXML(config.configFile);
 		
 		boolean swap = getSetLootFull(con.getEmail());
@@ -634,7 +634,7 @@ public class click
 			StreamResult result = new StreamResult(new File(file));
 			transformer.transform(source, result);
 			
-			 upLoadFTP(file,"config", false);
+			// upLoadFTP(file,"config", false);
 		}
 		catch(Exception e)
 		{
@@ -744,7 +744,7 @@ public class click
 	public String getNextRandomEmail()
 	{
 		String ret="";
-		downloadFTP(config.configFile , "/config/config.xml", false);  //download latest, I need latest active accounts
+	//	downloadFTP(config.configFile , "/config/config.xml", false);  //download latest, I need latest active accounts
 		Document doc  = createDocFromXML(config.configFile);
 		
 		Object[] values = hashAutoUpgradeSWAP.values().toArray(); //convert hash to array
@@ -922,7 +922,7 @@ public class click
 	{
 		ArrayList<AutoUpgradeData> alAutoUpgradeBuilder = new ArrayList<AutoUpgradeData> ();
 		try{					
-			downloadFTP(config.upgradeFile , "/config/upgrade.xml", false);
+			//downloadFTP(config.upgradeFile , "/config/upgrade.xml", false);
 			
 			File fXmlFile = new File(config.upgradeFile);
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -1757,8 +1757,8 @@ public void setUpAutoLootSwapList(Document doc)
 	 */
 	public AutoUpgradeData updateSwapDate(String e, boolean s, boolean l, boolean l2, boolean llootValue, int gold, int elixir )
 	{		
-		downloadFTP(config.HashSER , "/config/hash.ser", false);			
-		hashAutoUpgradeSWAP = deSeralize(new Hashtable(),config.HashSER);
+		//downloadFTP(config.HashSER , "/config/hash.ser", false);			
+		//hashAutoUpgradeSWAP = deSeralize(new Hashtable(),config.HashSER);
 		
 		AutoUpgradeData aud = hashAutoUpgradeSWAP.get(e);
 		if(s)
@@ -1783,8 +1783,8 @@ public void setUpAutoLootSwapList(Document doc)
 		
 		hashAutoUpgradeSWAP.put(e, aud);	
 		
-		seralize(hashAutoUpgradeSWAP, config.HashSER);
-		upLoadFTP(config.HashSER,"config", false);		
+		//seralize(hashAutoUpgradeSWAP, config.HashSER);
+		//upLoadFTP(config.HashSER,"config", false);		
 		
 		return aud;
 		
@@ -2861,7 +2861,11 @@ public void setUpAutoLootSwapList(Document doc)
 	public void updateStat() throws Exception 
 	{
 		if(guiFrame.getAutoUpgrade())
-		{							
+		{												
+			downloadFTP(config.configFile , "/config/config.xml", true);			
+			downloadFTP(config.upgradeFile , "/config/upgrade.xml", true);
+			//downloadFTP(config.HashSER , "/config/hash.ser", true);
+			
 			// hashAutoUpgradeSWAP, really only have 3 values, email, swapDate, and lootFull
 			Object[] values = hashAutoUpgradeSWAP.values().toArray(); //convert hash to array
 			ArrayList<Object> n = new ArrayList<Object>(Arrays.asList(values)); // convert array to arraylist
@@ -2906,7 +2910,11 @@ public void setUpAutoLootSwapList(Document doc)
 			
 			fw.close();					
 					
-			upLoadFTP(config.statFile,"config", true);
+			seralize(hashAutoUpgradeSWAP, config.HashSER);			
+			
+			String[] array = {config.statFile,config.configFile,config.HashSER} ;
+			upLoadFTP(array, "config", FTP.BINARY_FILE_TYPE);
+			
 			
 		}
 
