@@ -1760,7 +1760,7 @@ public void setUpAutoLootSwapList(Document doc)
 	public AutoUpgradeData updateSwapDate(String e, boolean s, boolean l, boolean l2, boolean llootValue, int gold, int elixir )
 	{		
 		//downloadFTP(config.HashSER , "/config/hash.ser", false);			
-		//hashAutoUpgradeSWAP = deSeralize(new Hashtable(),config.HashSER);
+		hashAutoUpgradeSWAP = deSeralize(new Hashtable(),config.HashSER);
 		
 		AutoUpgradeData aud = hashAutoUpgradeSWAP.get(e);
 		if(s)
@@ -2907,7 +2907,7 @@ public void setUpAutoLootSwapList(Document doc)
 	{
 		if(guiFrame.getAutoUpgrade())
 		{												
-			downloadFTP(config.configFile , "/config/config.xml", true);			
+			//downloadFTP(config.configFile , "/config/config.xml", true);			
 			downloadFTP(config.upgradeFile , "/config/upgrade.xml", true);
 			//downloadFTP(config.HashSER , "/config/hash.ser", true);
 			
@@ -2925,39 +2925,44 @@ public void setUpAutoLootSwapList(Document doc)
 			PrintWriter fw = new PrintWriter(f);					
 			
 		    Collections.sort(n1, new DateComparator()); //sort by swap date
-			
+			 
+		    		    
 			for(int i=0; i < n1.size(); i ++)
 			{
 				AutoUpgradeData aud =  n1.get(i);
-				fw.println("Account : " + aud.getEmail());
-				fw.println("Last Swap Date : " + aud.getSwapDate());
-				fw.println("Gold % : " + aud.getTempIntA());
-				fw.println("Elixir % : " + aud.getTempIntB());				
-				fw.println("Loot Full : " + aud.getLootFull());
-				fw.println();
+				
+				String t = "<a href = \"acct/%s/coc.html\" target=\"_blank\" >%s</a>";
+			    t = t.format(t, aud.getEmail(),aud.getEmail());
+			    
+				fw.println("Account : " +  t ); fw.println("</br>");				
+				fw.println("Last Swap Date : " + aud.getSwapDate()); fw.println("</br>");
+				fw.println("Gold % : " + aud.getTempIntA()); fw.println("</br>");
+				fw.println("Elixir % : " + aud.getTempIntB()); fw.println("</br>");
+				fw.println("Loot Full : " + aud.getLootFull()); fw.println("</br>");
+				fw.println("</br>");
 			}
 			
 			//output config's variables
 			
-			fw.println("Current Config Value:");
-			fw.println("Email : " + con.getEmail());
-			fw.println("deployArcher : " + con.getDeployArcher());
-			fw.println("deployBarb : " + con.getDeployBarb());
-			fw.println("Loot Threshold : " + con.getLootThreshold());
-			fw.println("Smart Loot : " + con.getSmartLoot());
-			fw.println();
+			fw.println("Current Config Value:");  fw.println("</br>");
+			fw.println("Email : " + con.getEmail());  fw.println("</br>");
+			fw.println("deployArcher : " + con.getDeployArcher());  fw.println("</br>");
+			fw.println("deployBarb : " + con.getDeployBarb());  fw.println("</br>");
+			fw.println("Loot Threshold : " + con.getLootThreshold());  fw.println("</br>");
+			fw.println("Smart Loot : " + con.getSmartLoot());  fw.println("</br>");
+			fw.println("</br>");
 			
 			//output system variables:
-			fw.println("System Variable");
-			fw.println("Manual smart loot : " + guiFrame.getSmartLoot());
-			fw.println();
+			fw.println("System Variable");  fw.println("</br>");
+			fw.println("Manual smart loot : " + guiFrame.getSmartLoot());  fw.println("</br>");
+			fw.println("</br>");
 			
 			
 			fw.close();					
 					
 			seralize(hashAutoUpgradeSWAP, config.HashSER);			
 			
-			String[] array = {config.statFile,config.configFile,config.HashSER} ;
+			String[] array = {config.statFile,config.HashSER} ;
 			upLoadFTP(array, "config", FTP.BINARY_FILE_TYPE);
 			
 			
