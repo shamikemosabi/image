@@ -34,14 +34,16 @@ public class ImageParser
 	{
 		try
 		{
-			
+			new ImageParser();
+			/*
 			Robot b  = new Robot();
 			BufferedImage screencapture = b.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));			
-			String name = dir+"fuck.jpg";
+			String name = dir+"current.jpg";
 			File outputFile = new File(name);
 		    ImageIO.write(screencapture, "jpg", outputFile);	
 		    new ImageParser(dir, "fuck.jpg", "fullGold");	
 		    new ImageParser(dir, "fuck.jpg", "fullElixir");	
+		    */
 		}
 		catch(Exception e)
 		{
@@ -54,7 +56,7 @@ public class ImageParser
 	{
 		int x1 = 0;
 		int x2 = 0;
-		int y= 6;  // this value can change
+		int y= 4;  // this value can change
 		String ret= "";
 		
 		boolean out=false;
@@ -79,7 +81,7 @@ public class ImageParser
 			if(out) // only gets here after having our two x1, x2 points
 			{
 				File outputFile = new File(dir+"test"+x+".jpg");
-	            ImageIO.write(b.getSubimage(x1-2, 0, x2-x1+4, 22), "jpg", outputFile);
+	            ImageIO.write(b.getSubimage(x1-2, 0, x2-x1+4, 15), "jpg", outputFile);
 	            NotFirst =false;
 	            out = false;
 	            
@@ -165,7 +167,7 @@ public class ImageParser
 		//String s= "C:\\Users\\CGS\\bot\\image\\loot\\" ;
 		String s= dir ;
 		
-		String g = "074593_00004_133.bmp";
+		String g = "current.jpg";
 		
 		// takes file, update img1/img2 to bufferimage for gold/elixer
 		saveLootParent(s,g);

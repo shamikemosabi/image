@@ -112,11 +112,13 @@ public class click
 	
 	public click() throws Exception
 	{
-		
-		//downloadFTP(config.configFile , "/config/config.xml", true);  
-		setGUIandControl();	
-	//	System.out.println(compareImage("queen"));
 
+		// downloadFTP(config.configFile , "/config/config.xml", true);
+		setGUIandControl();
+
+		//System.out.println(inBattle(true));
+		//setCalculateLootPercentage(con.getEmail());
+		
 		
 		RunEmailService();
 		RunUpdateStatService();
@@ -382,7 +384,7 @@ public class click
 			{
 			
 				guiFrame.info(e.getMessage());
-				
+				e.printStackTrace();
 				if(s.isStarted())
 				{
 					guiFrame.info("Error, stopping stop watch");
@@ -2194,14 +2196,16 @@ public void setUpAutoLootSwapList(Document doc)
 			{
 				if(breakOut > 1) break; // make sure we break out of loop eventually.
 					
+				/*
 				if ((outOfBarbs() && outOfArchs())) // out of troops
 				{
 					guiFrame.info("breaking");
 					break; // break while
 					
 				}
-				else
-				{
+				*/
+			//	else
+				//{
 					for(int temp = 0; temp< conLocal.getPos().size(); temp++) // should loop each pos , should only be 4
 					{
 						x1 = conLocal.getPos().get(temp).getX();  // current base point.
@@ -2236,7 +2240,7 @@ public void setUpAutoLootSwapList(Document doc)
 							
 							for(int a= 0; a<  ((con.work)? ((b%2==0)?con.getDeployBarb():con.getDeployArcher()): ((b%2==0)?28:22)) ; a++) //25:20 for home cause it lags.  
 							{				
-								int local = rand.nextInt(30);
+								int local = rand.nextInt(20);
 								int local2 = rand.nextInt(10); // gives it a little realistic feel 
 								
 								//move any where on that line
@@ -2267,12 +2271,16 @@ public void setUpAutoLootSwapList(Document doc)
 							activateHero();
 							activateHero = false;
 						}
-
-							deployHero("king") ;
-							deployHero("queen") ;													
+						
+						if(temp==0) //since I don't check if we have king or queen now. I need to only do this after first loop of temp
+						{
+							deployHero("king") ; // will deploy both king/queen/cc troops
+							//deployHero("queen") ;													
+						}	
+						
 						
 					}
-				}
+				//}
 				guiFrame.info("break out value " + breakOut);
 				breakOut++;
 				
@@ -2516,14 +2524,50 @@ public void setUpAutoLootSwapList(Document doc)
 			guiFrame.info("activating Hero");			
 			con.setName("king");
 			
-			 cont.mouseMove(con.getPos().get(0).getX(), con.getPos().get(0).getY());
-			 cont.mousePress(InputEvent.BUTTON1_MASK);	
-			 cont.mouseRelease(InputEvent.BUTTON1_MASK);
+			for(int j =0;  j < con.getPos().size() ; j++)
+			{
+				 cont.mouseMove(con.getPos().get(j).getX(), con.getPos().get(j).getY());
+				 cont.mousePress(InputEvent.BUTTON1_MASK);	
+				 cont.mouseRelease(InputEvent.BUTTON1_MASK);
+			}
+			
 		}
 		
 	}
 	public void deployHero(String h) throws Exception
 	{		
+		
+		
+		con.setName(h);
+		Random rand = new Random();		
+		
+		config c2 = new config();
+		c2.setName("attack");
+		
+		for(int j =0;  j < con.getPos().size() ; j++)
+		{
+			
+			cont.mouseMove(con.getPos().get(j).getX(), con.getPos().get(j).getY());
+			cont.mousePress(InputEvent.BUTTON1_MASK);	
+			cont.mouseRelease(InputEvent.BUTTON1_MASK);
+			Thread.sleep(300);
+			
+			int i = rand.nextInt(2);
+			
+			cont.mouseMove(c2.getPos().get(i).getX(), c2.getPos().get(i).getY());
+			cont.mouseMove(c2.getPos().get(i).getX(), c2.getPos().get(i).getY());
+			cont.mousePress(InputEvent.BUTTON1_MASK);	
+			cont.mouseRelease(InputEvent.BUTTON1_MASK);
+		}
+		
+		
+			
+		
+		guiFrame.info("deployed hero");
+		
+		activateHero = true;			
+
+		/*
 		con.setName(h);
 		Random rand = new Random();
 		boolean ret  = compareImage(h);			
@@ -2546,8 +2590,8 @@ public void setUpAutoLootSwapList(Document doc)
 			 guiFrame.info("deployed hero");
 			 
 			 activateHero = true;			
-		}	
-		
+		}
+		*/
 	}
 	
 	public void clickSafeSpot() throws Exception
@@ -2807,7 +2851,8 @@ public void setUpAutoLootSwapList(Document doc)
 	{
 		boolean temp ;
 		
-		String [] array = {"bluestack", "try", "search", "loadVillage", "confirm"};
+		//String [] array = {"bluestack", "try", "search", "loadVillage", "confirm"};
+		String [] array = {"search", "loadVillage", "confirm"};
 		
 		for(int i = 0 ; i< array.length; i++)
 		{
@@ -3555,9 +3600,11 @@ public void setUpAutoLootSwapList(Document doc)
 			 }
 			 
 			 //move screen down			 
-			 cont.mouseMove(1033, 337);
+			 // Why do I have to click the screen first then mouse wheel up?? 
+			 con.setName("safe");
+			 cont.mouseMove(con.getPos().get(0).getX(), con.getPos().get(0).getY());
 			 cont.mousePress(InputEvent.BUTTON1_MASK);
-			 
+			 cont.mouseRelease(InputEvent.BUTTON1_MASK);
 			 for(int i =0; i<8; i++)
 			 {
 				 cont.mouseWheel(-100);
@@ -3595,12 +3642,14 @@ public void setUpAutoLootSwapList(Document doc)
        con.setName(s);
        Convert c = new Convert();
        
+       
+       // I Need to get offset of bluestack's X,Y
        c.invertImage(name, "crop"+name, con.getX(), con.getY(), con.getW(), con.getH());
        // Now I will have the current screen image, inverted and cropped
        
        
        //do the same for our //rule/main.jpg
-       c.invertImage(con.getFile(), "crop"+con.getName()+".jpg", con.getX(), con.getY(), con.getW(), con.getH());
+       c.invertImage(con.getFile(), "crop"+con.getName()+".jpg", con.getXNOTOFF(), con.getYNOTOFF(), con.getW(), con.getH());
        
        ImageCompare ic = new ImageCompare("crop"+name, "crop"+con.getName()+".jpg");
        ret =  ic.setupAndCompare(ic);
@@ -3628,7 +3677,7 @@ public void setUpAutoLootSwapList(Document doc)
        
        
        //do the same for our //rule/main.jpg
-       c.invertImage(con.getFile(), "crop"+con.getName()+".jpg", con.getX(), con.getY(), con.getW(), con.getH());
+       c.invertImage(con.getFile(), "crop"+con.getName()+".jpg", con.getXNOTOFF(), con.getYNOTOFF(), con.getW(), con.getH());
        
        ImageCompare ic = new ImageCompare("crop"+name, "crop"+con.getName()+".jpg");
        ret =  ic.setupAndCompare(ic, a, b, c1, d);
@@ -3659,7 +3708,7 @@ public void setUpAutoLootSwapList(Document doc)
        
        
        //do the same for our //rule/main.jpg
-       c.invertImage(con.getFile(), "crop"+con.getName()+".jpg", con.getX(), con.getY(), con.getW(), con.getH());
+       c.invertImage(con.getFile(), "crop"+con.getName()+".jpg", con.getXNOTOFF(), con.getYNOTOFF(), con.getW(), con.getH());
        
        ImageCompare ic = new ImageCompare("crop"+name, "crop"+con.getName()+".jpg");
        ret =  ic.setupAndCompare(ic);
@@ -3697,7 +3746,7 @@ public void setUpAutoLootSwapList(Document doc)
        
        
        //do the same for our //rule/main.jpg
-       c.invertImage(configure.getFile(), "crop"+configure.getName()+".jpg", configure.getX(), configure.getY(), configure.getW(), configure.getH());
+       c.invertImage(configure.getFile(), "crop"+configure.getName()+".jpg", configure.getXNOTOFF(), configure.getYNOTOFF(), configure.getW(), configure.getH());
        
        ImageCompare ic = new ImageCompare("crop"+name, "crop"+configure.getName()+".jpg");
        ret =  ic.setupAndCompare(ic);

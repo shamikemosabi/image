@@ -33,13 +33,20 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
+
+
+import com.sun.jna.*;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.win32.*;
+
+
 import email.email;
 
 
 
 public class config
 {
-	public static boolean test = false; 
+	public static boolean test = true; 
 	
 	
 	ArrayList<struct> data ;
@@ -73,8 +80,8 @@ public class config
 	
 	private ArrayList<AutoUpgradeData> autoUpgradeList = new ArrayList<AutoUpgradeData>(); // don't use anymore, only in AutoUpgrade
 		
-	
-	
+	public int offsetX=0;
+	public int offsetY=0;
 	//used only in some local method. just to do some comparison
 	public config()
 	{
@@ -566,17 +573,18 @@ public class config
 		ArrayList<xy> pos = new ArrayList();
 		if(work)
 		{
+			setScreenOffset();
 			if(name.equals("main"))
 			{				
-				pos.add(new xy(86,806)); // click attack button
+				pos.add(new xy(257,729)); // click attack button
 				//change match pic, to builders head
 				//s = new struct("main",520,21, 37, 38, ruleFolder+"\\main.jpg",pos);
-				s = new struct("main",506,22, 39, 42, ruleFolder+"\\main.jpg",pos);
+				s = new struct("main",467,91, 31, 21, ruleFolder+"\\main.jpg",pos);
 			}
 			else if(name.equals("camp_full"))
 			{
 				//use barracks jpg different coordinate, match on All Camps Full!
-				s = new struct("camp_full",691,186, 128, 25, ruleFolder+"\\barracks.jpg",pos); 
+				s = new struct("camp_full",596,246, 92, 17, ruleFolder+"\\barracks.jpg",pos); 
 			}
 			else if(name.equals("camp"))
 			{
@@ -595,15 +603,18 @@ public class config
 			}
 			else if(name.equals("find")) // matching queue
 			{
-				pos.add(new xy(337, 636)); // click find a match
+				//pos.add(new xy(337, 636)); // click find a match
+				pos.add(new xy(430, 590)); // click find a match
 				//pos.add(new xy(725, 541)); // press okay to subtract shield
 				
 				//match on the townhall image 
-				s = new struct("find",	202, 283, 140, 133, ruleFolder+"\\find.jpg",pos);
+				//s = new struct("find",	202, 283, 140, 133, ruleFolder+"\\find.jpg",pos);
+				s = new struct("find",	401, 342, 63, 49, ruleFolder+"\\find.jpg",pos);
 			}
 			else if(name.equals("init")) // main village, with screen setup (zoomed out and scrolledup)
 			{
-				s = new struct("init",	1009, 63, 111, 64, ruleFolder+"\\init.jpg",pos);				
+				//s = new struct("init",	1009, 63, 111, 64, ruleFolder+"\\init.jpg",pos);
+				s = new struct("init",	796, 108, 33, 32, ruleFolder+"\\init.jpg",pos);
 			}
 			else if(name.equals("barracks"))
 			{
@@ -612,68 +623,91 @@ public class config
 				pos.add(xyBarrackTrain); //click train
 				
 				//match on Troop capacity after training:
-				s = new struct("barracks",	650, 317, 143, 23, ruleFolder+"\\barracks.jpg",pos);				
+				s = new struct("barracks",	566, 339, 147, 17, ruleFolder+"\\barracks.jpg",pos);				
 			}
 			else if(name.equals("battle")){
 				
-				pos.add(new xy(1296,673)); //click next
-				s = new struct("battle",33, 695, 128, 28, ruleFolder+"\\battle.jpg",pos);	//match on end battle
+				//pos.add(new xy(1296,673)); //click next
+				pos.add(new xy(924,633)); //click next
+				//s = new struct("battle",33, 695, 128, 28, ruleFolder+"\\battle.jpg",pos);	//match on end battle
+				s = new struct("battle",216, 654, 91, 18, ruleFolder+"\\battle.jpg",pos);	//match on end battle
 			}
 			else if(name.equals("end")){
-				pos.add(new xy(714,743)); //click return home			
-				s = new struct("end",661,719, 111, 48, ruleFolder+"\\end.jpg",pos); //return home
+				//pos.add(new xy(714,743)); //click return home			
+				//s = new struct("end",661,719, 111, 48, ruleFolder+"\\end.jpg",pos); //return home
+				
+				pos.add(new xy(623,636)); //click return home
+				s = new struct("end",558,633, 129, 22, ruleFolder+"\\end.jpg",pos); //return home
 			}
 			else if(name.equals("gold")){				
-				s = new struct("gold",68,95, 110, 27, ruleFolder+"\\gold.jpg",pos);			      			       
+				s = new struct("gold",239,135, 80, 18, ruleFolder+"\\gold.jpg",pos);			      			       
 			}
 			else if(name.equals("elixer")){				
-				s = new struct("elixer",66,134, 110, 26, ruleFolder+"\\elixer.jpg",pos);
+				s = new struct("elixer",239,163, 84, 19, ruleFolder+"\\elixer.jpg",pos);
 			}
 			
 			else if(name.equals("safe"))
 			{
-				pos.add(new xy(1425,13)); 
+			//	pos.add(new xy(1031,87)); 
+				pos.add(new xy(1023,95)); 
 				s = new struct("safe",0,0, 0, 0, ruleFolder+"\\safe.jpg",pos); 
 			}
 			else if(name.equals("attack"))
 			{
 				//pos.add(new xy(246,337));
-				pos.add(new xy(246,337));
-				pos.add(new xy(828,105));
-				pos.add(new xy(890,890));
-				pos.add(new xy(201,602));
+				pos.add(new xy(304,337));
+				pos.add(new xy(696,175));
+				pos.add(new xy(710,619));
+				pos.add(new xy(352,492));
 				s = new struct("attack",0,0, 0, 0, ruleFolder+"\\attack.jpg",pos); 
 			}
 			else if(name.equals("barbs"))
 			{
-				pos.add(new xy(433,446)); // position of barb in camp
-				pos.add(new xy(1191,418)); // next button
-				pos.add(new xy(229,812)); // position in battle screen
-				s = new struct("barbs",221,698,55, 68, ruleFolder+"\\barbs.jpg",pos); 
+				//pos.add(new xy(433,446)); // position of barb in camp
+				//pos.add(new xy(1191,418)); // next button
+				//pos.add(new xy(229,812)); // position in battle screen
+				
+				pos.add(new xy(356,433)); // position of barb in camp
+				pos.add(new xy(956,411)); // next button
+				pos.add(new xy(257,733)); // position in battle screen
+				//s = new struct("barbs",221,698,55, 68, ruleFolder+"\\barbs.jpg",pos); 
+				s = new struct("barbs",228,724,53, 33, ruleFolder+"\\barbs.jpg",pos);
 			}
 			else if(name.equals("archs"))
 			{
-				pos.add(new xy(570,447)); // position of archs in camp
-				pos.add(new xy(1191,418)); // next button
-				pos.add(new xy(318,810)); // position in battle screen
-				s = new struct("archs",317,701, 54, 59, ruleFolder+"\\archs.jpg",pos); 
+				//pos.add(new xy(570,447)); // position of archs in camp
+				//pos.add(new xy(1191,418)); // next button
+				//pos.add(new xy(318,810)); // position in battle screen
+				//s = new struct("archs",317,701, 54, 59, ruleFolder+"\\archs.jpg",pos); 
+				
+				pos.add(new xy(466,422)); // position of archs in camp
+				pos.add(new xy(956,411)); // next button
+				pos.add(new xy(323,731)); // position in battle screen
+				s = new struct("archs",300,727, 51, 32, ruleFolder+"\\archs.jpg",pos); 
 			}
+			
+			//Changed logic, Just click slot 3,4 and 5. deploy King, queen, maybe CC troops as well.
 			else if(name.equals("king"))
 			{				
 				
-				pos.add(new xy(414,807));
-				s = new struct("king",383,776, 64, 58, ruleFolder+"\\king.jpg",pos);  //new queen position
+				//pos.add(new xy(414,807));
+				pos.add(new xy(404,737));
+				pos.add(new xy(476,737));
+				pos.add(new xy(559,737));
+				
+				s = new struct("king",280,562, 43, 39, ruleFolder+"\\king.jpg",pos); 
 				
 			}
 			else if(name.equals("inactive"))
 			{
 				//pos.add(new xy(391,658));
-				s = new struct("inactive",24,31, 30, 25, ruleFolder+"\\inactive.jpg",pos); 
+				//s = new struct("inactive",24,31, 30, 25, ruleFolder+"\\inactive.jpg",pos);
+				s = new struct("inactive",211,89, 21, 17, ruleFolder+"\\inactive.jpg",pos); 
 			}
 			else if(name.equals("raided"))
 			{
 				pos.add(new xy(89,797)); // click return home
-				s = new struct("raided",44,761, 86, 52, ruleFolder+"\\raided.jpg",pos); 
+				s = new struct("raided",44,600, 86, 52, ruleFolder+"\\raided.jpg",pos); 
 			}
 			else if(name.equals("de")) // used to see if DE exist
 			{				
@@ -686,38 +720,51 @@ public class config
 			else if(name.equals("queen"))
 			{
 				//pos.add(new xy(408,706));
-				pos.add(new xy(414,807));
-				s = new struct("queen",383,776, 64, 58, ruleFolder+"\\queen.jpg",pos);  //new queen position																
+				//pos.add(new xy(414,807));
+				pos.add(new xy(302,584));
+				//s = new struct("queen",383,776, 64, 58, ruleFolder+"\\queen.jpg",pos);  //new queen position																
+				s = new struct("queen",278,568, 46, 39, ruleFolder+"\\queen.jpg",pos);  //new queen position
 			}
 			else  if(name.equals("status"))
 			{
-				pos.add(new xy(63,187));
-				pos.add(new xy(648,103));
+				pos.add(new xy(237,213));
+				pos.add(new xy(576,192));
 				s = new struct("status",0,0,0,0, ruleFolder+"\\status.jpg",pos);
 			}
 			else if(name.equals("swap"))
 			{
-				pos.add(new xy(1383,694)); //click setting
-				pos.add(new xy(738,114)); // click setting tab
-				pos.add(new xy(745,537)); // click disconnect
+				//pos.add(new xy(1383,694)); //click setting
+				//pos.add(new xy(738,114)); // click setting tab
+				//pos.add(new xy(745,537)); // click disconnect
+				//pos.add(swapSlot.get(slot-1)); // click where your account is
+				////pos.add(new xy(889,663)); // click ok, Okay pos will change when we add more account, lets make it last swapSlots
+				//pos.add(swapSlot.get(swapSlot.size()-1));
+				//pos.add(new xy(869,562)); // click load
+				//pos.add(new xy(549,275)); // click textbox
+				//pos.add(new xy(853,269)); // click Okay
+				
+				pos.add(new xy(1013,648)); //click setting
+				pos.add(new xy(629,190)); // click setting tab
+				pos.add(new xy(623,487)); // click disconnect
 				pos.add(swapSlot.get(slot-1)); // click where your account is
 				//pos.add(new xy(889,663)); // click ok, Okay pos will change when we add more account, lets make it last swapSlots
-				pos.add(swapSlot.get(swapSlot.size()-1));
-				pos.add(new xy(869,562)); // click load
-				pos.add(new xy(549,275)); // click textbox
-				pos.add(new xy(853,269)); // click Okay
+				pos.add(swapSlot.get(swapSlot.size()-1)); //no more ok button but still here for position
+				pos.add(new xy(708,498)); // click load
+				pos.add(new xy(501,264)); // click textbox
+				pos.add(new xy(711,261)); // click Okay
 				
-				s = new struct("swap",602,302,237,47, ruleFolder+"\\swap.jpg",pos); //load Image
+				//s = new struct("swap",602,302,237,47, ruleFolder+"\\swap.jpg",pos); //load Image
+				s = new struct("swap",539,328,170,36, ruleFolder+"\\swap.jpg",pos); //load Image
 			}
 			if(name.equals("zeroBuilder"))
 			{						
 				//change match pic, to 0 builders
-				s = new struct("zeroBuilder",581,29, 22, 23, ruleFolder+"\\init.jpg",pos);
+				s = new struct("zeroBuilder",517,91, 16, 14, ruleFolder+"\\init.jpg",pos);
 			}	
 			if(name.equals("zeroBuilder4"))
 			{						
 				//change match pic, to 0 builders
-				s = new struct("zeroBuilder4",581,29, 22, 23, ruleFolder+"\\zeroBuilder4.jpg",pos);
+				s = new struct("zeroBuilder4",518,91, 16, 14, ruleFolder+"\\zeroBuilder4.jpg",pos);
 			}	
 			if(name.equals("maxElixir"))
 			{
@@ -729,11 +776,11 @@ public class config
 			}
 			if(name.equals("fullGold"))
 			{				
-				s = new struct("fullGold",1174,53, 186, 6, ruleFolder+"\\maxGold.jpg",pos);
+				s = new struct("fullGold",863,106, 133, 4, ruleFolder+"\\maxGold.jpg",pos);
 			}
 			if(name.equals("fullElixir"))
 			{				
-				s = new struct("fullElixir",1174,124, 186, 6, ruleFolder+"\\maxElixir.jpg",pos);
+				s = new struct("fullElixir",859,157, 137,4, ruleFolder+"\\maxElixir.jpg",pos);
 			}
 			if(name.equals("barrackBoost"))
 			{
@@ -747,34 +794,38 @@ public class config
 			}
 			if(name.equals("try"))
 			{				
-				pos.add(new xy(1001,591)); // Try these apps button
+				pos.add(new xy(728,442)); // Try these apps button
 				
 				//match on bluestack icon middle top
-				s = new struct("try",648,36, 153, 115, ruleFolder+"\\try.jpg",pos);
+				s = new struct("try",454,66, 99, 77, ruleFolder+"\\try.jpg",pos);
 			}
 			if(name.equals("search"))
 			{				
-				pos.add(new xy(80,745)); // Return home button
-				
+				//pos.add(new xy(80,745)); // Return home button
+				pos.add(new xy(255,732)); // Return home button
 				//match on return home, the women's head
-				s = new struct("search",62,774, 50, 39, ruleFolder+"\\search.jpg",pos);
+				//s = new struct("search",62,774, 50, 39, ruleFolder+"\\search.jpg",pos);
+				s = new struct("search",236,705, 42, 34, ruleFolder+"\\search.jpg",pos);
 			}	
 			if(name.equals("bluestack"))
 			{				
-				pos.add(new xy(309,192)); // click last open app (should be clash of clan)
+				//pos.add(new xy(309,192)); // click last open app (should be clash of clan)
+				pos.add(new xy(209,172)); // click last open app (should be clash of clan)
 				
 				//match on search button
-				s = new struct("bluestack",54,139, 87, 87, ruleFolder+"\\bluestack.jpg",pos);
+				//s = new struct("bluestack",54,139, 87, 87, ruleFolder+"\\bluestack.jpg",pos);
+				s = new struct("bluestack",37,126, 74, 79, ruleFolder+"\\bluestack.jpg",pos);
 			}
 			if(name.equals("loadVillage"))
 			{
-				pos.add(new xy(611,533)); // click cancel
-				s = new struct("swap",580,269,284,55, ruleFolder+"\\swap.jpg",pos); //load Image
+				pos.add(new xy(538,492)); // click cancel
+				//s = new struct("swap",580,269,284,55, ruleFolder+"\\swap.jpg",pos); //load Image				
+				s = new struct("swap",539,328,170,36, ruleFolder+"\\swap.jpg",pos); //load Image
 			}
 			if(name.equals("confirm"))
 			{
-				pos.add(new xy(942,41)); // click cancel
-				s = new struct("swap",423,378,575,73, ruleFolder+"\\confirm.jpg",pos); //load Image
+				pos.add(new xy(782,102)); // click cancel
+				s = new struct("confirm",537,82,163,28, ruleFolder+"\\confirm.jpg",pos); //matchon Are you sure?
 			}
 		}
 
@@ -811,12 +862,24 @@ public class config
 	}
 	public int getX()
 	{
-		return s.x;
+		// I have to subtract rule by default is 140, 27
+		return s.x + this.offsetX - 142;
 	}
 	public int getY()
 	{
-		return s.y;
+		return s.y + this.offsetY - 27;
 	}
+	
+	public int getXNOTOFF()
+	{
+		
+		return s.x;
+	}
+	public int getYNOTOFF()
+	{
+		return s.y ;
+	}
+	
 	public int getW()
 	{
 		return s.w;
@@ -840,6 +903,27 @@ public class config
 	public void setAutoSwap(boolean autoSwap) {
 		this.autoSwap = autoSwap;
 	}
+	
+	 public interface User32 extends StdCallLibrary {
+	      User32 INSTANCE = (User32) Native.loadLibrary("user32", User32.class,
+	               W32APIOptions.DEFAULT_OPTIONS);
+
+	      HWND FindWindow(String lpClassName, String lpWindowName);
+
+	      int GetWindowRect(HWND handle, int[] rect);
+	   }
+
+ public void setScreenOffset()  {
+	HWND hwnd = User32.INSTANCE.FindWindow(null, "Bluestacks App Player");
+			
+	int[] rect = {0, 0, 0, 0};
+	int result = User32.INSTANCE.GetWindowRect(hwnd, rect);
+	
+	offsetX = rect[0];
+	offsetY = rect[1];
+	}
+ 
+ 
 	
 	
 	/*
@@ -884,11 +968,11 @@ public class config
 		
 		public int getX()
 		{
-			return x;
+			return x + offsetX - 142; 
 		}
 		public int getY()
 		{
-			return y;
+			return y  + offsetY - 27;
 		}
 	}
 
