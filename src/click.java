@@ -2852,7 +2852,7 @@ public void setUpAutoLootSwapList(Document doc)
 		boolean temp ;
 		
 		//String [] array = {"bluestack", "try", "search", "loadVillage", "confirm"};
-		String [] array = {"search", "loadVillage", "confirm"};
+		String [] array = {"try", "search", "loadVillage", "confirm"};
 		
 		for(int i = 0 ; i< array.length; i++)
 		{
