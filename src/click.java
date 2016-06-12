@@ -193,8 +193,8 @@ public class click
 					updateSwapDate(con.getEmail(), true, false, false, false, 0,0); //update last time this email was active
 					
 					AutoUpgrade2(); // check for swap NOW, Static
-					AutoUpgradeBuilder(); // check if free builder, if so then build					
-					AutoSwapFullLoot2(); // check if loot is full, if so then swap										
+					//AutoUpgradeBuilder(); // check if free builder, if so then build FH LOCAL					
+					//AutoSwapFullLoot2(); // check if loot is full, if so then swap FH LOCAL										
 					sendPictureText(); //if email has status, will click to attack log and send pic back
 					setUpScreen();			
 					

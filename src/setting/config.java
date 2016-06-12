@@ -46,7 +46,7 @@ import email.email;
 
 public class config
 {
-	public static boolean test = true; 
+	public static boolean test = false; 
 	
 	
 	ArrayList<struct> data ;
@@ -794,10 +794,10 @@ public class config
 			}
 			if(name.equals("try"))
 			{				
-				pos.add(new xy(728,442)); // Try these apps button
+				pos.add(new xy(829,569)); // Try these apps button
 				
 				//match on bluestack icon middle top
-				s = new struct("try",454,66, 99, 77, ruleFolder+"\\try.jpg",pos);
+				s = new struct("try",564,90, 122, 101, ruleFolder+"\\try.jpg",pos);
 			}
 			if(name.equals("search"))
 			{				
